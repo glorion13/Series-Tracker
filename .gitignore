@@ -1,0 +1,5 @@
+
+*.user
+*.suo
+/wp7/SeriesTracker/Bin
+/wp7/SeriesTracker/obj
