@@ -9,7 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ReactiveUI;
-using SeriesTracker.Api;
+using SeriesTracker;
 
 namespace SeriesTracker
 {
@@ -31,6 +31,7 @@ namespace SeriesTracker
             series = new ReactiveCollection<Series>();
             tvdb = new TvDb();
         }
+
        
     }
 }
