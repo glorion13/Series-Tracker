@@ -11,6 +11,7 @@ using System.Windows.Shapes;
 using ReactiveUI;
 using SeriesTracker;
 using System.Reactive.Linq;
+using System.Reactive.Concurrency;
 
 namespace SeriesTracker
 {
@@ -31,7 +32,26 @@ namespace SeriesTracker
         {
             series = new ReactiveCollection<Series>();
             tvdb = new TvDb();
-            tvdb.FindSeries("game").ObserveOnDispatcher().Subscribe(s => series.Add(new Series(s)));
+            
+            this.ObservableForProperty(m => m.Search).Throttle(TimeSpan.FromMilliseconds(250), Scheduler.CurrentThread).Subscribe(change =>
+            {
+                series.Clear();
+                tvdb.FindSeries(change.Value).ObserveOnDispatcher().Subscribe(s => series.Add(new Series(s)));
+            });
+        }
+
+        private string search;
+        public string Search
+        {
+            get
+            {
+                return search;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(s => s.Search, ref search, value);
+            }
         }
     }
 }

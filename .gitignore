@@ -1,5 +1,5 @@
 
 *.user
 *.suo
-/wp7/SeriesTracker/Bin
-/wp7/SeriesTracker/obj
+/wp7/*/Bin
+/wp7/*/obj
