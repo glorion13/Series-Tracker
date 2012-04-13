@@ -10,6 +10,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ReactiveUI;
 using SeriesTracker;
+using System.Reactive.Linq;
 
 namespace SeriesTracker
 {
@@ -30,8 +31,7 @@ namespace SeriesTracker
         {
             series = new ReactiveCollection<Series>();
             tvdb = new TvDb();
+            tvdb.FindSeries("game").ObserveOnDispatcher().Subscribe(s => series.Add(new Series(s)));
         }
-
-       
     }
 }

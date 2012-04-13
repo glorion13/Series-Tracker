@@ -8,6 +8,16 @@ namespace SeriesTracker
 {
     public class Series : ReactiveObject
     {
+        private TvDbSeries series;
+
+        public Series(TvDbSeries series)
+        {
+            this.series = series;
+
+            Title = series.Title;
+            Image = series.ImageUrl;
+        }
+
         private string title;
         public string Title
         {

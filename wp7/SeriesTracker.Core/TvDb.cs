@@ -16,7 +16,7 @@ namespace SeriesTracker
 
         public TvDb()
         {
-            new Thread(new ThreadStart(Initialize)).Start();
+            Scheduler.NewThread.Schedule(() => Initialize());
         }
 
         private readonly object key = new object();
@@ -31,6 +31,13 @@ namespace SeriesTracker
                     initializing = true;
                     DoInitialize();
                 }
+            }
+        }
+
+        private void EnsureInitialized() {
+            while (!initialized || initializing)
+            {
+                Thread.Sleep(100);
             }
         }
 
@@ -58,16 +65,16 @@ namespace SeriesTracker
             var subject = new Subject<TvDbSeries>();
 
             Scheduler.NewThread.Schedule(() => {
-                Initialize();
+                EnsureInitialized();
                 WebClient client = new WebClient();
                 var download = Observable.FromEvent<DownloadStringCompletedEventHandler, DownloadStringCompletedEventArgs>(
                     ev => new DownloadStringCompletedEventHandler((s, e) => ev(e)),
                     ev => client.DownloadStringCompleted += ev,
                     ev => client.DownloadStringCompleted -= ev)
                     .Subscribe(o => {
-                        var list = from series in XDocument.Parse(o.Result).Descendants("Item")
+                        var list = from series in XDocument.Parse(o.Result).Descendants("Series")
                                    where string.Equals(series.Descendants("language").First().Value, "en")
-                                   select new TvDbSeries() { Title = series.Descendants("translation").First().Value };
+                                   select new TvDbSeries() { Title = series.Descendants("SeriesName").First().Value };
                         foreach (var s in list)
                         {
                             subject.OnNext(s);
