@@ -60,9 +60,9 @@ namespace SeriesTracker
             initializing = false;
         }
 
-        public IObservable<TvDbSeries> FindSeries(string name)
+        public IObservable<TvDbSeriesBase> FindSeries(string name)
         {
-            var subject = new Subject<TvDbSeries>();
+            var subject = new Subject<TvDbSeriesBase>();
 
             Scheduler.NewThread.Schedule(() => {
                 EnsureInitialized();
@@ -74,16 +74,56 @@ namespace SeriesTracker
                     .Subscribe(o => {
                         var list = from series in XDocument.Parse(o.Result).Descendants("Series")
                                    where string.Equals(series.Descendants("language").First().Value, "en")
-                                   select new TvDbSeries() { Title = series.Descendants("SeriesName").First().Value };
+                                   select new TvDbSeries() { 
+                                       Title = series.Descendants("SeriesName").First().Value,
+                                       Id = series.Descendants("seriesid").First().Value
+                                   };
                         foreach (var s in list)
                         {
-                            subject.OnNext(s);
+                            subject.OnNext(s);              
                         }
+                        subject.OnCompleted();
                     });
                 client.DownloadStringAsync(new Uri(mirror + "/api/GetSeries.php?seriesname="+name+"&language=en"));
             });
 
             return subject;
+        }
+
+        public IObservable<TvDbSeries> UpdateData(TvDbSeriesBase baseRecord)
+        {
+            WebClient client = new WebClient();
+            var download = Observable.FromEvent<DownloadStringCompletedEventHandler, DownloadStringCompletedEventArgs>(
+                ev => new DownloadStringCompletedEventHandler((s, e) => ev(e)),
+                ev => client.DownloadStringCompleted += ev,
+                ev => client.DownloadStringCompleted -= ev)
+            .Select(r =>
+            {
+                var series = new TvDbSeries(baseRecord);
+                
+                var doc = XDocument.Parse(r.Result);
+                var poster = doc.Descendants("poster").FirstOrDefault();
+                if (poster != null ) {
+                    if (!string.IsNullOrEmpty(poster.Value))
+                    {
+                        var originalUrl = mirror + "/banners/" + poster.Value;
+                        series.Image = "http://quickthumbnail.com/rspic.php?wm=&wm_size=16&wm_color=1filter=none&filename=" + originalUrl + "&width=147";
+                    }
+                }
+
+                var rating = doc.Descendants("Rating").FirstOrDefault();
+                if (rating != null)
+                {
+                    if (!string.IsNullOrEmpty(rating.Value))
+                    {
+                        series.Rating = float.Parse(rating.Value);
+                    }
+                }
+                return series;
+            });              
+ 
+            client.DownloadStringAsync(new Uri(mirror + "/api/" + ApiKey + "/series/" + baseRecord.Id + "/all/en.xml"));
+            return download;
         }
     }
 }

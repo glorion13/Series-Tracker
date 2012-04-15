@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,13 +13,17 @@ using ReactiveUI;
 using SeriesTracker;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
+using GalaSoft.MvvmLight;
+using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace SeriesTracker
 {
-    public class Main : ReactiveObject
+    public class Main : ViewModelBase
     {
-        ReactiveCollection<Series> series;
-        public ReactiveCollection<Series> Series
+        ObservableCollection<SeriesRecord> series;
+        public ObservableCollection<SeriesRecord> Series
         {
             get
             {
@@ -30,14 +35,52 @@ namespace SeriesTracker
 
         public Main()
         {
-            series = new ReactiveCollection<Series>();
-            tvdb = new TvDb();
+            series = new ObservableCollection<SeriesRecord>();
             
-            this.ObservableForProperty(m => m.Search).Throttle(TimeSpan.FromMilliseconds(250), Scheduler.CurrentThread).Subscribe(change =>
+            if (!IsInDesignMode)
             {
-                series.Clear();
-                tvdb.FindSeries(change.Value).ObserveOnDispatcher().Subscribe(s => series.Add(new Series(s)));
-            });
+                tvdb = new TvDb();
+
+                this.ObservableForProperty(m => m.Search).ObserveOnDispatcher().Subscribe(change =>
+                {
+                    series.Clear();
+                    var list = new List<SeriesRecord>();
+
+                    tvdb.FindSeries(change.Value).Select(seriesBase => tvdb.UpdateData(seriesBase).First()).ObserveOnDispatcher().Subscribe(s =>
+                    {
+                        list.Add(new SeriesRecord(s));
+                    }, () =>
+                    {
+                        series = new ObservableCollection<SeriesRecord>(list.OrderByDescending(s => s.Series.Rating).ToList());
+                        RaisePropertyChanged(() => Series);
+                    });
+                    /*
+                    tvdb.FindSeries(change.Value).Subscribe(seriesBase =>
+                    {
+                        tvdb.UpdateData(seriesBase).Subscribe((s) => list.Add(new SeriesRecord(s)));
+                    }, () =>
+                    {
+                        series = new ObservableCollection<SeriesRecord>(list.OrderByDescending(s => s.Series.Rating));
+                        RaisePropertyChanged(() => Series);
+                    });*/
+                });
+            } else if (IsInDesignMode)
+            {
+                Search = "Simpsons";
+                series.Add(new SeriesRecord(new TvDbSeries()
+                {
+                    Title = "Futurama",
+                    Image = "http://thetvdb.com/banners/posters/73871-2.jpg",
+                    Rating = 5
+                }));
+
+                series.Add(new SeriesRecord(new TvDbSeries()
+                {
+                    Title = "Simpsons",
+                    Image = "http://thetvdb.com/banners/posters/71663-10.jpg",
+                    Rating = 10
+                }));
+            }
         }
 
         private string search;
@@ -50,7 +93,7 @@ namespace SeriesTracker
 
             set
             {
-                this.RaiseAndSetIfChanged(s => s.Search, ref search, value);
+                Set(() => Search, ref search, value);
             }
         }
     }

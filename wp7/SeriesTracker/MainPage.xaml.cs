@@ -20,8 +20,6 @@ namespace SeriesTracker
         {
             InitializeComponent();
 
-            // Set the data context of the listbox control to the sample data
-            DataContext = App.ViewModel;
             this.Loaded += new RoutedEventHandler(MainPage_Loaded);
         }
 

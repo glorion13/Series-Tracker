@@ -7,19 +7,36 @@
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:scm="clr-namespace:System.ComponentModel;assembly=System.Windows"
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800" 
-    d:DataContext="{d:DesignData SampleData/MainViewModelSampleData.xaml}"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
-    shell:SystemTray.IsVisible="False">
+    shell:SystemTray.IsVisible="False"
+    DataContext="{Binding MainViewModel, Mode=OneWay, Source={StaticResource Locator}}">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="#FFF3F3F3">
+    	<Grid.Resources>			
+			<DataTemplate x:Key="SeriesTemplate">
+        		<StackPanel Orientation="Horizontal" Margin="0,0,0,17">
+                	<Image Height="100" Width="100" Margin="12,0,9,0" Source="{Binding Series.Image}" Stretch="UniformToFill" />
+            		<StackPanel Width="311">
+                    	<TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" TextWrapping="Wrap" Style="{StaticResource ItemTitle}" Margin="12,-10,12,0"/>
+                        <TextBlock Text="{Binding Series.Rating}" TextWrapping="Wrap"  Style="{StaticResource ItemDescription}" />
+            		</StackPanel>
+            	</StackPanel>
+    		</DataTemplate>    		
+    	</Grid.Resources>
  
         <!--Panorama control-->
-        <controls:Panorama Title="Series Tracker" Foreground="Black">
+        <controls:Panorama Foreground="Black">
+        	<controls:Panorama.Title>
+        		
+        		<TextBlock FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Andy" Margin="0,44,0,-57">Series Tracker</TextBlock>     	
+			</controls:Panorama.Title>
+			
             <controls:Panorama.Background>
                 <ImageBrush ImageSource="PanoramaBackground.png"/>
             </controls:Panorama.Background>
@@ -27,16 +44,7 @@
             <!--Panorama item one-->
             <controls:PanoramaItem Header="followed">
                 <!--Double line list with text wrapping-->
-                <ListBox Margin="0,0,-12,0" ItemsSource="{Binding Series}" Foreground="Black">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Margin="0,0,0,17" Width="432" Height="78">
-                                <TextBlock Text="{Binding Title}" TextWrapping="Wrap" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
-                                <TextBlock Text="{Binding Image}" TextWrapping="Wrap" Margin="12,-6,12,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <ListBox Margin="0,0,-12,0" ItemsSource="{Binding Series}" Foreground="Black" ItemTemplate="{StaticResource SeriesTemplate}" />
             </controls:PanoramaItem>
  
             <!--Panorama item two-->
@@ -47,20 +55,7 @@
             		<!--Double line list with image placeholder and text wrapping-->
             		<TextBox TextWrapping="Wrap" Text="{Binding Search, Mode=TwoWay}"/>
             	<!--Double line list with image placeholder and text wrapping-->
-            		<ListBox ItemsSource="{Binding Series}" Height="498" Foreground="Black">
-            			<ListBox.ItemTemplate>
-            				<DataTemplate>
-            					<StackPanel Orientation="Horizontal" Margin="0,0,0,17">
-            						<!--Replace rectangle with image-->
-            						<Rectangle Height="100" Width="100" Fill="#FFE5001b" Margin="12,0,9,0"/>
-            						<StackPanel Width="311">
-                                        <TextBlock Text="{Binding Title}" TextWrapping="Wrap" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
-                                        <TextBlock Text="{Binding Image}" TextWrapping="Wrap" Margin="12,-6,12,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
-            						</StackPanel>
-            					</StackPanel>
-            				</DataTemplate>
-            			</ListBox.ItemTemplate>
-            		</ListBox>
+                    <ListBox ItemsSource="{Binding Series}" Height="498" Foreground="Black" ItemTemplate="{StaticResource SeriesTemplate}" />
             	</StackPanel>
             </controls:PanoramaItem>
         </controls:Panorama>

@@ -25,6 +25,8 @@
     <SilverlightAppEntry>SeriesTracker.App</SilverlightAppEntry>
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <Utf8Output>true</Utf8Output>
+    <ExpressionBlendVersion>4.0.30816.0</ExpressionBlendVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -48,17 +50,25 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GalaSoft.MvvmLight.Extras.WP71, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MvvmLightPreview.4.1.0\lib\sl4-windowsphone71\GalaSoft.MvvmLight.Extras.WP71.dll</HintPath>
+    </Reference>
+    <Reference Include="GalaSoft.MvvmLight.WP71, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MvvmLightPreview.4.1.0\lib\sl4-windowsphone71\GalaSoft.MvvmLight.WP71.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Phone.Controls" />
     <Reference Include="Microsoft.Phone.Interop" />
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\packages\MvvmLightPreview.4.1.0\lib\sl4-windowsphone71\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Reactive.Testing">
       <HintPath>packages\Rx_Experimental-Testing.1.1.11111\lib\SL3-WP\Microsoft.Reactive.Testing.dll</HintPath>
     </Reference>
     <Reference Include="ReactiveUI.Blend_WP7">
       <HintPath>packages\reactiveui-xaml.2.5.2.0\lib\SL3-WP\ReactiveUI.Blend_WP7.dll</HintPath>
-    </Reference>
-    <Reference Include="ReactiveUI.Testing_WP7">
-      <HintPath>packages\reactiveui-testing.2.5.2.0\lib\SL3-WP\ReactiveUI.Testing_WP7.dll</HintPath>
     </Reference>
     <Reference Include="ReactiveUI.Xaml_WP7">
       <HintPath>packages\reactiveui-xaml.2.5.2.0\lib\SL3-WP\ReactiveUI.Xaml_WP7.dll</HintPath>
@@ -77,6 +87,9 @@
     <Reference Include="system" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Interactivity, Version=3.8.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightPreview.4.1.0\lib\sl4-windowsphone71\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="mscorlib.extensions" />
     <Reference Include="System.Xml.Linq" />
@@ -85,12 +98,14 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\UppercaseConverter.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModels\Main.cs" />
-    <Compile Include="ViewModels\Series.cs" />
+    <Compile Include="ViewModels\SeriesRecord.cs" />
+    <Compile Include="ViewModels\ViewModelLocator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -101,12 +116,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <DesignData Include="SampleData\MainViewModelSampleData.xaml">
+    <Page Include="Styles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </DesignData>
+    </Page>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\AppManifest.xml" />
     <None Include="Properties\WMAppManifest.xml" />
@@ -118,6 +134,11 @@
     <Content Include="Background.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <BlendEmbeddedFont Include="Fonts\andyb.ttf">
+      <IsSystemFont>True</IsSystemFont>
+      <All>True</All>
+      <AutoFill>True</AutoFill>
+    </BlendEmbeddedFont>
     <Resource Include="PanoramaBackground.png" />
     <Content Include="SplashScreenImage.jpg" />
   </ItemGroup>
@@ -126,6 +147,9 @@
       <Project>{34D61BBF-D269-4543-BA61-D537642E54DF}</Project>
       <Name>SeriesTracker.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SampleData\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
@@ -137,4 +161,5 @@
   </Target>
   -->
   <ProjectExtensions />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Expression\Blend\WindowsPhone\v7.1\Microsoft.Expression.Blend.WindowsPhone.targets" />
 </Project>

@@ -17,24 +17,6 @@ namespace SeriesTracker
 {
     public partial class App : Application
     {
-        private static Main viewModel = null;
-
-        /// <summary>
-        /// A static ViewModel used by the views to bind against.
-        /// </summary>
-        /// <returns>The MainViewModel object.</returns>
-        public static Main ViewModel
-        {
-            get
-            {
-                // Delay creation of the view model until necessary
-                if (viewModel == null)
-                    viewModel = new Main();
-
-                return viewModel;
-            }
-        }
-
         /// <summary>
         /// Provides easy access to the root frame of the Phone Application.
         /// </summary>
