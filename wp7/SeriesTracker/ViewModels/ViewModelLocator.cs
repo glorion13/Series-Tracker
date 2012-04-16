@@ -13,6 +13,7 @@
 */
 
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Threading;
 
 namespace SeriesTracker
 {
@@ -26,6 +27,7 @@ namespace SeriesTracker
 
         public ViewModelLocator()
         {
+            DispatcherHelper.Initialize();
             main = new Main();
         }
 

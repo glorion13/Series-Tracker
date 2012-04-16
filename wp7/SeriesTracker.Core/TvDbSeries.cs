@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using ReactiveUI;
 using GalaSoft.MvvmLight;
+using System.Xml.Serialization;
 
 namespace SeriesTracker
 {
     public class TvDbSeries : ViewModelBase
     {
+        [XmlElement]
         private string id;
         public string Id
         {
@@ -23,6 +25,7 @@ namespace SeriesTracker
             }
         }
 
+        [XmlElement]
         private string title;
         public string Title
         {
@@ -37,6 +40,7 @@ namespace SeriesTracker
             }
         }
 
+        [XmlElement]
         private string image;
         public string Image
         {
@@ -51,6 +55,7 @@ namespace SeriesTracker
             }
         }
 
+        [XmlElement]
         private float rating;
         public float Rating
         {
@@ -62,6 +67,21 @@ namespace SeriesTracker
             set
             {
                 Set(() => Rating, ref rating, value);
+            }
+        }
+
+        [XmlElement]
+        private bool isSubscribed;
+        public bool IsSubscribed
+        {
+            get
+            {
+                return isSubscribed;
+            }
+
+            set
+            {
+                Set(() => IsSubscribed, ref isSubscribed, value);
             }
         }
     }

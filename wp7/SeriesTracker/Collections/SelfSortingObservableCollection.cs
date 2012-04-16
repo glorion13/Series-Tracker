@@ -21,6 +21,8 @@ using System.Reactive;
 
 namespace SeriesTracker
 {
+    public enum SortOrder { Asc, Desc }
+
     public class SelfSortingObservableCollection<T, Tv> : ObservableCollection<T>
         where T : class, INotifyPropertyChanged
     {
@@ -30,13 +32,18 @@ namespace SeriesTracker
 
         private Dictionary<T, IDisposable> subscriptions;
 
-        public SelfSortingObservableCollection(Expression<Func<T, Tv>> sortingProperty, IComparer<Tv> comparer = null)
+        private int sortModifier = 1;
+
+        public SelfSortingObservableCollection(Expression<Func<T, Tv>> sortingProperty, IComparer<Tv> comparer = null, SortOrder order = SortOrder.Asc)
         {
             this.sortingProperty = sortingProperty;
             accessor = sortingProperty.Compile();
             this.comparer = comparer ?? Comparer<Tv>.Default;
 
             subscriptions = new Dictionary<T, IDisposable>();
+
+            if (order == SortOrder.Desc)
+                sortModifier = -1;
         }
 
         private object gate = new object();
@@ -54,13 +61,11 @@ namespace SeriesTracker
             for (; i < Count; i++)
             {
                 var currentValue = accessor(this[i]);
-                if (comparer.Compare(newValue, currentValue) > 0)
+                if (comparer.Compare(newValue, currentValue) * sortModifier < 0)
                     break;
             }
             return i;
         }
-
-        private Subject<Unit> changes;
 
         private T beingReordered;
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)

@@ -18,13 +18,18 @@ using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Threading;
+using GalaSoft.MvvmLight.Command;
+using System.Reactive;
+using GalaSoft.MvvmLight.Threading;
 
 namespace SeriesTracker
 {
     public class Main : ViewModelBase
     {
-        SelfSortingObservableCollection<SeriesRecord, float> series;
-        public SelfSortingObservableCollection<SeriesRecord, float> Series
+        private SubscriptionManager subscriptionManager;
+
+        SelfSortingObservableCollection<SeriesRecord, string> series;
+        public SelfSortingObservableCollection<SeriesRecord, string> Series
         {
             get
             {
@@ -32,33 +37,30 @@ namespace SeriesTracker
             }
         }
 
+        SelfSortingObservableCollection<SeriesRecord, float> searchResults;
+        public SelfSortingObservableCollection<SeriesRecord, float> SearchResults
+        {
+            get
+            {
+                return searchResults;
+            }
+        }
+
         private TvDb tvdb;
 
         public Main()
         {
-            series = new SelfSortingObservableCollection<SeriesRecord, float>(s => s.Series.Rating);
+            subscriptionManager = new SubscriptionManager();
+
+            searchResults = new SelfSortingObservableCollection<SeriesRecord, float>(s => s.Series.Rating, order:SortOrder.Desc);
+            series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
             
+
             if (!IsInDesignMode)
             {
-                tvdb = new TvDb();
+                LoadSubscriptions();
+                SetupSearch();
 
-                this.ObservableForProperty(m => m.Search).ObserveOnDispatcher().Subscribe(change =>
-                {
-                    series.Clear();
-                    IsSearching = true;
-                    var list = new List<SeriesRecord>();
-
-                    tvdb.FindSeries(change.Value).ObserveOnDispatcher().Do(s =>
-                    {
-                        series.Add(new SeriesRecord(s));
-                    })
-                    .ObserveOn(Scheduler.ThreadPool).Select(seriesBase => tvdb.UpdateData(seriesBase).First())
-                    .ObserveOnDispatcher().Finally(() =>
-                    {
-                        IsSearching = false;
-                        RaisePropertyChanged(() => Series);
-                    }).Subscribe();
-                });
             } else if (IsInDesignMode)
             {
                 Search = "Simpsons";
@@ -78,6 +80,42 @@ namespace SeriesTracker
             }
         }
 
+        private void SetupSearch()
+        {
+            tvdb = new TvDb();
+
+            this.ObservableForProperty(m => m.Search).ObserveOnDispatcher().Subscribe(change =>
+            {
+                searchResults.Clear();
+                IsSearching = true;
+                var list = new List<SeriesRecord>();
+
+                tvdb.FindSeries(change.Value).ObserveOnDispatcher().Do(s =>
+                {
+                    searchResults.Add(new SeriesRecord(s));
+                })
+                .ObserveOn(Scheduler.ThreadPool).Select(seriesBase => tvdb.UpdateData(seriesBase).First())
+                .ObserveOnDispatcher().Finally(() =>
+                {
+                    IsSearching = false;
+                    RaisePropertyChanged(() => Series);
+                }).Subscribe();
+            });
+        }
+
+        private void LoadSubscriptions()
+        {
+            IsLoadingSubscriptions = true;
+            Scheduler.NewThread.Schedule(() =>
+            {
+                foreach (var s in subscriptionManager.Subscriptions)
+                {
+                    DispatcherHelper.CheckBeginInvokeOnUI(() => series.Add(new SeriesRecord(s)));
+                }
+                DispatcherHelper.CheckBeginInvokeOnUI(() => IsLoadingSubscriptions = false);
+            });
+        }
+
         private string search;
         public string Search
         {
@@ -92,6 +130,19 @@ namespace SeriesTracker
             }
         }
 
+        private bool isLoadingSubscriptions;
+        public bool IsLoadingSubscriptions
+        {
+            get
+            {
+                return isLoadingSubscriptions;
+            }
+            set
+            {
+                Set(() => IsLoadingSubscriptions, ref isLoadingSubscriptions, value);
+            }
+        }
+
         private bool isSearching;
         public bool IsSearching
         {
@@ -102,6 +153,17 @@ namespace SeriesTracker
             set
             {
                 Set(() => IsSearching, ref isSearching, value);
+            }
+        }
+
+        private RelayCommand<TvDbSeries> subscribe;
+        public RelayCommand<TvDbSeries> Subscribe
+        {
+            get {
+                return subscribe ?? (subscribe = new RelayCommand<TvDbSeries>(s => {
+                    subscriptionManager.Subscribe(s);
+                    series.Add(new SeriesRecord(s));
+                }));
             }
         }
     }
