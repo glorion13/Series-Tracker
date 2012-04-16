@@ -20,36 +20,11 @@
     shell:SystemTray.IsVisible="False"
     DataContext="{Binding MainViewModel, Mode=OneWay, Source={StaticResource Locator}}">
 
-	<i:Interaction.Behaviors>
-        <ec:DataStateBehavior Binding="{Binding IsSearching}" TrueState="Searching" FalseState="NotSearching" Value="True"/>
-        <ec:DataStateBehavior Binding="{Binding IsLoadingSubscriptions}" TrueState="Loading" FalseState="NotLoading" Value="True"/>
-    </i:Interaction.Behaviors>
 	<Grid x:Name="LayoutRoot" Background="#FFF3F3F3">
-		<Grid.Resources>			
-			<DataTemplate x:Key="SeriesTemplate">
-				<StackPanel Orientation="Horizontal" Margin="0,0,0,17">
-					<Image Height="100" Width="100" Margin="12,0,9,0" Source="{Binding Series.Image}" Stretch="UniformToFill" />
-					<StackPanel Width="311">
-						<TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" TextWrapping="Wrap" Style="{StaticResource ItemTitle}" Margin="12,-10,12,0"/>
-						<TextBlock Text="{Binding Series.Rating}" TextWrapping="Wrap"  Style="{StaticResource ItemDescription}" />
-					</StackPanel>
-				</StackPanel>
-			</DataTemplate>    				
-			<DataTemplate x:Key="SearchResultTemplate">
-				<StackPanel Orientation="Horizontal" Margin="0,0,0,17" Background="#00000000">
-					<i:Interaction.Triggers>
-						<i:EventTrigger EventName="Tap">
-							<GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding Series, Mode=OneWay}" Command="{Binding MainViewModel.Subscribe, Mode=OneWay, Source={StaticResource Locator}}"/>
-						</i:EventTrigger>
-					</i:Interaction.Triggers>
-					<Image Height="100" Width="100" Margin="12,0,9,0" Source="{Binding Series.Image}" Stretch="UniformToFill" />
-					<StackPanel Width="311">
-						<TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" TextWrapping="Wrap" Style="{StaticResource ItemTitle}" Margin="12,-10,12,0"/>
-						<TextBlock Text="{Binding Series.Rating}" TextWrapping="Wrap"  Style="{StaticResource ItemDescription}" />
-					</StackPanel>
-				</StackPanel>
-			</DataTemplate>    		
-		</Grid.Resources>
+		<i:Interaction.Behaviors>
+	        <ec:DataStateBehavior Binding="{Binding IsSearching}" TrueState="Searching" FalseState="NotSearching" Value="True"/>
+	        <ec:DataStateBehavior Binding="{Binding IsLoadingSubscriptions}" TrueState="Loading" FalseState="NotLoading" Value="True"/>
+	    </i:Interaction.Behaviors>	
 		<VisualStateManager.VisualStateGroups>
 			<VisualStateGroup x:Name="Search">
 				<VisualState x:Name="Searching">
@@ -80,10 +55,61 @@
 				<VisualState x:Name="NotLoading"/>
 			</VisualStateGroup>
 		</VisualStateManager.VisualStateGroups>
- 
+	 
 		<VisualStateManager.CustomVisualStateManager>
 			<ec:ExtendedVisualStateManager/>
 		</VisualStateManager.CustomVisualStateManager>
+		
+		
+		
+		<Grid.Resources>			
+			<DataTemplate x:Key="SeriesTemplate">
+				<StackPanel Orientation="Horizontal" Margin="0,0,0,17">
+					<Image Height="100" Width="100" Margin="12,0,9,0" Source="{Binding Series.Image}" Stretch="UniformToFill" />
+					<StackPanel Width="311">
+						<TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" TextWrapping="Wrap" Style="{StaticResource ItemTitle}" Margin="12,-10,12,0"/>
+						<TextBlock Text="{Binding Series.Rating}" TextWrapping="Wrap"  Style="{StaticResource ItemDescription}" />
+					</StackPanel>
+				</StackPanel>
+			</DataTemplate>    				
+			<DataTemplate x:Key="SearchResultTemplate">
+				<StackPanel x:Name="stackPanel" Orientation="Horizontal" Margin="0,0,0,17" Background="#00000000">
+					<i:Interaction.Behaviors>
+						<ec:DataStateBehavior Binding="{Binding Series.IsSubscribed}" Value="True" TrueState="Subscribed" FalseState="NotSubscribed"/>
+					</i:Interaction.Behaviors>
+					<VisualStateManager.VisualStateGroups>
+						<VisualStateGroup x:Name="IsSubscribed" ec:ExtendedVisualStateManager.UseFluidLayout="True">
+							<VisualStateGroup.Transitions>
+								<VisualTransition GeneratedDuration="0:0:0.5"/>
+							</VisualStateGroup.Transitions>
+							<VisualState x:Name="Subscribed">
+								<Storyboard>
+									<DoubleAnimation Duration="0" To="0.18" Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="image" d:IsOptimized="True"/>
+									<DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="tick" d:IsOptimized="True"/>
+								</Storyboard>
+							</VisualState>
+							<VisualState x:Name="NotSubscribed"/>
+						</VisualStateGroup>
+					</VisualStateManager.VisualStateGroups>
+					<VisualStateManager.CustomVisualStateManager>
+						<ec:ExtendedVisualStateManager/>
+					</VisualStateManager.CustomVisualStateManager>
+					<i:Interaction.Triggers>
+						<i:EventTrigger EventName="Tap">
+							<GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding Series, Mode=OneWay}" Command="{Binding MainViewModel.ToggleSubscribed, Mode=OneWay, Source={StaticResource Locator}}"/>
+						</i:EventTrigger>
+					</i:Interaction.Triggers>
+					<Canvas Height="100" Width="100" Margin="12,0,9,0">
+						<Image x:Name="image" Height="100" Width="100" Source="{Binding Series.Image}" Stretch="UniformToFill" />
+						<Grid x:Name="tick" Width="100" Height="100" Visibility="Visible" Opacity="0"><Path Data="F1M57.0078,13.3424C54.8815,11.3346,51.5313,11.4283,49.5221,13.5521L23.7877,39.6022 14.0924,31.125C11.8854,29.2084 8.53906,29.4531 6.62231,31.6666 4.71094,33.8776 4.95313,37.224 7.16528,39.1342L19.9426,50.3125C20.1731,50.5131 20.4244,50.6771 20.6809,50.8307 22.8112,52.6484 26.0065,52.5143 27.9479,50.4557L57.2161,20.8295C59.2291,18.7045,59.1354,15.3516,57.0078,13.3424z" Stretch="Uniform" Fill="{StaticResource PhoneAccentBrush}" Width="60" Height="60" Margin="0,0,0,0" /></Grid>
+					</Canvas>
+					<StackPanel Width="311">
+						<TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" TextWrapping="Wrap" Style="{StaticResource ItemTitle}" Margin="12,-10,12,0"/>
+						<TextBlock Text="{Binding Series.Rating}" TextWrapping="Wrap"  Style="{StaticResource ItemDescription}" />
+					</StackPanel>
+				</StackPanel>
+			</DataTemplate>    		
+		</Grid.Resources>
  
 		<!--Panorama control-->
 		<controls:Panorama Foreground="Black" toolkit:TiltEffect.IsTiltEnabled="True">

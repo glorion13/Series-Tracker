@@ -28,8 +28,8 @@ namespace SeriesTracker
     {
         private SubscriptionManager subscriptionManager;
 
-        SelfSortingObservableCollection<SeriesRecord, string> series;
-        public SelfSortingObservableCollection<SeriesRecord, string> Series
+        ObservableCollection<SeriesRecord> series;
+        public ObservableCollection<SeriesRecord> Series
         {
             get
             {
@@ -37,8 +37,8 @@ namespace SeriesTracker
             }
         }
 
-        SelfSortingObservableCollection<SeriesRecord, float> searchResults;
-        public SelfSortingObservableCollection<SeriesRecord, float> SearchResults
+        ObservableCollection<SeriesRecord> searchResults;
+        public ObservableCollection<SeriesRecord> SearchResults
         {
             get
             {
@@ -52,17 +52,19 @@ namespace SeriesTracker
         {
             subscriptionManager = new SubscriptionManager();
 
-            searchResults = new SelfSortingObservableCollection<SeriesRecord, float>(s => s.Series.Rating, order:SortOrder.Desc);
-            series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
-            
-
             if (!IsInDesignMode)
             {
+                searchResults = new SelfSortingObservableCollection<SeriesRecord, float>(s => s.Series.Rating, order: SortOrder.Desc);
+                series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
+
                 LoadSubscriptions();
                 SetupSearch();
 
-            } else if (IsInDesignMode)
+            } 
+            else if (IsInDesignMode)
             {
+                searchResults = series = new ObservableCollection<SeriesRecord>();
+
                 Search = "Simpsons";
                 series.Add(new SeriesRecord(new TvDbSeries()
                 {
@@ -156,13 +158,22 @@ namespace SeriesTracker
             }
         }
 
-        private RelayCommand<TvDbSeries> subscribe;
-        public RelayCommand<TvDbSeries> Subscribe
+        private RelayCommand<TvDbSeries> toggleSubscribed;
+        public RelayCommand<TvDbSeries> ToggleSubscribed
         {
             get {
-                return subscribe ?? (subscribe = new RelayCommand<TvDbSeries>(s => {
-                    subscriptionManager.Subscribe(s);
-                    series.Add(new SeriesRecord(s));
+                return toggleSubscribed ?? (toggleSubscribed = new RelayCommand<TvDbSeries>(s =>
+                {
+                    if (!s.IsSubscribed)
+                    {
+                        subscriptionManager.Subscribe(s);
+                        series.Add(new SeriesRecord(s));
+                    }
+                    else
+                    {
+                        subscriptionManager.Unsubscribe(s);
+                        series.Remove(series.FirstOrDefault(old => old.Series.Id == s.Id));
+                    }
                 }));
             }
         }

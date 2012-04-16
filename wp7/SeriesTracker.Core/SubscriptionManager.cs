@@ -29,6 +29,13 @@ namespace SeriesTracker
             SaveSubscriptions();
         }
 
+        public void Unsubscribe(TvDbSeries series)
+        {
+            series.IsSubscribed = false;
+            DoGetSubscriptions().Remove(series);
+            SaveSubscriptions();
+        }
+
         private void SaveSubscriptions()
         {
             using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
