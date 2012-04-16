@@ -44,6 +44,7 @@ namespace SeriesTracker
                 this.ObservableForProperty(m => m.Search).ObserveOnDispatcher().Subscribe(change =>
                 {
                     series.Clear();
+                    IsSearching = true;
                     var list = new List<SeriesRecord>();
 
                     tvdb.FindSeries(change.Value).Select(seriesBase => tvdb.UpdateData(seriesBase).First()).ObserveOnDispatcher().Subscribe(s =>
@@ -51,18 +52,10 @@ namespace SeriesTracker
                         list.Add(new SeriesRecord(s));
                     }, () =>
                     {
+                        IsSearching = false;
                         series = new ObservableCollection<SeriesRecord>(list.OrderByDescending(s => s.Series.Rating).ToList());
                         RaisePropertyChanged(() => Series);
                     });
-                    /*
-                    tvdb.FindSeries(change.Value).Subscribe(seriesBase =>
-                    {
-                        tvdb.UpdateData(seriesBase).Subscribe((s) => list.Add(new SeriesRecord(s)));
-                    }, () =>
-                    {
-                        series = new ObservableCollection<SeriesRecord>(list.OrderByDescending(s => s.Series.Rating));
-                        RaisePropertyChanged(() => Series);
-                    });*/
                 });
             } else if (IsInDesignMode)
             {
@@ -94,6 +87,19 @@ namespace SeriesTracker
             set
             {
                 Set(() => Search, ref search, value);
+            }
+        }
+
+        private bool isSearching;
+        public bool IsSearching
+        {
+            get
+            {
+                return isSearching;
+            }
+            set
+            {
+                Set(() => IsSearching, ref isSearching, value);
             }
         }
     }

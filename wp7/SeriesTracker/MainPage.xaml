@@ -1,5 +1,4 @@
-﻿<phone:PhoneApplicationPage 
-    x:Class="SeriesTracker.MainPage"
+﻿<phone:PhoneApplicationPage
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
@@ -8,6 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 	xmlns:scm="clr-namespace:System.ComponentModel;assembly=System.Windows"
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" xmlns:ec="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions" 
+    x:Class="SeriesTracker.MainPage"
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800" 
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -16,25 +17,49 @@
     shell:SystemTray.IsVisible="False"
     DataContext="{Binding MainViewModel, Mode=OneWay, Source={StaticResource Locator}}">
 
-    <!--LayoutRoot is the root grid where all page content is placed-->
+	<i:Interaction.Behaviors>
+		<ec:DataStateBehavior Binding="{Binding IsSearching}" TrueState="Searching" FalseState="NotSearching" Value="True"/>
+	</i:Interaction.Behaviors>
+<!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="#FFF3F3F3">
     	<Grid.Resources>			
-			<DataTemplate x:Key="SeriesTemplate">
-        		<StackPanel Orientation="Horizontal" Margin="0,0,0,17">
-                	<Image Height="100" Width="100" Margin="12,0,9,0" Source="{Binding Series.Image}" Stretch="UniformToFill" />
-            		<StackPanel Width="311">
-                    	<TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" TextWrapping="Wrap" Style="{StaticResource ItemTitle}" Margin="12,-10,12,0"/>
-                        <TextBlock Text="{Binding Series.Rating}" TextWrapping="Wrap"  Style="{StaticResource ItemDescription}" />
-            		</StackPanel>
-            	</StackPanel>
+    		<DataTemplate x:Key="SeriesTemplate">
+    			<StackPanel Orientation="Horizontal" Margin="0,0,0,17">
+    				<Image Height="100" Width="100" Margin="12,0,9,0" Source="{Binding Series.Image}" Stretch="UniformToFill" />
+    				<StackPanel Width="311">
+    					<TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" TextWrapping="Wrap" Style="{StaticResource ItemTitle}" Margin="12,-10,12,0"/>
+    					<TextBlock Text="{Binding Series.Rating}" TextWrapping="Wrap"  Style="{StaticResource ItemDescription}" />
+    				</StackPanel>
+    			</StackPanel>
     		</DataTemplate>    		
     	</Grid.Resources>
+    	<VisualStateManager.VisualStateGroups>
+    		<VisualStateGroup x:Name="Search">
+    			<VisualState x:Name="Searching">
+    				<Storyboard>
+    					<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="progressBar">
+    						<DiscreteObjectKeyFrame KeyTime="0">
+    							<DiscreteObjectKeyFrame.Value>
+    								<Visibility>Visible</Visibility>
+    							</DiscreteObjectKeyFrame.Value>
+    						</DiscreteObjectKeyFrame>
+    					</ObjectAnimationUsingKeyFrames>
+    				</Storyboard>
+    			</VisualState>
+    			<VisualState x:Name="NotSearching"/>
+    		</VisualStateGroup>
+    	</VisualStateManager.VisualStateGroups>
+ 
+    	<VisualStateManager.CustomVisualStateManager>
+    		<ec:ExtendedVisualStateManager/>
+    	</VisualStateManager.CustomVisualStateManager>
  
         <!--Panorama control-->
         <controls:Panorama Foreground="Black">
+        	<!--Panorama item two-->
         	<controls:Panorama.Title>
         		
-        		<TextBlock FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Andy" Margin="0,44,0,-57">Series Tracker</TextBlock>     	
+        		<TextBlock FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Andy" Margin="0,44,0,-57"><Run Text="Series Tracker"/></TextBlock>     	
 			</controls:Panorama.Title>
 			
             <controls:Panorama.Background>
@@ -47,13 +72,13 @@
                 <ListBox Margin="0,0,-12,0" ItemsSource="{Binding Series}" Foreground="Black" ItemTemplate="{StaticResource SeriesTemplate}" />
             </controls:PanoramaItem>
  
-            <!--Panorama item two-->
             <!--Use 'Orientation="Horizontal"' to enable a panel that lays out horizontally-->
             <controls:PanoramaItem Header="search">
                 <!--Double line list with image placeholder and text wrapping-->
                 <StackPanel Margin="0,0,-12,0" Orientation="Vertical" d:LayoutOverrides="Height">
             		<!--Double line list with image placeholder and text wrapping-->
             		<TextBox TextWrapping="Wrap" Text="{Binding Search, Mode=TwoWay}"/>
+                    <ProgressBar x:Name="progressBar" Height="10" Margin="0,-15,0,5" IsIndeterminate="True" Visibility="Collapsed"/>
             	<!--Double line list with image placeholder and text wrapping-->
                     <ListBox ItemsSource="{Binding Series}" Height="498" Foreground="Black" ItemTemplate="{StaticResource SeriesTemplate}" />
             	</StackPanel>
