@@ -17,13 +17,14 @@ using GalaSoft.MvvmLight;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace SeriesTracker
 {
     public class Main : ViewModelBase
     {
-        ObservableCollection<SeriesRecord> series;
-        public ObservableCollection<SeriesRecord> Series
+        SelfSortingObservableCollection<SeriesRecord, float> series;
+        public SelfSortingObservableCollection<SeriesRecord, float> Series
         {
             get
             {
@@ -35,7 +36,7 @@ namespace SeriesTracker
 
         public Main()
         {
-            series = new ObservableCollection<SeriesRecord>();
+            series = new SelfSortingObservableCollection<SeriesRecord, float>(s => s.Series.Rating);
             
             if (!IsInDesignMode)
             {
@@ -47,15 +48,16 @@ namespace SeriesTracker
                     IsSearching = true;
                     var list = new List<SeriesRecord>();
 
-                    tvdb.FindSeries(change.Value).Select(seriesBase => tvdb.UpdateData(seriesBase).First()).ObserveOnDispatcher().Subscribe(s =>
+                    tvdb.FindSeries(change.Value).ObserveOnDispatcher().Do(s =>
                     {
-                        list.Add(new SeriesRecord(s));
-                    }, () =>
+                        series.Add(new SeriesRecord(s));
+                    })
+                    .ObserveOn(Scheduler.ThreadPool).Select(seriesBase => tvdb.UpdateData(seriesBase).First())
+                    .ObserveOnDispatcher().Finally(() =>
                     {
                         IsSearching = false;
-                        series = new ObservableCollection<SeriesRecord>(list.OrderByDescending(s => s.Series.Rating).ToList());
                         RaisePropertyChanged(() => Series);
-                    });
+                    }).Subscribe();
                 });
             } else if (IsInDesignMode)
             {

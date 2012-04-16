@@ -60,9 +60,9 @@ namespace SeriesTracker
             initializing = false;
         }
 
-        public IObservable<TvDbSeriesBase> FindSeries(string name)
+        public IObservable<TvDbSeries> FindSeries(string name)
         {
-            var subject = new Subject<TvDbSeriesBase>();
+            var subject = new Subject<TvDbSeries>();
 
             Scheduler.NewThread.Schedule(() => {
                 EnsureInitialized();
@@ -90,7 +90,7 @@ namespace SeriesTracker
             return subject;
         }
 
-        public IObservable<TvDbSeries> UpdateData(TvDbSeriesBase baseRecord)
+        public IObservable<TvDbSeries> UpdateData(TvDbSeries series)
         {
             WebClient client = new WebClient();
             var download = Observable.FromEvent<DownloadStringCompletedEventHandler, DownloadStringCompletedEventArgs>(
@@ -98,16 +98,17 @@ namespace SeriesTracker
                 ev => client.DownloadStringCompleted += ev,
                 ev => client.DownloadStringCompleted -= ev)
             .Select(r =>
-            {
-                var series = new TvDbSeries(baseRecord);
-                
+            {                
                 var doc = XDocument.Parse(r.Result);
                 var poster = doc.Descendants("poster").FirstOrDefault();
                 if (poster != null ) {
                     if (!string.IsNullOrEmpty(poster.Value))
                     {
                         var originalUrl = mirror + "/banners/" + poster.Value;
-                        series.Image = "http://quickthumbnail.com/rspic.php?wm=&wm_size=16&wm_color=1filter=none&filename=" + originalUrl + "&width=147";
+                        var newUrl = "http://quickthumbnail.com/rspic.php?wm=&wm_size=16&wm_color=1filter=none&filename=" + originalUrl + "&width=147";
+                        DispatcherScheduler.Instance.Schedule(() => {
+                            series.Image = newUrl;
+                        });
                     }
                 }
 
@@ -116,13 +117,16 @@ namespace SeriesTracker
                 {
                     if (!string.IsNullOrEmpty(rating.Value))
                     {
-                        series.Rating = float.Parse(rating.Value);
+                        var newRating = float.Parse(rating.Value);
+                        DispatcherScheduler.Instance.Schedule(() => {
+                            series.Rating = newRating;
+                        });  
                     }
                 }
                 return series;
             });              
  
-            client.DownloadStringAsync(new Uri(mirror + "/api/" + ApiKey + "/series/" + baseRecord.Id + "/all/en.xml"));
+            client.DownloadStringAsync(new Uri(mirror + "/api/" + ApiKey + "/series/" + series.Id + "/all/en.xml"));
             return download;
         }
     }

@@ -81,7 +81,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TvDb.cs" />
     <Compile Include="TvDbSeries.cs" />
-    <Compile Include="TvDbSeriesBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

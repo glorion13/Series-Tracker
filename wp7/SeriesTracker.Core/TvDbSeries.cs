@@ -7,12 +7,34 @@ using GalaSoft.MvvmLight;
 
 namespace SeriesTracker
 {
-    public class TvDbSeries : TvDbSeriesBase
+    public class TvDbSeries : ViewModelBase
     {
-        public TvDbSeries () {}
-        public TvDbSeries (TvDbSeriesBase baseRecorod) {
-            this.Title = baseRecorod.Title;
-            this.Id = baseRecorod.Id;
+        private string id;
+        public string Id
+        {
+            get
+            {
+                return id;
+            }
+
+            set
+            {
+                Set(() => Id, ref id, value);
+            }
+        }
+
+        private string title;
+        public string Title
+        {
+            get
+            {
+                return title;
+            }
+
+            set
+            {
+                Set(() => Title, ref title, value);
+            }
         }
 
         private string image;
