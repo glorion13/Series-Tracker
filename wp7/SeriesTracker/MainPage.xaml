@@ -125,7 +125,7 @@
 			<!--Panorama item one-->
 			<controls:PanoramaItem Header="followed">
 				<StackPanel Margin="0,0,-12,0" Orientation="Vertical" d:LayoutOverrides="Height">
-					<ProgressBar x:Name="subsProgressBar" Height="10" Margin="0,-15,0,5" IsIndeterminate="True" Visibility="Collapsed"/>
+					<toolkit:PerformanceProgressBar x:Name="subsProgressBar" Height="10" Margin="0,-15,0,5" IsIndeterminate="True" Visibility="Collapsed"/>
 					<!--Double line list with text wrapping-->
 					<ListBox Margin="0,0,-12,0" ItemsSource="{Binding Series}" Foreground="Black" ItemTemplate="{StaticResource SeriesTemplate}" />
 				</StackPanel>
@@ -137,7 +137,7 @@
 				<StackPanel Margin="0,0,-12,0" Orientation="Vertical" d:LayoutOverrides="Height">
 					<!--Double line list with image placeholder and text wrapping-->
 					<TextBox TextWrapping="Wrap" Text="{Binding Search, Mode=TwoWay}"/>
-					<ProgressBar x:Name="searchProgressBar" Height="10" Margin="0,-15,0,5" IsIndeterminate="True" Visibility="Collapsed"/>
+					<toolkit:PerformanceProgressBar x:Name="searchProgressBar" Height="10" Margin="0,-15,0,5" IsIndeterminate="True" Visibility="Collapsed"/>
 					<ListBox ItemsSource="{Binding SearchResults}" Height="498" Foreground="Black" ItemTemplate="{StaticResource SearchResultTemplate}" />
 				</StackPanel>
 			</controls:PanoramaItem>
