@@ -3,3 +3,5 @@
 *.suo
 /wp7/*/Bin
 /wp7/*/obj
+/wp7/SeriesTracker/SubmissionInfo/ManualTestResults.xml
+/wp7/SeriesTracker/SubmissionInfo/Settings.xml

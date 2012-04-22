@@ -96,7 +96,9 @@ namespace SeriesTracker
                 {
                     searchResults.Add(new SeriesRecord(s));
                 })
-                .ObserveOn(Scheduler.ThreadPool).Select(seriesBase => tvdb.UpdateData(seriesBase).First())
+                .ObserveOn(Scheduler.ThreadPool).Select(seriesBase => tvdb.UpdateData(seriesBase).
+                    .Subscribe(_ => { }, e => { MessageBox.Show("An error occured when downloading a series feed. Data might be incomplete, please try again later."); })
+                ).Merge()
                 .ObserveOnDispatcher().Finally(() =>
                 {
                     IsSearching = false;

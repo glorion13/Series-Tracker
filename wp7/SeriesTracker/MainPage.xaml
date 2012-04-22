@@ -70,6 +70,12 @@
 						<TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" TextWrapping="Wrap" Style="{StaticResource ItemTitle}" Margin="12,-10,12,0"/>
 						<TextBlock Text="{Binding Series.Rating}" TextWrapping="Wrap"  Style="{StaticResource ItemDescription}" />
 					</StackPanel>
+					<toolkit:ContextMenuService.ContextMenu>
+						<toolkit:ContextMenu>
+							<toolkit:MenuItem Header="unsubscribe" Command="{Binding MainViewModel.ToggleSubscribed, Mode=OneWay, Source={StaticResource Locator}}" CommandParameter="{Binding Series}" />
+							<toolkit:MenuItem Header="share"/>
+						</toolkit:ContextMenu>
+					</toolkit:ContextMenuService.ContextMenu>
 				</StackPanel>
 			</DataTemplate>    				
 			<DataTemplate x:Key="SearchResultTemplate">

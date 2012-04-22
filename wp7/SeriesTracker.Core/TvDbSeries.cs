@@ -84,5 +84,20 @@ namespace SeriesTracker
                 Set(() => IsSubscribed, ref isSubscribed, value);
             }
         }
+
+        [XmlElement]
+        private DateTime dataLoaded;
+        public DateTime DataLoaded
+        {
+            get
+            {
+                return dataLoaded;
+            }
+
+            set
+            {
+                Set(() => DataLoaded, ref dataLoaded, value);
+            }
+        }
     }
 }

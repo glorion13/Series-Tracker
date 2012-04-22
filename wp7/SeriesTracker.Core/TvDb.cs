@@ -97,6 +97,8 @@ namespace SeriesTracker
                 ev => new DownloadStringCompletedEventHandler((s, e) => ev(e)),
                 ev => client.DownloadStringCompleted += ev,
                 ev => client.DownloadStringCompleted -= ev)
+            .Retry(3)
+            .Take(1)
             .Select(r =>
             {                
                 var doc = XDocument.Parse(r.Result);
@@ -123,6 +125,12 @@ namespace SeriesTracker
                         });  
                     }
                 }
+
+                DispatcherScheduler.Instance.Schedule(() =>
+                {
+                    series.DataLoaded = DateTime.Now;
+                }); 
+
                 return series;
             });              
  
