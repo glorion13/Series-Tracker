@@ -112,7 +112,8 @@ namespace SeriesTracker
             {
                 foreach (var s in subscriptionManager.Subscriptions)
                 {
-                    DispatcherHelper.CheckBeginInvokeOnUI(() => series.Add(new SeriesRecord(s)));
+                    var sr = new SeriesRecord(s);
+                    DispatcherHelper.CheckBeginInvokeOnUI(() => series.Add(sr));
                 }
                 DispatcherHelper.CheckBeginInvokeOnUI(() => IsLoadingSubscriptions = false);
             });
