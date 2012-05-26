@@ -105,7 +105,7 @@ namespace SeriesTracker
                     if (!string.IsNullOrEmpty(poster.Value))
                     {
                         var originalUrl = mirror + "/banners/" + poster.Value;
-                        var newUrl = "http://quickthumbnail.com/rspic.php?wm=&wm_size=16&wm_color=1filter=none&filename=" + originalUrl + "&width=147";
+                        var newUrl = "http://imageresizer-1.apphb.com/resize?url=" + originalUrl + "&width=147";
                         DispatcherScheduler.Instance.Schedule(() => {
                             series.Image = newUrl;
                         });
