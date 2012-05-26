@@ -41,6 +41,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Akavache_WP7">
+      <HintPath>..\packages\akavache.1.0.1\lib\sl4-windowsphone71\Akavache_WP7.dll</HintPath>
+    </Reference>
     <Reference Include="GalaSoft.MvvmLight.Extras.WP71">
       <HintPath>..\packages\MvvmLightPreview.4.1.0\lib\sl4-windowsphone71\GalaSoft.MvvmLight.Extras.WP71.dll</HintPath>
     </Reference>
@@ -50,14 +53,26 @@
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\packages\MvvmLightPreview.4.1.0\lib\sl4-windowsphone71\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
-    <Reference Include="ReactiveUI.Blend_WP7">
-      <HintPath>..\packages\reactiveui-xaml.2.5.2.0\lib\SL3-WP\ReactiveUI.Blend_WP7.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.4.5.5\lib\sl4-windowsphone71\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="ReactiveUI.Xaml_WP7">
-      <HintPath>..\packages\reactiveui-xaml.2.5.2.0\lib\SL3-WP\ReactiveUI.Xaml_WP7.dll</HintPath>
+    <Reference Include="NLog">
+      <HintPath>..\packages\NLog.2.0.0.2000\lib\sl4-windowsphone71\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="ReactiveUI_WP7">
-      <HintPath>..\packages\reactiveui-core.2.5.2.0\lib\SL3-WP\ReactiveUI_WP7.dll</HintPath>
+    <Reference Include="ReactiveUI.Blend_WP7, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\reactiveui-xaml.3.1.2\lib\SL4-WindowsPhone71\ReactiveUI.Blend_WP7.dll</HintPath>
+    </Reference>
+    <Reference Include="ReactiveUI.Routing_WP7">
+      <HintPath>..\packages\reactiveui-xaml.3.1.2\lib\SL4-WindowsPhone71\ReactiveUI.Routing_WP7.dll</HintPath>
+    </Reference>
+    <Reference Include="ReactiveUI.Xaml_WP7, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\reactiveui-xaml.3.1.2\lib\SL4-WindowsPhone71\ReactiveUI.Xaml_WP7.dll</HintPath>
+    </Reference>
+    <Reference Include="ReactiveUI_WP7, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\reactiveui-core.3.1.2\lib\SL4-WindowsPhone71\ReactiveUI_WP7.dll</HintPath>
     </Reference>
     <Reference Include="System.Observable" />
     <Reference Include="System.Reactive">
