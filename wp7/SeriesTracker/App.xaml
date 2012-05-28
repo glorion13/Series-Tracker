@@ -2,13 +2,13 @@
 <Application xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone" xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone" xmlns:sys="clr-namespace:System;assembly=mscorlib" xmlns:app="clr-namespace:SeriesTracker" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="SeriesTracker.App" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
   <!--Application Resources-->
   <Application.Resources>
-  	<ResourceDictionary>
-  		<ResourceDictionary.MergedDictionaries>
-  			<ResourceDictionary Source="Styles.xaml"/>
-  		</ResourceDictionary.MergedDictionaries>
-  		<app:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
-  		<app:UppercaseConverter x:Key="ToUpper" />
-  	</ResourceDictionary>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Styles.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+      <app:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
+      <app:UppercaseConverter x:Key="ToUpper" />
+    </ResourceDictionary>
   </Application.Resources>
   <Application.ApplicationLifetimeObjects>
     <!--Required object that handles lifetime events for the application-->

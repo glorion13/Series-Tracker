@@ -96,7 +96,7 @@ namespace SeriesTracker
                 {
                     searchResults.Add(new SeriesRecord(s));
                 })
-                .ObserveOn(Scheduler.ThreadPool).Select(seriesBase => tvdb.UpdateData(seriesBase).First())
+                .ObserveOn(ThreadPoolScheduler.Instance).Select(seriesBase => tvdb.UpdateData(seriesBase).First())
                 .ObserveOnDispatcher().Finally(() =>
                 {
                     IsSearching = false;
@@ -108,7 +108,7 @@ namespace SeriesTracker
         private void LoadSubscriptions()
         {
             IsLoadingSubscriptions = true;
-            Scheduler.NewThread.Schedule(() =>
+            new NewThreadScheduler().Schedule(() =>
             {
                 foreach (var s in subscriptionManager.Subscriptions)
                 {

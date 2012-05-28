@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ReactiveUI;
 using GalaSoft.MvvmLight;
 using System.Xml.Serialization;
 

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
-using System.Reactive.Linq;
 using System.Threading;
-using System.Reactive.Concurrency;
-using System.Reactive.Subjects;
 using System.Xml.Linq;
+using System.Xml;
+using System.IO;
+using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using Akavache;
 
 namespace SeriesTracker
 {
@@ -16,26 +19,21 @@ namespace SeriesTracker
 
         public TvDb()
         {
-            Scheduler.NewThread.Schedule(() => Initialize());
+            Initialize();
         }
 
         private readonly object key = new object();
-        private bool initializing;
         private bool initialized;
         private void Initialize()
         {
-            lock (key)
+            if (!initialized)
             {
-                if (!initialized && !initializing)
-                {
-                    initializing = true;
-                    DoInitialize();
-                }
+                DoInitialize();
             }
         }
 
         private void EnsureInitialized() {
-            while (!initialized || initializing)
+            while (!initialized)
             {
                 Thread.Sleep(100);
             }
@@ -43,13 +41,9 @@ namespace SeriesTracker
 
         private void DoInitialize()
         {
-            WebClient client = new WebClient();
-            var download = Observable.FromEvent<DownloadStringCompletedEventHandler, DownloadStringCompletedEventArgs>(
-                ev => new DownloadStringCompletedEventHandler((s, e) => ev(e)),
-                ev => client.DownloadStringCompleted += ev,
-                ev => client.DownloadStringCompleted -= ev)
-                .Subscribe(o => ProcessMirrors(o.Result));
-            client.DownloadStringAsync(new Uri("http://www.thetvdb.com/api/" + ApiKey + "/mirrors.xml"));
+            BlobCache.LocalMachine.DownloadUrl("http://www.thetvdb.com/api/" + ApiKey + "/mirrors.xml", TimeSpan.FromDays(1))
+                .Select(array => System.Text.Encoding.UTF8.GetString(array, 0, array.Length))
+                .Subscribe(s => ProcessMirrors(s));
         }
 
         private void ProcessMirrors(string p)
@@ -57,14 +51,16 @@ namespace SeriesTracker
             mirror = (from path in XDocument.Parse(p).Descendants("mirrorpath")
                       select path.Value).First();
             initialized = true;
-            initializing = false;
         }
 
         public IObservable<TvDbSeries> FindSeries(string name)
         {
             var subject = new Subject<TvDbSeries>();
 
-            Scheduler.NewThread.Schedule(() => {
+            //System.Reactive.PlatformServices
+
+            new NewThreadScheduler().Schedule(() =>
+            {
                 EnsureInitialized();
                 WebClient client = new WebClient();
                 var download = Observable.FromEvent<DownloadStringCompletedEventHandler, DownloadStringCompletedEventArgs>(
@@ -106,6 +102,7 @@ namespace SeriesTracker
                     {
                         var originalUrl = mirror + "/banners/" + poster.Value;
                         var newUrl = "http://imageresizer-1.apphb.com/resize?url=" + originalUrl + "&width=147";
+                        
                         DispatcherScheduler.Instance.Schedule(() => {
                             series.Image = newUrl;
                         });

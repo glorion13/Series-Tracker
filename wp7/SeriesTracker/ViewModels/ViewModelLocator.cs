@@ -14,6 +14,8 @@
 
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Threading;
+using GalaSoft.MvvmLight.Ioc;
+using Microsoft.Practices.ServiceLocation;
 
 namespace SeriesTracker
 {
@@ -23,19 +25,20 @@ namespace SeriesTracker
     /// </summary>
     public class ViewModelLocator
     {
-        private static Main main;
 
         public ViewModelLocator()
         {
             DispatcherHelper.Initialize();
-            main = new Main();
+
+            ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+            SimpleIoc.Default.Register<Main>();  
         }
 
         public Main MainViewModel
         {
             get
             {
-                return main;
+                return ServiceLocator.Current.GetInstance<Main>();
             }
         }
     }
