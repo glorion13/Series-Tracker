@@ -42,8 +42,7 @@ namespace SeriesTracker
         private void DoInitialize()
         {
             BlobCache.LocalMachine.DownloadUrl("http://www.thetvdb.com/api/" + ApiKey + "/mirrors.xml", TimeSpan.FromDays(1))
-                .Select(array => System.Text.Encoding.UTF8.GetString(array, 0, array.Length))
-                .Subscribe(s => ProcessMirrors(s));
+                .AsContentString().Subscribe(s => ProcessMirrors(s));
         }
 
         private void ProcessMirrors(string p)
@@ -57,30 +56,26 @@ namespace SeriesTracker
         {
             var subject = new Subject<TvDbSeries>();
 
-            //System.Reactive.PlatformServices
-
-            new NewThreadScheduler().Schedule(() =>
+            NewThreadScheduler.Default.Schedule(() =>
             {
                 EnsureInitialized();
-                WebClient client = new WebClient();
-                var download = Observable.FromEvent<DownloadStringCompletedEventHandler, DownloadStringCompletedEventArgs>(
-                    ev => new DownloadStringCompletedEventHandler((s, e) => ev(e)),
-                    ev => client.DownloadStringCompleted += ev,
-                    ev => client.DownloadStringCompleted -= ev)
-                    .Subscribe(o => {
-                        var list = from series in XDocument.Parse(o.Result).Descendants("Series")
+
+                BlobCache.LocalMachine.DownloadUrl(mirror + "/api/GetSeries.php?seriesname=" + name + "&language=en", TimeSpan.FromHours(1))
+                    .AsContentString().Subscribe(result =>
+                    {
+                        var list = from series in XDocument.Parse(result).Descendants("Series")
                                    where string.Equals(series.Descendants("language").First().Value, "en")
-                                   select new TvDbSeries() { 
+                                   select new TvDbSeries()
+                                   {
                                        Title = series.Descendants("SeriesName").First().Value,
                                        Id = series.Descendants("seriesid").First().Value
                                    };
                         foreach (var s in list)
                         {
-                            subject.OnNext(s);              
+                            subject.OnNext(s);
                         }
                         subject.OnCompleted();
                     });
-                client.DownloadStringAsync(new Uri(mirror + "/api/GetSeries.php?seriesname="+name+"&language=en"));
             });
 
             return subject;
@@ -88,14 +83,12 @@ namespace SeriesTracker
 
         public IObservable<TvDbSeries> UpdateData(TvDbSeries series)
         {
-            WebClient client = new WebClient();
-            var download = Observable.FromEvent<DownloadStringCompletedEventHandler, DownloadStringCompletedEventArgs>(
-                ev => new DownloadStringCompletedEventHandler((s, e) => ev(e)),
-                ev => client.DownloadStringCompleted += ev,
-                ev => client.DownloadStringCompleted -= ev)
-            .Select(r =>
+            EnsureInitialized();
+
+            var download = BlobCache.LocalMachine.DownloadUrl(mirror + "/api/" + ApiKey + "/series/" + series.Id + "/all/en.xml", TimeSpan.FromMinutes(15))
+            .AsContentString().Select(r =>
             {                
-                var doc = XDocument.Parse(r.Result);
+                var doc = XDocument.Parse(r);
                 var poster = doc.Descendants("poster").FirstOrDefault();
                 if (poster != null ) {
                     if (!string.IsNullOrEmpty(poster.Value))
@@ -122,8 +115,7 @@ namespace SeriesTracker
                 }
                 return series;
             });              
- 
-            client.DownloadStringAsync(new Uri(mirror + "/api/" + ApiKey + "/series/" + series.Id + "/all/en.xml"));
+
             return download;
         }
     }

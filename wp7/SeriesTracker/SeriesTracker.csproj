@@ -139,12 +139,6 @@
     <None Include="packages.config" />
     <None Include="Properties\AppManifest.xml" />
     <None Include="Properties\WMAppManifest.xml" />
-    <None Include="SeriesTracker_2012_05_26_21_30_01.sap" />
-    <None Include="SeriesTracker_2012_05_26_21_31_06.sap" />
-    <None Include="SeriesTracker_2012_05_26_21_45_33.sap" />
-    <None Include="SeriesTracker_2012_05_28_15_13_11.sap" />
-    <None Include="SeriesTracker_2012_05_28_15_14_13.sap" />
-    <None Include="SeriesTracker_2012_05_28_15_15_50.sap" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ApplicationIcon.png">
