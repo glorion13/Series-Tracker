@@ -1,5 +1,5 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeriesTracker", "SeriesTracker\SeriesTracker.csproj", "{0FED0DFE-F60C-438D-AB17-8DB18B8E4C5F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FAC6C700-532A-4478-A4BD-B613A9396CCE}"
@@ -9,9 +9,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeriesTracker.BackgroundAgent", "SeriesTracker.BackgroundAgent\SeriesTracker.BackgroundAgent.csproj", "{1094F5DD-F436-44FB-82A3-DDC4D3FD3B0A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B500E416-2D86-4553-90E5-C738CA55ACD9}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\packages.config = .nuget\packages.config
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
