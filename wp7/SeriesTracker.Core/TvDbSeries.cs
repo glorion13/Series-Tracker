@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using GalaSoft.MvvmLight;
 using System.Xml.Serialization;
+using System.Collections.ObjectModel;
 
 namespace SeriesTracker
 {
@@ -77,11 +78,29 @@ namespace SeriesTracker
             {
                 return isSubscribed;
             }
-
             set
             {
                 Set(() => IsSubscribed, ref isSubscribed, value);
             }
+        }
+
+        [XmlElement]
+        private ObservableCollection<TvDbSeriesEpisode> episodes;
+        public ObservableCollection<TvDbSeriesEpisode> Episodes
+        {
+            get
+            {
+                return episodes;
+            }
+
+            set
+            {
+                Set(() => Episodes, ref episodes, value);
+            }
+        }
+
+        public TvDbSeries() {
+            episodes = new ObservableCollection<TvDbSeriesEpisode>();
         }
     }
 }

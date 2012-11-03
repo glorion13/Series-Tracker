@@ -9,6 +9,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Akavache;
+using System.Collections.ObjectModel;
 
 namespace SeriesTracker
 {
@@ -64,11 +65,11 @@ namespace SeriesTracker
                     .AsContentString().Subscribe(result =>
                     {
                         var list = from series in XDocument.Parse(result).Descendants("Series")
-                                   where string.Equals(series.Descendants("language").First().Value, "en")
+                                   where string.Equals(series.Descendants("language").Select(n => n.Value).FirstOrDefault(), "en")
                                    select new TvDbSeries()
                                    {
-                                       Title = series.Descendants("SeriesName").First().Value,
-                                       Id = series.Descendants("seriesid").First().Value
+                                       Title = series.Descendants("SeriesName").Select(n => n.Value).FirstOrDefault(),
+                                       Id = series.Descendants("seriesid").Select(n => n.Value).FirstOrDefault()
                                    };
                         foreach (var s in list)
                         {
@@ -95,8 +96,8 @@ namespace SeriesTracker
                     {
                         var originalUrl = mirror + "/banners/" + poster.Value;
                         var newUrl = "http://imageresizer-1.apphb.com/resize?url=" + originalUrl + "&width=147";
-                        
-                        DispatcherScheduler.Instance.Schedule(() => {
+                        DispatcherScheduler.Current.Schedule(() =>
+                        {
                             series.Image = newUrl;
                         });
                     }
@@ -108,11 +109,27 @@ namespace SeriesTracker
                     if (!string.IsNullOrEmpty(rating.Value))
                     {
                         var newRating = float.Parse(rating.Value);
-                        DispatcherScheduler.Instance.Schedule(() => {
+                        DispatcherScheduler.Current.Schedule(() =>
+                        {
                             series.Rating = newRating;
                         });  
                     }
                 }
+
+                var episodes = new ObservableCollection<TvDbSeriesEpisode>(
+                from e in doc.Descendants("Episode")
+                select new TvDbSeriesEpisode()
+                {
+                    Name = e.Descendants("EpisodeName").Select(n => n.Value).FirstOrDefault(),
+                    SeriesNumber = e.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
+                    EpisodeNumber = e.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault()
+                });
+
+                DispatcherScheduler.Current.Schedule(() =>
+                {
+                    series.Episodes = episodes;
+                });
+
                 return series;
             });              
 

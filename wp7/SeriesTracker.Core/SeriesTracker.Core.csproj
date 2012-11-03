@@ -104,6 +104,7 @@
     <Compile Include="SubscriptionManager.cs" />
     <Compile Include="TvDb.cs" />
     <Compile Include="TvDbSeries.cs" />
+    <Compile Include="TvDbSeriesEpisode.cs" />
     <Compile Include="TvDbSeriesRepository.cs" />
   </ItemGroup>
   <ItemGroup>

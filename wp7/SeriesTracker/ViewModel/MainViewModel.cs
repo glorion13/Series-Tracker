@@ -49,10 +49,10 @@ namespace SeriesTracker
 
         public Main(TvDbSeriesRepository repository)
         {
-            this.repository = repository;
-
             if (!IsInDesignMode)
             {
+                this.repository = repository;
+
                 searchResults = new SelfSortingObservableCollection<SeriesRecord, float>(s => s.Series.Rating, order: SortOrder.Desc);
                 series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
 
