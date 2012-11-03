@@ -125,6 +125,11 @@ namespace SeriesTracker
             // Handle navigation failures
             RootFrame.NavigationFailed += RootFrame_NavigationFailed;
 
+            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Uri>(this, m =>
+            {
+                RootFrame.Navigate(m);
+            });
+
             // Ensure we don't initialize again
             phoneApplicationInitialized = true;
         }

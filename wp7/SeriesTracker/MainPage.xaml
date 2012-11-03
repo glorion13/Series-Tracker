@@ -69,6 +69,11 @@
 					<StackPanel Width="311">
 						<TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" TextWrapping="Wrap" Style="{StaticResource ItemTitle}" Margin="12,-10,12,0"/>
 						<TextBlock Text="{Binding Series.Rating}" TextWrapping="Wrap"  Style="{StaticResource ItemDescription}" />
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Tap">
+                                <GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding}" Command="{Binding MainViewModel.ViewDetails, Source={StaticResource Locator}}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
 					</StackPanel>
 				</StackPanel>
 			</DataTemplate>    				

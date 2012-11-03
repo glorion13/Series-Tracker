@@ -21,6 +21,7 @@ using System.Windows.Threading;
 using GalaSoft.MvvmLight.Command;
 using System.Reactive;
 using GalaSoft.MvvmLight.Threading;
+using System.Windows.Navigation;
 
 namespace SeriesTracker
 {
@@ -46,14 +47,14 @@ namespace SeriesTracker
             }
         }
 
-        public Main()
+        public Main(TvDbSeriesRepository repository)
         {
+            this.repository = repository;
+
             if (!IsInDesignMode)
             {
                 searchResults = new SelfSortingObservableCollection<SeriesRecord, float>(s => s.Series.Rating, order: SortOrder.Desc);
                 series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
-
-                repository = new TvDbSeriesRepository();
 
                 LoadSubscriptions();
                 SetupSearch();
@@ -173,6 +174,22 @@ namespace SeriesTracker
                         series.Remove(series.FirstOrDefault(old => old.Series.Id == s.Id));
                     }
                 }));
+            }
+        }
+
+        private ICommand viewDetails;
+        public ICommand ViewDetails
+        {
+            get
+            {
+                return viewDetails ?? (viewDetails = new RelayCommand<SeriesRecord>(s =>
+                    {
+                        MessengerInstance.Send(s.Series);
+                        MessengerInstance.Send(new Uri("/SeriesDetails.xaml", UriKind.Relative));
+
+                        /*var navigation = new NavigationService();
+                        navigation.Navigate(new Uri("SeriesDetails.xaml"));*/
+                    }));
             }
         }
     }

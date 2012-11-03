@@ -31,6 +31,7 @@ namespace SeriesTracker
             DispatcherHelper.Initialize();
 
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+            SimpleIoc.Default.Register<TvDbSeriesRepository>();
             SimpleIoc.Default.Register<Main>();
         }
 
