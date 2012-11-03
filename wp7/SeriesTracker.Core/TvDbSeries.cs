@@ -10,7 +10,6 @@ namespace SeriesTracker
 {
     public class TvDbSeries : ViewModelBase
     {
-        [XmlElement]
         private string id;
         public string Id
         {
@@ -25,7 +24,6 @@ namespace SeriesTracker
             }
         }
 
-        [XmlElement]
         private string title;
         public string Title
         {
@@ -40,7 +38,6 @@ namespace SeriesTracker
             }
         }
 
-        [XmlElement]
         private string image;
         public string Image
         {
@@ -55,7 +52,20 @@ namespace SeriesTracker
             }
         }
 
-        [XmlElement]
+        private string thumbnail;
+        public string Thumbnail
+        {
+            get
+            {
+                return thumbnail;
+            }
+
+            set
+            {
+                Set(() => Thumbnail, ref thumbnail, value);
+            }
+        }
+
         private float rating;
         public float Rating
         {
@@ -70,7 +80,6 @@ namespace SeriesTracker
             }
         }
 
-        [XmlElement]
         private bool isSubscribed;
         public bool IsSubscribed
         {
@@ -84,7 +93,6 @@ namespace SeriesTracker
             }
         }
 
-        [XmlElement]
         private ObservableCollection<TvDbSeriesEpisode> episodes;
         public ObservableCollection<TvDbSeriesEpisode> Episodes
         {

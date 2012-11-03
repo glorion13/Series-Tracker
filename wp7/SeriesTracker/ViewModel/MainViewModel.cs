@@ -22,6 +22,7 @@ using GalaSoft.MvvmLight.Command;
 using System.Reactive;
 using GalaSoft.MvvmLight.Threading;
 using System.Windows.Navigation;
+using System.Threading.Tasks;
 
 namespace SeriesTracker
 {
@@ -68,14 +69,14 @@ namespace SeriesTracker
                 series.Add(new SeriesRecord(new TvDbSeries()
                 {
                     Title = "Futurama",
-                    Image = "http://thetvdb.com/banners/posters/73871-2.jpg",
+                    Thumbnail = "http://thetvdb.com/banners/posters/73871-2.jpg",
                     Rating = 5
                 }));
 
                 series.Add(new SeriesRecord(new TvDbSeries()
                 {
                     Title = "Simpsons",
-                    Image = "http://thetvdb.com/banners/posters/71663-10.jpg",
+                    Thumbnail = "http://thetvdb.com/banners/posters/71663-10.jpg",
                     Rating = 10
                 }));
             }
@@ -93,8 +94,12 @@ namespace SeriesTracker
                 {
                     searchResults.Add(new SeriesRecord(s));
                 })
-                .ObserveOn(ThreadPoolScheduler.Instance).Select(seriesBase => repository.UpdateData(seriesBase).First())
-                .ObserveOnDispatcher().Finally(() =>
+                .Select(sb => repository.UpdateData(sb))
+                .ObserveOn(NewThreadScheduler.Default)
+                .ToArray()
+                .Do(l => Task.WaitAll(l))
+                .ObserveOnDispatcher()
+                .Finally(() =>
                 {
                     IsSearching = false;
                     RaisePropertyChanged(() => Series);

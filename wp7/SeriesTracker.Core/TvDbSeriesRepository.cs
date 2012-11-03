@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reactive.Linq;
+using System.Windows.Threading;
+using System.Reactive.Concurrency;
+using System.Xml;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace SeriesTracker
 {
@@ -19,18 +24,38 @@ namespace SeriesTracker
 
         public IObservable<TvDbSeries> Find(string seriesName)
         {
-            return tvdb.FindSeries(seriesName);
+            try
+            {
+                return tvdb.FindSeries(seriesName);
+            }
+            catch (XmlException e)
+            {
+                Debug.WriteLine("Search failed for '{0}', message: '{1}'", seriesName, e.Message);
+                return Observable.Empty<TvDbSeries>();
+            }
         }
 
-        public IObservable<TvDbSeries> UpdateData(TvDbSeries series)
+        public async Task UpdateData(TvDbSeries series)
         {
-            return tvdb.UpdateData(series).Select(s => UpdateSubscirptionStatus(s));
+            try
+            {
+                var update = tvdb.UpdateData(series);
+                var subs = UpdateSubscirptionStatus(series);
+                await update;
+                await subs;
+                return;
+            }
+            catch (XmlException e)
+            {
+                Debug.WriteLine("Search failed for '{0}', message: '{1}'", series.Title, e.Message);
+                return;
+            }
         }
 
-        private TvDbSeries UpdateSubscirptionStatus(TvDbSeries s)
+        private async Task UpdateSubscirptionStatus(TvDbSeries s)
         {
-            s.IsSubscribed = subscriptionManager.Subscriptions.Any(series => series.Id == s.Id);
-            return s;
+            var isSubscribed = await Task.Factory.StartNew(() => subscriptionManager.Subscriptions.Any(series => series.Id == s.Id));
+            s.IsSubscribed = isSubscribed;
         }
 
         public IEnumerable<TvDbSeries> GetSubscribed()

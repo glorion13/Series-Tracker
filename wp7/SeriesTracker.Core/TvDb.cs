@@ -10,6 +10,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Akavache;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace SeriesTracker
 {
@@ -82,58 +83,45 @@ namespace SeriesTracker
             return subject;
         }
 
-        public IObservable<TvDbSeries> UpdateData(TvDbSeries series)
+        public async Task UpdateData(TvDbSeries series)
         {
             EnsureInitialized();
+            
+            var url = mirror + "/api/" + ApiKey + "/series/" + series.Id + "/all/en.xml";
+            var wc = new WebClient();
+            string s = await wc.DownloadStringTaskAsync(url);
+          
+            var doc = XDocument.Parse(s);
+            var poster = doc.Descendants("poster").FirstOrDefault();
+            if (poster != null ) {
+                if (!string.IsNullOrEmpty(poster.Value))
+                {
+                    var originalUrl = mirror + "/banners/" + poster.Value;
+                    var newUrl = "http://imageresizer-1.apphb.com/resize?url=" + originalUrl + "&width=147";
 
-            var download = BlobCache.LocalMachine.DownloadUrl(mirror + "/api/" + ApiKey + "/series/" + series.Id + "/all/en.xml", TimeSpan.FromMinutes(15))
-            .AsContentString().Select(r =>
-            {                
-                var doc = XDocument.Parse(r);
-                var poster = doc.Descendants("poster").FirstOrDefault();
-                if (poster != null ) {
-                    if (!string.IsNullOrEmpty(poster.Value))
-                    {
-                        var originalUrl = mirror + "/banners/" + poster.Value;
-                        var newUrl = "http://imageresizer-1.apphb.com/resize?url=" + originalUrl + "&width=147";
-                        DispatcherScheduler.Current.Schedule(() =>
-                        {
-                            series.Image = newUrl;
-                        });
-                    }
+                    series.Image = originalUrl;
+                    series.Thumbnail = newUrl;
                 }
+            }
 
-                var rating = doc.Descendants("Rating").FirstOrDefault();
-                if (rating != null)
+            var rating = doc.Descendants("Rating").FirstOrDefault();
+            if (rating != null)
+            {
+                if (!string.IsNullOrEmpty(rating.Value))
                 {
-                    if (!string.IsNullOrEmpty(rating.Value))
-                    {
-                        var newRating = float.Parse(rating.Value);
-                        DispatcherScheduler.Current.Schedule(() =>
-                        {
-                            series.Rating = newRating;
-                        });  
-                    }
+                    var newRating = float.Parse(rating.Value);
+                    series.Rating = newRating;
                 }
+            }
 
-                var episodes = new ObservableCollection<TvDbSeriesEpisode>(
-                from e in doc.Descendants("Episode")
-                select new TvDbSeriesEpisode()
-                {
-                    Name = e.Descendants("EpisodeName").Select(n => n.Value).FirstOrDefault(),
-                    SeriesNumber = e.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
-                    EpisodeNumber = e.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault()
-                });
-
-                DispatcherScheduler.Current.Schedule(() =>
-                {
-                    series.Episodes = episodes;
-                });
-
-                return series;
-            });              
-
-            return download;
+            series.Episodes = new ObservableCollection<TvDbSeriesEpisode>(
+            from e in doc.Descendants("Episode")
+            select new TvDbSeriesEpisode()
+            {
+                Name = e.Descendants("EpisodeName").Select(n => n.Value).FirstOrDefault(),
+                SeriesNumber = e.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
+                EpisodeNumber = e.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault()
+            });    
         }
     }
 }
