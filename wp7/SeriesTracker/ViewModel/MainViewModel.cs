@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace SeriesTracker
 {
-    public class Main : ViewModelBase
+    public class MainViewModel : ViewModelBase
     {
         private TvDbSeriesRepository repository;
 
@@ -48,7 +48,7 @@ namespace SeriesTracker
             }
         }
 
-        public Main(TvDbSeriesRepository repository)
+        public MainViewModel(TvDbSeriesRepository repository)
         {
             if (!IsInDesignMode)
             {
@@ -169,13 +169,13 @@ namespace SeriesTracker
                 {
                     if (!s.IsSubscribed)
                     {
-                        repository.Subscribe(s);
                         series.Add(new SeriesRecord(s));
+                        repository.Subscribe(s);
                     }
                     else
                     {
-                        repository.Unsubscribe(s);
                         series.Remove(series.FirstOrDefault(old => old.Series.Id == s.Id));
+                        repository.Unsubscribe(s); 
                     }
                 }));
             }
@@ -190,9 +190,6 @@ namespace SeriesTracker
                     {
                         MessengerInstance.Send(s.Series);
                         MessengerInstance.Send(new Uri("/SeriesDetails.xaml", UriKind.Relative));
-
-                        /*var navigation = new NavigationService();
-                        navigation.Navigate(new Uri("SeriesDetails.xaml"));*/
                     }));
             }
         }

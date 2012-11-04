@@ -10,15 +10,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:SeriesTracker.ViewModel" mc:Ignorable="d">
   <!--Application Resources-->
-  <Application.Resources>
-    <ResourceDictionary>
-      <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Styles.xaml" />
-      </ResourceDictionary.MergedDictionaries>
-      <app:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
-      <app:UppercaseConverter x:Key="ToUpper" />
-    </ResourceDictionary>
-  </Application.Resources>
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+            <ResourceDictionary Source="Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <app:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
+            <app:UppercaseConverter x:Key="ToUpper" />
+            <app:VisibleIfNotNullOrEmpty x:Key="VisibleIfNotNullOrEmpty" />
+        </ResourceDictionary>
+    </Application.Resources>
   <Application.ApplicationLifetimeObjects>
     <!--Required object that handles lifetime events for the application-->
     <shell:PhoneApplicationService Launching="Application_Launching" Closing="Application_Closing" Activated="Application_Activated" Deactivated="Application_Deactivated" />

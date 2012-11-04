@@ -66,6 +66,20 @@ namespace SeriesTracker
             }
         }
 
+        private string banner;
+        public string Banner
+        {
+            get
+            {
+                return banner;
+            }
+
+            set
+            {
+                Set(() => Banner, ref banner, value);
+            }
+        }
+
         private float rating;
         public float Rating
         {

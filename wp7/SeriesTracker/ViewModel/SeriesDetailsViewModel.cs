@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SeriesTracker.ViewModel
+namespace SeriesTracker
 {
     public class SeriesDetailsViewModel : ViewModelBase
     {
-        private TvDbSeries series = null;
+        private TvDbSeries series;
         public TvDbSeries Series
         {
             get
@@ -23,7 +23,21 @@ namespace SeriesTracker.ViewModel
 
         public SeriesDetailsViewModel()
         {
-            MessengerInstance.Register<TvDbSeries>(this, s => Series = s);
+            if (!IsInDesignMode)
+            {
+                MessengerInstance.Register<TvDbSeries>(this, s => Series = s);
+            }
+            else
+            {
+                Series = new TvDbSeries()
+                {
+                    Title = "Futurama",
+                    Image = "http://thetvdb.com/banners/posters/73871-2.jpg",
+                    Thumbnail = "http://thetvdb.com/banners/posters/73871-2.jpg",
+                    Banner = "http://thetvdb.com/banners/graphical/121361-g19.jpg",
+                    Rating = 5
+                };
+            }
         }
     }
 }

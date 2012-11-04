@@ -70,7 +70,8 @@ namespace SeriesTracker
                         select new TvDbSeries()
                         {
                             Title = series.Descendants("SeriesName").Select(n => n.Value).FirstOrDefault(),
-                            Id = series.Descendants("seriesid").Select(n => n.Value).FirstOrDefault()
+                            Id = series.Descendants("seriesid").Select(n => n.Value).FirstOrDefault(),
+                            Banner = series.Descendants("banner").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault()
                         };
 
             return list;

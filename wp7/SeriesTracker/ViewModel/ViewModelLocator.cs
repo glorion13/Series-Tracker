@@ -25,21 +25,30 @@ namespace SeriesTracker
     /// </summary>
     public class ViewModelLocator
     {
-
         public ViewModelLocator()
         {
-            DispatcherHelper.Initialize();
+            //DispatcherHelper.Initialize();
 
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+
             SimpleIoc.Default.Register<TvDbSeriesRepository>();
-            SimpleIoc.Default.Register<Main>();
+            SimpleIoc.Default.Register<MainViewModel>(true);
+            SimpleIoc.Default.Register<SeriesDetailsViewModel>(true);
         }
 
-        public Main MainViewModel
+        public MainViewModel MainViewModel
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<Main>();
+                return ServiceLocator.Current.GetInstance<MainViewModel>();
+            }
+        }
+
+        public SeriesDetailsViewModel SeriesDetails
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<SeriesDetailsViewModel>();
             }
         }
     }
