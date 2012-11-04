@@ -8,9 +8,9 @@ using System.IO;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Akavache;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace SeriesTracker
 {
@@ -19,73 +19,66 @@ namespace SeriesTracker
         private const string ApiKey = "D8E7E19874B4F438";
         private string mirror = null;
 
-        public TvDb()
-        {
-            Initialize();
-        }
-
         private readonly object key = new object();
+        
         private bool initialized;
-        private void Initialize()
-        {
-            if (!initialized)
-            {
-                DoInitialize();
-            }
-        }
-
-        private void EnsureInitialized() {
-            while (!initialized)
-            {
-                Thread.Sleep(100);
-            }
+        private async Task EnsureInitialized() {
+            await Task.Factory.StartNew(() => {
+                lock (key)
+                {
+                    if (!initialized)
+                    {
+                        DoInitialize();
+                    }
+                    while (!initialized)
+                    {
+                        Thread.Sleep(100);
+                    }
+                }
+            });
         }
 
         private void DoInitialize()
         {
-            BlobCache.LocalMachine.DownloadUrl("http://www.thetvdb.com/api/" + ApiKey + "/mirrors.xml", TimeSpan.FromDays(1))
-                .AsContentString().Subscribe(s => ProcessMirrors(s));
+            var url = "http://www.thetvdb.com/api/" + ApiKey + "/mirrors.xml";
+            var wc = new WebClient();
+            wc.DownloadStringCompleted += wc_DownloadStringCompleted;
+            wc.DownloadStringAsync(new Uri(url));
         }
 
-        private void ProcessMirrors(string p)
+        void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
-            mirror = (from path in XDocument.Parse(p).Descendants("mirrorpath")
-                      select path.Value).First();
+            if (e.Error != null)
+                throw e.Error;
+
+            this.mirror = (from path in XDocument.Parse(e.Result).Descendants("mirrorpath")
+                           select path.Value).First();
             initialized = true;
         }
 
-        public IObservable<TvDbSeries> FindSeries(string name)
+
+        public async Task<IEnumerable<TvDbSeries>> FindSeries(string name)
         {
-            var subject = new Subject<TvDbSeries>();
+            await EnsureInitialized();
 
-            NewThreadScheduler.Default.Schedule(() =>
-            {
-                EnsureInitialized();
+            var url = mirror + "/api/GetSeries.php?seriesname=" + name + "&language=en";
+            var wc = new WebClient();
+            string s = await wc.DownloadStringTaskAsync(url);
 
-                BlobCache.LocalMachine.DownloadUrl(mirror + "/api/GetSeries.php?seriesname=" + name + "&language=en", TimeSpan.FromHours(1))
-                    .AsContentString().Subscribe(result =>
-                    {
-                        var list = from series in XDocument.Parse(result).Descendants("Series")
-                                   where string.Equals(series.Descendants("language").Select(n => n.Value).FirstOrDefault(), "en")
-                                   select new TvDbSeries()
-                                   {
-                                       Title = series.Descendants("SeriesName").Select(n => n.Value).FirstOrDefault(),
-                                       Id = series.Descendants("seriesid").Select(n => n.Value).FirstOrDefault()
-                                   };
-                        foreach (var s in list)
+            var list = from series in XDocument.Parse(s).Descendants("Series")
+                        where string.Equals(series.Descendants("language").Select(n => n.Value).FirstOrDefault(), "en")
+                        select new TvDbSeries()
                         {
-                            subject.OnNext(s);
-                        }
-                        subject.OnCompleted();
-                    });
-            });
+                            Title = series.Descendants("SeriesName").Select(n => n.Value).FirstOrDefault(),
+                            Id = series.Descendants("seriesid").Select(n => n.Value).FirstOrDefault()
+                        };
 
-            return subject;
+            return list;
         }
 
         public async Task UpdateData(TvDbSeries series)
         {
-            EnsureInitialized();
+            await EnsureInitialized();
             
             var url = mirror + "/api/" + ApiKey + "/series/" + series.Id + "/all/en.xml";
             var wc = new WebClient();

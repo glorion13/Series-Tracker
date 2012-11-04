@@ -84,41 +84,40 @@ namespace SeriesTracker
 
         private void SetupSearch()
         {
-            this.ObservableForProperty(m => m.Search).ObserveOnDispatcher().Subscribe(change =>
+            this.ObservableForProperty(m => m.Search).Subscribe(async change =>
             {
                 searchResults.Clear();
                 IsSearching = true;
-                var list = new List<SeriesRecord>();
 
-                repository.Find(change.Value).ObserveOnDispatcher().Do(s =>
-                {
-                    searchResults.Add(new SeriesRecord(s));
-                })
-                .Select(sb => repository.UpdateData(sb))
-                .ObserveOn(NewThreadScheduler.Default)
-                .ToArray()
-                .Do(l => Task.WaitAll(l))
-                .ObserveOnDispatcher()
-                .Finally(() =>
-                {
-                    IsSearching = false;
-                    RaisePropertyChanged(() => Series);
-                }).Subscribe();
+                var results = await repository.Find(change.Value);
+
+                results.ToObservable()
+                    .Do(s => searchResults.Add(new SeriesRecord(s)))
+                    .Select(sb => repository.UpdateData(sb))
+                    .ObserveOn(NewThreadScheduler.Default)
+                    .ToArray()
+                    .Do(l => Task.WaitAll(l))
+                    .ObserveOnDispatcher()
+                    .Finally(() =>
+                        {
+                            IsSearching = false;
+                            RaisePropertyChanged(() => Series);
+                        })
+                    .Subscribe();
             });
         }
 
-        private void LoadSubscriptions()
+        private async Task LoadSubscriptions()
         {
             IsLoadingSubscriptions = true;
-            new NewThreadScheduler().Schedule(() =>
+
+            var subs = await repository.GetSubscribed();
+            foreach (var s in subs)
             {
-                foreach (var s in repository.GetSubscribed())
-                {
-                    var sr = new SeriesRecord(s);
-                    DispatcherHelper.CheckBeginInvokeOnUI(() => series.Add(sr));
-                }
-                DispatcherHelper.CheckBeginInvokeOnUI(() => IsLoadingSubscriptions = false);
-            });
+                series.Add(new SeriesRecord(s));
+            }
+
+            IsLoadingSubscriptions = false;
         }
 
         private string search;

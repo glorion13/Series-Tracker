@@ -22,16 +22,16 @@ namespace SeriesTracker
             tvdb = new TvDb();
         }
 
-        public IObservable<TvDbSeries> Find(string seriesName)
+        public async Task<IEnumerable<TvDbSeries>> Find(string seriesName)
         {
             try
             {
-                return tvdb.FindSeries(seriesName);
+                return await tvdb.FindSeries(seriesName);
             }
             catch (XmlException e)
             {
                 Debug.WriteLine("Search failed for '{0}', message: '{1}'", seriesName, e.Message);
-                return Observable.Empty<TvDbSeries>();
+                return new List<TvDbSeries>();
             }
         }
 
@@ -52,25 +52,29 @@ namespace SeriesTracker
             }
         }
 
-        private async Task UpdateSubscirptionStatus(TvDbSeries s)
+        private async Task UpdateSubscirptionStatus(TvDbSeries series)
         {
-            var isSubscribed = await Task.Factory.StartNew(() => subscriptionManager.Subscriptions.Any(series => series.Id == s.Id));
-            s.IsSubscribed = isSubscribed;
+            var isSubscribed = await Task.Factory.StartNew(async () =>
+            {
+                var subs = await subscriptionManager.GetSubscriptions();
+                return subs.Any(s => series.Id == s.Id);
+            }).Unwrap();
+            series.IsSubscribed = isSubscribed;
         }
 
-        public IEnumerable<TvDbSeries> GetSubscribed()
+        public async Task<IEnumerable<TvDbSeries>> GetSubscribed()
         {
-            return subscriptionManager.Subscriptions;
+            return await subscriptionManager.GetSubscriptions();
         }
 
-        public void Subscribe(TvDbSeries series)
+        public async Task Subscribe(TvDbSeries series)
         {
-            subscriptionManager.Subscribe(series);
+            await subscriptionManager.Subscribe(series);
         }
 
-        public void Unsubscribe(TvDbSeries series)
+        public async Task Unsubscribe(TvDbSeries series)
         {
-            subscriptionManager.Unsubscribe(series);
+            await subscriptionManager.Unsubscribe(series);
         }
     }
 }

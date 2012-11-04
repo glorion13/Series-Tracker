@@ -14,51 +14,68 @@ using System.Runtime.Serialization;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Xml.Serialization;
+using System.Threading.Tasks;
 
 namespace SeriesTracker
 {
     public class SubscriptionManager
     {
-        public SubscriptionManager()
-        {
-        }
 
-        public void Subscribe(TvDbSeries series) {
+        private object saveLock = new object();
+        public async Task Subscribe(TvDbSeries series) {
             series.IsSubscribed = true;
-            DoGetSubscriptions().Add(series);
-            SaveSubscriptions();
+
+            await Task.Factory.StartNew(() =>
+            {
+                lock (saveLock)
+                {
+                    var subs = GetCachedSubscriptions();
+                    subs.ContinueWith(s => s.Result.Add(series)).Wait();
+                    SaveSubscriptions();
+                }
+            });
         }
 
-        public void Unsubscribe(TvDbSeries series)
+        public async Task Unsubscribe(TvDbSeries series)
         {
             series.IsSubscribed = false;
-            DoGetSubscriptions().Remove(series);
-            SaveSubscriptions();
+
+            await Task.Factory.StartNew(() =>
+            {
+                lock (saveLock)
+                {
+                    var subs = GetCachedSubscriptions();
+                    subs.ContinueWith(s => s.Result.Remove(series)).Wait();
+                    SaveSubscriptions();
+                }
+            });
         }
 
         private void SaveSubscriptions()
         {
             using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
+            using (IsolatedStorageFileStream file = new IsolatedStorageFileStream("subscriptions.xml", FileMode.Truncate, storage))
             {
-                using (IsolatedStorageFileStream file = new IsolatedStorageFileStream("subscriptions.xml", FileMode.Truncate, storage))
-                {
-                    XmlSerializer serializer = new XmlSerializer(typeof(List<TvDbSeries>));
-                    serializer.Serialize(file, DoGetSubscriptions());
-                }
-            } 
-        }
-
-
-        public IEnumerable<TvDbSeries> Subscriptions {
-            get
-            {
-                return DoGetSubscriptions();
+                XmlSerializer serializer = new XmlSerializer(typeof(List<TvDbSeries>));
+                serializer.Serialize(file, GetCachedSubscriptions());
             }
         }
 
+
+        public async Task<IEnumerable<TvDbSeries>> GetSubscriptions() {
+            return await GetCachedSubscriptions();
+        }
+
         List<TvDbSeries> subscriptions = null;
-        private List<TvDbSeries> DoGetSubscriptions() {
-            return subscriptions ?? (subscriptions = LoadSubscriptios());
+        private object key = new object();
+        private async Task<List<TvDbSeries>> GetCachedSubscriptions() {
+            return subscriptions ?? await Task.Factory.StartNew(() =>
+            {
+                lock (key)
+                {
+                    return subscriptions ?? (subscriptions = LoadSubscriptios());
+                }
+            });
         }
 
         private List<TvDbSeries> LoadSubscriptios()
