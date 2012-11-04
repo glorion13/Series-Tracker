@@ -46,5 +46,31 @@ namespace SeriesTracker
                 Set(() => EpisodeNumber, ref episodeNumber, value);
             }
         }
+
+        private string description;
+        public string Description
+        {
+            get
+            {
+                return description;
+            }
+            set
+            {
+                Set(() => Description, ref description, value);
+            }
+        }
+
+        private string image;
+        public string Image
+        {
+            get
+            {
+                return image;
+            }
+            set
+            {
+                Set(() => Image, ref image, value);
+            }
+        }
     }
 }

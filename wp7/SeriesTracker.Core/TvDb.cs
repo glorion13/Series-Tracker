@@ -114,7 +114,9 @@ namespace SeriesTracker
             {
                 Name = e.Descendants("EpisodeName").Select(n => n.Value).FirstOrDefault(),
                 SeriesNumber = e.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
-                EpisodeNumber = e.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault()
+                EpisodeNumber = e.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault(),
+                Description = e.Descendants("Overview").Select(n => n.Value).FirstOrDefault(),
+                Image = e.Descendants("filename").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault()
             });    
         }
     }

@@ -26,6 +26,24 @@
 				<TextBlock Text="{Binding}" Opacity="0.6"/>
 			</Grid>
 		</DataTemplate>
+		<DataTemplate x:Key="EpisodeTemplate">
+			<Grid Margin="0,0,-28,12" Width="422">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition/>
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="160"/>
+					<ColumnDefinition/>
+				</Grid.ColumnDefinitions>
+				<Image Source="{Binding Image}" Height="90" Width="160" Stretch="UniformToFill" d:LayoutOverrides="GridBox" />
+				<Grid VerticalAlignment="Top" Grid.Row="1">
+					<Rectangle Fill="{StaticResource PhoneAccentBrush}" d:LayoutOverrides="GridBox"/>
+					<TextBlock TextWrapping="Wrap" Text="{Binding Name}" d:LayoutOverrides="Width, Height" FontSize="16" Margin="{StaticResource PhoneMargin}"/>
+				</Grid>
+				<TextBlock TextWrapping="Wrap" Text="{Binding Description}" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource PhoneTextSmallStyle}" FontSize="14.667"/>
+			</Grid>
+		</DataTemplate>
 	</phone:PhoneApplicationPage.Resources>
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
@@ -42,7 +60,9 @@
 
             <!--Panorama item two-->
             <controls:PanoramaItem Header="episodes">
-                <Grid/>
+                <Grid>
+                	<ListBox ItemsSource="{Binding Series.Episodes}" ItemTemplate="{StaticResource EpisodeTemplate}"/>
+                </Grid>
             </controls:PanoramaItem>
         </controls:Panorama>
     </Grid>

@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -35,7 +36,23 @@ namespace SeriesTracker
                     Image = "http://thetvdb.com/banners/posters/73871-2.jpg",
                     Thumbnail = "http://thetvdb.com/banners/posters/73871-2.jpg",
                     Banner = "http://thetvdb.com/banners/graphical/121361-g19.jpg",
-                    Rating = 5
+                    Rating = 5,
+                    Episodes = new ObservableCollection<TvDbSeriesEpisode>() {
+                        new TvDbSeriesEpisode() {
+                            Name = "Episode 1",
+                            SeriesNumber = "1",
+                            EpisodeNumber = "1",
+                            Description = "bla bla bla bla bla lba",
+                            Image = "http://thetvdb.com/banners/episodes/121361/3254641.jpg"
+                        },
+                        new TvDbSeriesEpisode() {
+                            Name = "Episode 2",
+                            SeriesNumber = "1",
+                            EpisodeNumber = "2",
+                            Description = "bla bla bla bla bla lba",
+                            Image = "http://thetvdb.com/banners/episodes/121361/3254641.jpg"
+                        }
+                    } 
                 };
             }
         }
