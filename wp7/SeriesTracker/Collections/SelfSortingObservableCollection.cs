@@ -18,6 +18,7 @@ using System.Reactive.Linq;
 using System.Collections.Generic;
 using System.Reactive.Subjects;
 using System.Reactive;
+using GalaSoft.MvvmLight.Threading;
 
 namespace SeriesTracker
 {
@@ -77,15 +78,17 @@ namespace SeriesTracker
                     {
                         if (beingReordered != item)
                         {
-                            var subscription = item.ObservableForProperty(sortingProperty).ObserveOnDispatcher().Subscribe(change =>
+                            var subscription = item.ObservableForProperty(sortingProperty).Subscribe(change =>
                             {
-                                beingReordered = item;
+                                DispatcherHelper.UIDispatcher.BeginInvoke(() => {
+                                    beingReordered = item;
 
-                                // force reording
-                                Remove(item);
-                                Add(item);
+                                    // force reording
+                                    Remove(item);
+                                    Add(item);
 
-                                beingReordered = null;
+                                    beingReordered = null;
+                                });
                             });
 
                             subscriptions.Add(item, subscription);

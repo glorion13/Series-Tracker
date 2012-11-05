@@ -84,7 +84,8 @@ namespace SeriesTracker
 
         private void SetupSearch()
         {
-            this.ObservableForProperty(m => m.Search).Subscribe(async change =>
+            var ui = DispatcherSynchronizationContext.Current;
+            this.ObservableForProperty(m => m.Search).ObserveOn(ui).Subscribe(async change =>
             {
                 searchResults.Clear();
                 IsSearching = true;
@@ -94,14 +95,16 @@ namespace SeriesTracker
                 results.ToObservable()
                     .Do(s => searchResults.Add(new SeriesRecord(s)))
                     .Select(sb => repository.UpdateData(sb))
-                    .ObserveOn(NewThreadScheduler.Default)
+                    .ObserveOn(new NewThreadScheduler())
                     .ToArray()
                     .Do(l => Task.WaitAll(l))
-                    .ObserveOnDispatcher()
                     .Finally(() =>
                         {
-                            IsSearching = false;
-                            RaisePropertyChanged(() => Series);
+                            DispatcherHelper.UIDispatcher.BeginInvoke(() =>
+                            {
+                                IsSearching = false;
+                                RaisePropertyChanged(() => Series);
+                            });
                         })
                     .Subscribe();
             });

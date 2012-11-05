@@ -87,30 +87,28 @@
     <Reference Include="NLog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.2.0.0.2000\lib\sl4-windowsphone71\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="ReactiveUI_WP7, Version=3.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ReactiveUI.Blend_WP7">
+      <HintPath>..\packages\reactiveui-wp7.2.5.1.0\lib\sl3-wp\ReactiveUI.Blend_WP7.dll</HintPath>
+    </Reference>
+    <Reference Include="ReactiveUI.Routing_WP7">
+      <HintPath>..\packages\reactiveui-wp7.2.5.1.0\lib\sl3-wp\ReactiveUI.Routing_WP7.dll</HintPath>
+    </Reference>
+    <Reference Include="ReactiveUI.Serialization_WP7">
+      <HintPath>..\packages\reactiveui-wp7.2.5.1.0\lib\sl3-wp\ReactiveUI.Serialization_WP7.dll</HintPath>
+    </Reference>
+    <Reference Include="ReactiveUI.Testing_WP7">
+      <HintPath>..\packages\reactiveui-wp7.2.5.1.0\lib\sl3-wp\ReactiveUI.Testing_WP7.dll</HintPath>
+    </Reference>
+    <Reference Include="ReactiveUI.Xaml_WP7">
+      <HintPath>..\packages\reactiveui-wp7.2.5.1.0\lib\sl3-wp\ReactiveUI.Xaml_WP7.dll</HintPath>
+    </Reference>
+    <Reference Include="ReactiveUI_WP7">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Reactive-UI\ReactiveUI_WP7.dll</HintPath>
+      <HintPath>..\packages\reactiveui-wp7.2.5.1.0\lib\sl3-wp\ReactiveUI_WP7.dll</HintPath>
     </Reference>
     <Reference Include="System.Observable" />
-    <Reference Include="System.Reactive.Core, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Rx-Core.2.0.21030\lib\SL4-WindowsPhone71\System.Reactive.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Rx-Interfaces.2.0.21030\lib\SL4-WindowsPhone71\System.Reactive.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Linq, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Rx-Linq.2.0.21030\lib\SL4-WindowsPhone71\System.Reactive.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Rx-PlatformServices.2.0.21030\lib\SL4-WindowsPhone71\System.Reactive.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Windows.Threading, Version=2.0.20823.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Rx-Xaml.2.0.21030\lib\SL4-WindowsPhone71\System.Reactive.Windows.Threading.dll</HintPath>
+    <Reference Include="System.Reactive">
+      <HintPath>..\packages\reactiveui-wp7.2.5.1.0\lib\sl3-wp\System.Reactive.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime">
       <HintPath>..\packages\Microsoft.Bcl.1.0.11-beta\lib\sl4-windowsphone71\System.Runtime.dll</HintPath>
@@ -122,9 +120,7 @@
     <Reference Include="system" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net" />
-    <Reference Include="System.Windows.Interactivity, Version=3.8.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MvvmLightPreview.4.1.23.0\lib\sl4-windowsphone71\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Windows.Interactivity, Version=3.8.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml.Serialization" />

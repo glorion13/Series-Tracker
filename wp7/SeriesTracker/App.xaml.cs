@@ -117,6 +117,8 @@ namespace SeriesTracker
             if (phoneApplicationInitialized)
                 return;
 
+            DispatcherHelper.Initialize();
+              
             // Create the frame but don't set it as RootVisual yet; this allows the splash
             // screen to remain active until the application is ready to render.
             RootFrame = new PhoneApplicationFrame();
