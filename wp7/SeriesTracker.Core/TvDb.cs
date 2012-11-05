@@ -11,6 +11,7 @@ using System.Reactive.Subjects;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace SeriesTracker
 {
@@ -103,7 +104,7 @@ namespace SeriesTracker
             {
                 if (!string.IsNullOrEmpty(rating.Value))
                 {
-                    var newRating = float.Parse(rating.Value);
+                    var newRating = float.Parse(rating.Value, CultureInfo.InvariantCulture.NumberFormat);
                     series.Rating = newRating;
                 }
             }
