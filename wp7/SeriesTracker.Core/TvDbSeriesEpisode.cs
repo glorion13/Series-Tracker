@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SeriesTracker
 {
-    public class TvDbSeriesEpisode : ViewModelBase
+    public class TvDbSeriesEpisode : ViewModelBase, IComparable<TvDbSeriesEpisode>
     {
         private string name;
         public string Name
@@ -71,6 +71,16 @@ namespace SeriesTracker
             {
                 Set(() => Image, ref image, value);
             }
+        }
+
+        public int CompareTo(TvDbSeriesEpisode other)
+        {
+            if (other == null) return 1;
+
+            if (this.SeriesNumber == null)
+                return -1;
+
+            return -1 * this.SeriesNumber.CompareTo(other.SeriesNumber);
         }
     }
 }

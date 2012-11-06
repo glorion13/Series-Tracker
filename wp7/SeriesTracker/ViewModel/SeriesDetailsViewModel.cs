@@ -1,4 +1,5 @@
 ﻿using GalaSoft.MvvmLight;
+using SeriesTracker.Collections;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -51,9 +52,29 @@ namespace SeriesTracker
                             EpisodeNumber = "2",
                             Description = "bla bla bla bla bla lba",
                             Image = "http://thetvdb.com/banners/episodes/121361/3254641.jpg"
+                        },
+                        new TvDbSeriesEpisode() {
+                            Name = "Episode 1",
+                            SeriesNumber = "2",
+                            EpisodeNumber = "1",
+                            Description = "bla bla bla bla bla lba",
+                            Image = "http://thetvdb.com/banners/episodes/121361/3254641.jpg"
                         }
                     } 
                 };
+
+                
+            }
+        }
+
+        public LongListCollection<TvDbSeriesEpisode, string> Episodes
+        {
+            get
+            {
+                return new LongListCollection<TvDbSeriesEpisode, string>(
+                    series.Episodes.OrderByDescending(l => l.SeriesNumber).ThenByDescending(l => l.EpisodeNumber),
+                    e => e.SeriesNumber,
+                    series.Episodes.Select(e => e.SeriesNumber).ToList());
             }
         }
     }

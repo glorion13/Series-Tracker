@@ -130,6 +130,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="BlobCache.cs" />
+    <Compile Include="Collections\LongListCollection.cs" />
     <Compile Include="Collections\SelfSortingObservableCollection.cs" />
     <Compile Include="Converters\VisibleIfNotNullOrEmpty.cs" />
     <Compile Include="Converters\UppercaseConverter.cs" />
