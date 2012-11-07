@@ -15,6 +15,7 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using System.Xml.Serialization;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace SeriesTracker
 {
@@ -51,13 +52,20 @@ namespace SeriesTracker
             });
         }
 
-        private void SaveSubscriptions()
+        private async void SaveSubscriptions()
         {
             using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
             using (IsolatedStorageFileStream file = new IsolatedStorageFileStream("subscriptions.xml", FileMode.Truncate, storage))
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(List<TvDbSeries>));
-                serializer.Serialize(file, GetCachedSubscriptions());
+                try
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(List<TvDbSeries>));
+                    serializer.Serialize(file, await GetCachedSubscriptions());
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
             }
         }
 
