@@ -30,17 +30,21 @@ namespace SeriesTracker
     {
         private TvDbSeriesRepository repository;
 
-        ObservableCollection<SeriesRecord> series;
-        public ObservableCollection<SeriesRecord> Series
+        private ObservableCollection<TvDbSeries> series;
+        public ObservableCollection<TvDbSeries> Series
         {
             get
             {
                 return series;
             }
+            set
+            {
+                Set(() => Series, ref series, value);
+            }
         }
 
-        ObservableCollection<SeriesRecord> searchResults;
-        public ObservableCollection<SeriesRecord> SearchResults
+        ObservableCollection<TvDbSeries> searchResults;
+        public ObservableCollection<TvDbSeries> SearchResults
         {
             get
             {
@@ -54,8 +58,8 @@ namespace SeriesTracker
             {
                 this.repository = repository;
 
-                searchResults = new SelfSortingObservableCollection<SeriesRecord, float>(s => s.Series.Rating, order: SortOrder.Desc);
-                series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
+                searchResults = new SelfSortingObservableCollection<TvDbSeries, float>(s => s.Rating, order: SortOrder.Desc);
+                //series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
 
                 LoadSubscriptions();
                 SetupSearch();
@@ -63,22 +67,23 @@ namespace SeriesTracker
             }
             else if (IsInDesignMode)
             {
-                searchResults = series = new ObservableCollection<SeriesRecord>();
+                searchResults = new ObservableCollection<TvDbSeries>();
+                series = new ObservableCollection<TvDbSeries>();
 
                 Search = "Simpsons";
-                series.Add(new SeriesRecord(new TvDbSeries()
+                series.Add(new TvDbSeries()
                 {
                     Title = "Futurama",
                     Thumbnail = "http://thetvdb.com/banners/posters/73871-2.jpg",
                     Rating = 5
-                }));
+                });
 
-                series.Add(new SeriesRecord(new TvDbSeries()
+                series.Add(new TvDbSeries()
                 {
                     Title = "Simpsons",
                     Thumbnail = "http://thetvdb.com/banners/posters/71663-10.jpg",
                     Rating = 10
-                }));
+                });
             }
         }
 
@@ -93,7 +98,7 @@ namespace SeriesTracker
                 var results = await repository.Find(change.Value);
 
                 results.ToObservable()
-                    .Do(s => searchResults.Add(new SeriesRecord(s)))
+                    .Do(s => searchResults.Add(s))
                     .Select(sb => repository.UpdateData(sb))
                     .ObserveOn(new NewThreadScheduler())
                     .ToArray()
@@ -103,7 +108,6 @@ namespace SeriesTracker
                             DispatcherHelper.UIDispatcher.BeginInvoke(() =>
                             {
                                 IsSearching = false;
-                                RaisePropertyChanged(() => Series);
                             });
                         })
                     .Subscribe();
@@ -114,11 +118,15 @@ namespace SeriesTracker
         {
             IsLoadingSubscriptions = true;
 
-            var subs = await repository.GetSubscribed();
-            foreach (var s in subs)
+            Series = await repository.GetSubscribed();
+            /*foreach (var s in subs)
             {
                 series.Add(new SeriesRecord(s));
-            }
+                s.ObservableForProperty(i => i.IsSubscribed).Where(x => x).Subscribe(item =>
+                {
+                    series.Remove(item);
+                });
+            }*/
 
             IsLoadingSubscriptions = false;
         }
@@ -172,12 +180,12 @@ namespace SeriesTracker
                 {
                     if (!s.IsSubscribed)
                     {
-                        series.Add(new SeriesRecord(s));
+                        //series.Add(new SeriesRecord(s));
                         repository.Subscribe(s);
                     }
                     else
                     {
-                        series.Remove(series.FirstOrDefault(old => old.Series.Id == s.Id));
+                        //series.Remove(series.FirstOrDefault(old => old.Series.Id == s.Id));
                         repository.Unsubscribe(s); 
                     }
                 }));
@@ -189,9 +197,9 @@ namespace SeriesTracker
         {
             get
             {
-                return viewDetails ?? (viewDetails = new RelayCommand<SeriesRecord>(s =>
+                return viewDetails ?? (viewDetails = new RelayCommand<TvDbSeries>(s =>
                     {
-                        MessengerInstance.Send(s.Series);
+                        MessengerInstance.Send(s);
                         MessengerInstance.Send(new Uri("/SeriesDetails.xaml", UriKind.Relative));
                     }));
             }

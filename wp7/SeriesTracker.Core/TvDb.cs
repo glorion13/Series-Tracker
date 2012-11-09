@@ -84,6 +84,8 @@ namespace SeriesTracker
             
             var url = mirror + "/api/" + ApiKey + "/series/" + series.Id + "/all/en.xml";
             var wc = new WebClient();
+            var updated = DateTime.Now;
+
             string s = await wc.DownloadStringTaskAsync(url);
           
             var doc = XDocument.Parse(s);
@@ -118,7 +120,9 @@ namespace SeriesTracker
                 EpisodeNumber = e.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault(),
                 Description = e.Descendants("Overview").Select(n => n.Value).FirstOrDefault(),
                 Image = e.Descendants("filename").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault()
-            });    
+            });
+
+            series.Updated = updated;
         }
     }
 }

@@ -7,6 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" 
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" xmlns:ec="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions" 
+    xmlns:toolkitPrimitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit" xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP71" 
     x:Class="SeriesTracker.SeriesDetails" 
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
     SupportedOrientations="Portrait"  Orientation="Portrait"
@@ -14,20 +16,19 @@
 	>
 	<phone:PhoneApplicationPage.Resources>
 		<DataTemplate x:Key="TitleTemplate">
-			<Grid Margin="-10,76,0,-76">
-				<Rectangle Height="130" Opacity="0.2" Width="900"/>
-				<TextBlock Text="{Binding Title}" Style="{StaticResource PhoneTextTitle3Style}" Visibility="{Binding Banner, ConverterParameter=True, Converter={StaticResource VisibleIfNotNullOrEmpty}}" Opacity="0.85" VerticalAlignment="Top" />
+			<Grid MinHeight="140">
+				<TextBlock Text="{Binding Title}" Style="{StaticResource PhoneTextTitle3Style}" Visibility="{Binding Banner, ConverterParameter=True, Converter={StaticResource VisibleIfNotNullOrEmpty}}" Opacity="0.85" VerticalAlignment="Top" Margin="12,303,12,0" />
 			</Grid>
 		</DataTemplate>
 		<DataTemplate x:Key="HeaderTemplate">
 			<Grid>
-				<TextBlock Text="{Binding}" Opacity="0.6"/>
+				<TextBlock Text="{Binding}" Opacity="0.618"/>
 			</Grid>
 		</DataTemplate>
 		<DataTemplate x:Key="DataTemplate1">
-				<Border Margin="{StaticResource PhoneTouchTargetOverhang}"  Padding="{StaticResource PhoneTouchTargetOverhang}" Width="92" Height="92" Background="{Binding GroupBackgroundBrush}">
-					<TextBlock Text="{Binding Key}" Style="{StaticResource PhoneTextLargeStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-				</Border>
+			<Border Margin="{StaticResource PhoneTouchTargetOverhang}"  Padding="{StaticResource PhoneTouchTargetOverhang}" Width="92" Height="92" Background="{Binding GroupBackgroundBrush}">
+				<TextBlock Text="{Binding Key}" Style="{StaticResource PhoneTextLargeStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+			</Border>
 		</DataTemplate>
 	</phone:PhoneApplicationPage.Resources>
 
@@ -48,52 +49,87 @@
     <Grid x:Name="LayoutRoot">
         <controls:Panorama HeaderTemplate="{StaticResource HeaderTemplate}"  Title="{Binding Series}"  TitleTemplate="{StaticResource TitleTemplate}" RenderTransformOrigin="0.5,0.5">
         	<controls:Panorama.Background>
-        		<ImageBrush ImageSource="{Binding SeriesDetails.Series.Banner, Source={StaticResource Locator}}" AlignmentX="Left" AlignmentY="Top" Stretch="Uniform"/>
+        		<ImageBrush ImageSource="{Binding SeriesDetails.Series.Banner, Source={StaticResource Locator}}" AlignmentX="Left" AlignmentY="Top" Stretch="Uniform" Opacity="0.381"/>
         	</controls:Panorama.Background>
 
             <!--Panorama item one-->
             <controls:PanoramaItem Header="details">
-                <Grid/>
+                <Grid>
+                	<Grid.RowDefinitions>
+                		<RowDefinition Height="Auto"/>
+                		<RowDefinition Height="0.856*"/>
+                	</Grid.RowDefinitions>
+                	<Grid.ColumnDefinitions>
+                		<ColumnDefinition Width="0.757*"/>
+                		<ColumnDefinition Width="Auto"/>
+                	</Grid.ColumnDefinitions>
+                	<toolkitPrimitives:ToggleSwitchButton Content="ToggleSwitchButton" HorizontalAlignment="Left" Grid.Column="1" d:LayoutOverrides="Height" IsChecked="{Binding Series.IsSubscribed, Mode=OneWay}">
+                		<i:Interaction.Triggers>
+                			<i:EventTrigger EventName="Unchecked">
+                				<GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding Unsunscribe, Mode=OneWay}"/>
+                			</i:EventTrigger>
+                			<i:EventTrigger EventName="Checked">
+                				<GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding Subscribe, Mode=OneWay}"/>
+                			</i:EventTrigger>
+                		</i:Interaction.Triggers>
+                	</toolkitPrimitives:ToggleSwitchButton>
+                	<TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Subscribed" VerticalAlignment="Center" Margin="{StaticResource PhoneMargin}"/>
+                </Grid>
             </controls:PanoramaItem>
 
             <!--Panorama item two-->
             <controls:PanoramaItem Header="episodes">
                 <Grid>
-                	<toolkit:LongListSelector ItemsSource="{Binding Episodes}" ShowListFooter="False" ShowListHeader="False" GroupItemTemplate="{StaticResource DataTemplate1}">	
-						<toolkit:LongListSelector.GroupItemsPanel>
-							<ItemsPanelTemplate>
-								<toolkit:WrapPanel/>
-							</ItemsPanelTemplate>
-						</toolkit:LongListSelector.GroupItemsPanel>
-						<toolkit:LongListSelector.GroupHeaderTemplate>
-							<DataTemplate>
-								<Border Padding="{StaticResource PhoneTouchTargetOverhang}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="64" Height="64" Margin="{StaticResource PhoneMargin}">
-									<Border.Background>
-										<SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
-									</Border.Background><TextBlock Text="{Binding Key}" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center" /></Border>
-							</DataTemplate>
-						</toolkit:LongListSelector.GroupHeaderTemplate>
-						<toolkit:LongListSelector.ItemTemplate>
-							<DataTemplate>
-								<Grid Margin="0,0,-28,12" Width="422">
-									<Grid.RowDefinitions>
-										<RowDefinition Height="Auto"/>
-										<RowDefinition/>
-									</Grid.RowDefinitions>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="160"/>
-										<ColumnDefinition/>
-									</Grid.ColumnDefinitions>
-									<Image Source="{Binding Image}" Height="90" Width="160" Stretch="UniformToFill" d:LayoutOverrides="GridBox" />
-									<Grid VerticalAlignment="Top" Grid.Row="1">
-										<Rectangle Fill="{StaticResource PhoneAccentBrush}" d:LayoutOverrides="GridBox"/>
-										<TextBlock TextWrapping="Wrap" Text="{Binding Name}" d:LayoutOverrides="Width, Height" FontSize="18.667" Margin="{StaticResource PhoneMargin}"/>
-									</Grid>
-									<TextBlock TextWrapping="Wrap" Text="{Binding Description}" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16"/>
-								</Grid>
-							</DataTemplate>
-					</toolkit:LongListSelector.ItemTemplate>
-					</toolkit:LongListSelector>
+                	<toolkit:LongListSelector x:Name="episodeList" SelectedItem="{Binding SelectedEpisode, Mode=TwoWay}" toolkit:TiltEffect.IsTiltEnabled="True" ItemsSource="{Binding Episodes}" ShowListFooter="False" ShowListHeader="False" GroupItemTemplate="{StaticResource DataTemplate1}">	
+                		<toolkit:LongListSelector.GroupItemsPanel>
+                			<ItemsPanelTemplate>
+                				<toolkit:WrapPanel/>
+                			</ItemsPanelTemplate>
+                		</toolkit:LongListSelector.GroupItemsPanel>
+                		<toolkit:LongListSelector.GroupHeaderTemplate>
+                			<DataTemplate>
+                				<Border Padding="{StaticResource PhoneTouchTargetOverhang}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="64" Height="64" Margin="{StaticResource PhoneMargin}">
+                					<Border.Background>
+                						<SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
+                					</Border.Background><TextBlock Text="{Binding Key}" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center" /></Border>
+                			</DataTemplate>
+                		</toolkit:LongListSelector.GroupHeaderTemplate>
+                		<toolkit:LongListSelector.ItemTemplate>
+                			<DataTemplate>
+                				<Grid Margin="0,0,-28,12" Width="425">
+                					<Grid.RowDefinitions>
+                						<RowDefinition Height="Auto"/>
+                						<RowDefinition/>
+                					</Grid.RowDefinitions>
+                					<Grid.ColumnDefinitions>
+                						<ColumnDefinition Width="0.382*"/>
+                						<ColumnDefinition Width="0.618*"/>
+                					</Grid.ColumnDefinitions>
+                					<Image Source="{Binding Image}" Height="90" Stretch="UniformToFill" d:LayoutOverrides="GridBox" />
+                					<Grid VerticalAlignment="Top" Grid.Row="1">
+                						<Rectangle Fill="{StaticResource PhoneAccentBrush}" d:LayoutOverrides="GridBox"/>
+                						<TextBlock TextWrapping="Wrap" Text="{Binding Name, Converter={StaticResource ToUpper}}" d:LayoutOverrides="Width, Height" FontSize="18.667" Margin="{StaticResource PhoneMargin}" Foreground="{StaticResource PhoneForegroundBrush}" Style="{StaticResource PhoneTextBlockBase}" FontFamily="Rockwell Condensed"/>
+                					</Grid>
+                					<TextBlock TextWrapping="Wrap" Text="{Binding Description}" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" MaxHeight="140" VerticalAlignment="Top">
+                						<i:Interaction.Triggers>
+                							<ec:DataTrigger Value="{Binding}" Binding="{Binding SeriesDetails.SelectedEpisode, Source={StaticResource Locator}}" >
+                								<ec:ChangePropertyAction PropertyName="MaxHeight" Value="800" Duration="0:0:0.3" >
+                									<ec:ChangePropertyAction.Ease>
+                										<CubicEase EasingMode="EaseInOut"/>
+                									</ec:ChangePropertyAction.Ease>
+                								</ec:ChangePropertyAction>
+                							</ec:DataTrigger>
+                						</i:Interaction.Triggers>
+                					</TextBlock>
+                				</Grid>
+                			</DataTemplate>
+                		</toolkit:LongListSelector.ItemTemplate>
+                		<i:Interaction.Triggers>
+                			<i:EventTrigger EventName="SelectionChanged">
+                				<GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding EpisodeSelected, Mode=OneWay}" PassEventArgsToCommand="True"/>
+                			</i:EventTrigger>
+                		</i:Interaction.Triggers>
+                	</toolkit:LongListSelector>
                 </Grid>
             </controls:PanoramaItem>
         </controls:Panorama>

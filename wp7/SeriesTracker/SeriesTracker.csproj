@@ -131,7 +131,6 @@
     </Compile>
     <Compile Include="BlobCache.cs" />
     <Compile Include="Collections\LongListCollection.cs" />
-    <Compile Include="Collections\SelfSortingObservableCollection.cs" />
     <Compile Include="Converters\VisibleIfNotNullOrEmpty.cs" />
     <Compile Include="Converters\UppercaseConverter.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -142,7 +141,6 @@
       <DependentUpon>SeriesDetails.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\SeriesDetailsViewModel.cs" />
-    <Compile Include="ViewModel\SeriesRecord.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
   </ItemGroup>

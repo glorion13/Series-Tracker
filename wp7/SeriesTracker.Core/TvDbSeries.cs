@@ -124,5 +124,18 @@ namespace SeriesTracker
         public TvDbSeries() {
             episodes = new ObservableCollection<TvDbSeriesEpisode>();
         }
+
+        private DateTime? updated = null;
+        public DateTime? Updated
+        {
+            get
+            {
+                return updated;
+            }
+            set
+            {
+                Set(() => Updated, ref updated, value);
+            }
+        }
     }
 }

@@ -1,15 +1,21 @@
 ﻿using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
+using Microsoft.Phone.Controls;
 using SeriesTracker.Collections;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace SeriesTracker
 {
     public class SeriesDetailsViewModel : ViewModelBase
     {
+        private SubscriptionManager subscriptionManager;
+
         private TvDbSeries series;
         public TvDbSeries Series
         {
@@ -23,8 +29,59 @@ namespace SeriesTracker
             }
         }
 
-        public SeriesDetailsViewModel()
+        private TvDbSeriesEpisode selectedEpisode = null;
+        public TvDbSeriesEpisode SelectedEpisode
         {
+            get
+            {
+                return selectedEpisode;
+            }
+            set
+            {
+                Set(() => SelectedEpisode, ref selectedEpisode, value);
+            }
+        }
+
+        private ICommand episodeSelected;
+        public ICommand EpisodeSelected
+        {
+            get
+            {
+                return episodeSelected ?? (episodeSelected = new RelayCommand<SelectionChangedEventArgs>(s =>
+                    {
+                        SelectedEpisode = s.AddedItems.OfType<LongListSelectorItem>().Select(i => i.Item as TvDbSeriesEpisode).FirstOrDefault();
+                    }));
+            }
+        }
+
+        private ICommand subscribe;
+        public ICommand Subscribe
+        {
+            get
+            {
+                return subscribe ?? (subscribe = new RelayCommand(() =>
+                {
+                    subscriptionManager.Subscribe(series);
+                }));
+            }
+        }
+
+        private ICommand unsubscribe;
+        public ICommand Unsunscribe
+        {
+            get
+            {
+                return unsubscribe ?? (unsubscribe = new RelayCommand(() =>
+                {
+                    subscriptionManager.Unsubscribe(series);
+                }));
+            }
+        }
+
+        public SeriesDetailsViewModel(SubscriptionManager subscriptionManager)
+        {
+            this.subscriptionManager = subscriptionManager;
+
             if (!IsInDesignMode)
             {
                 MessengerInstance.Register<TvDbSeries>(this, s => Series = s);

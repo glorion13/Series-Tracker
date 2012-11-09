@@ -12,13 +12,13 @@ using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using ReactiveUI;
 using System.Linq.Expressions;
 using System.Reactive.Linq;
 using System.Collections.Generic;
 using System.Reactive.Subjects;
 using System.Reactive;
 using GalaSoft.MvvmLight.Threading;
+using ReactiveUI;
 
 namespace SeriesTracker
 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +17,9 @@ using System.IO.IsolatedStorage;
 using System.Xml.Serialization;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
+using System.Windows.Threading;
+using GalaSoft.MvvmLight.Threading;
 
 namespace SeriesTracker
 {
@@ -31,7 +35,9 @@ namespace SeriesTracker
                 lock (saveLock)
                 {
                     var subs = GetCachedSubscriptions();
-                    subs.ContinueWith(s => s.Result.Add(series)).Wait();
+                    subs.ContinueWith(async s => {
+                        await DispatcherHelper.UIDispatcher.InvokeAsync(async () => (await s).Add(series));
+                    }).Unwrap().Wait();
                     SaveSubscriptions();
                 }
             });
@@ -45,8 +51,13 @@ namespace SeriesTracker
             {
                 lock (saveLock)
                 {
-                    var subs = GetCachedSubscriptions();
-                    subs.ContinueWith(s => s.Result.Remove(series)).Wait();
+                    GetCachedSubscriptions().ContinueWith(s =>
+                    {
+                        DispatcherHelper.UIDispatcher.InvokeAsync(() => {
+                            ObservableCollection<TvDbSeries> subscriptions = s.Result;
+                            subscriptions.RemoveAllThatMatch(m => series.Id == m.Id);
+                        }).Wait();
+                    }).Wait();
                     SaveSubscriptions();
                 }
             });
@@ -60,7 +71,7 @@ namespace SeriesTracker
                 try
                 {
                     XmlSerializer serializer = new XmlSerializer(typeof(List<TvDbSeries>));
-                    serializer.Serialize(file, await GetCachedSubscriptions());
+                    serializer.Serialize(file, (await GetCachedSubscriptions()).ToList());
                 }
                 catch (Exception e)
                 {
@@ -70,13 +81,14 @@ namespace SeriesTracker
         }
 
 
-        public async Task<IEnumerable<TvDbSeries>> GetSubscriptions() {
+        public async Task<ObservableCollection<TvDbSeries>> GetSubscriptions()
+        {
             return await GetCachedSubscriptions();
         }
 
-        List<TvDbSeries> subscriptions = null;
+        ObservableCollection<TvDbSeries> subscriptions = null;
         private object key = new object();
-        private async Task<List<TvDbSeries>> GetCachedSubscriptions() {
+        private async Task<ObservableCollection<TvDbSeries>> GetCachedSubscriptions() {
             return subscriptions ?? await Task.Factory.StartNew(() =>
             {
                 lock (key)
@@ -86,7 +98,7 @@ namespace SeriesTracker
             });
         }
 
-        private List<TvDbSeries> LoadSubscriptios()
+        private ObservableCollection<TvDbSeries> LoadSubscriptios()
         {
             using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
             {
@@ -95,11 +107,13 @@ namespace SeriesTracker
                     if (file.Length > 0)
                     {
                         XmlSerializer serializer = new XmlSerializer(typeof(List<TvDbSeries>));
-                        return serializer.Deserialize(file) as List<TvDbSeries>;
+                        var collection = new SelfSortingObservableCollection<TvDbSeries, string>(s => s.Title);
+                        collection.AddAll(serializer.Deserialize(file) as List<TvDbSeries>);
+                        return collection;                        
                     }
                     else
                     {
-                        return new List<TvDbSeries>();
+                        return new ObservableCollection<TvDbSeries>();
                     }
                 }
             }         

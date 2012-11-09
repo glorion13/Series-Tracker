@@ -8,6 +8,7 @@ using System.Reactive.Concurrency;
 using System.Xml;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace SeriesTracker
 {
@@ -16,9 +17,9 @@ namespace SeriesTracker
         private readonly SubscriptionManager subscriptionManager;
         private readonly TvDb tvdb;
 
-        public TvDbSeriesRepository()
+        public TvDbSeriesRepository(SubscriptionManager subscriptionManager)
         {
-            subscriptionManager = new SubscriptionManager();
+            this.subscriptionManager = subscriptionManager;
             tvdb = new TvDb();
         }
 
@@ -62,7 +63,7 @@ namespace SeriesTracker
             series.IsSubscribed = isSubscribed;
         }
 
-        public async Task<IEnumerable<TvDbSeries>> GetSubscribed()
+        public async Task<ObservableCollection<TvDbSeries>> GetSubscribed()
         {
             return await subscriptionManager.GetSubscriptions();
         }
