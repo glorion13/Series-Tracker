@@ -66,7 +66,7 @@
                 		<ColumnDefinition Width="0.757*"/>
                 		<ColumnDefinition Width="Auto"/>
                 	</Grid.ColumnDefinitions>
-                	<TextBlock TextWrapping="Wrap" Text="{Binding Series.Title}" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextGroupHeaderStyle}"/>
+                	<TextBlock TextWrapping="Wrap" Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Grid.ColumnSpan="2" Style="{StaticResource ItemTitle}" FontFamily="Segoe UI" Foreground="{StaticResource PhoneForegroundBrush}"/>
                 	<toolkitPrimitives:ToggleSwitchButton Content="ToggleSwitchButton" HorizontalAlignment="Left" Grid.Column="1" d:LayoutOverrides="Height" IsChecked="{Binding Series.IsSubscribed, Mode=OneWay}" Grid.Row="1">
                 		<i:Interaction.Triggers>
                 			<i:EventTrigger EventName="Unchecked">
@@ -102,11 +102,6 @@
                 		<toolkit:LongListSelector.ItemTemplate>
                 			<DataTemplate>
                 				<Grid Margin="0,0,-28,12" Width="425">
-                					<i:Interaction.Triggers>
-                						<i:EventTrigger EventName="Tap">
-                							<GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding SeriesDetails.ToggleExpanded, Source={StaticResource Locator}}" CommandParameter="{Binding}"/>
-                						</i:EventTrigger>
-                					</i:Interaction.Triggers>
                 					<Grid.RowDefinitions>
                 						<RowDefinition Height="Auto"/>
                 						<RowDefinition />
@@ -124,24 +119,7 @@
                 						<Rectangle Fill="{StaticResource PhoneAccentBrush}" />
                 						<TextBlock TextWrapping="Wrap" Text="{Binding Episode.Name, Converter={StaticResource ToUpper}}" FontSize="18.667" Margin="{StaticResource PhoneMargin}" Foreground="{StaticResource PhoneForegroundBrush}" Style="{StaticResource PhoneTextBlockBase}" FontFamily="Rockwell Condensed"/>
                 					</Grid>
-                					<TextBlock TextWrapping="Wrap" Text="{Binding Episode.Description}" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" MaxHeight="140" VerticalAlignment="Top">
-                						<i:Interaction.Triggers>
-                							<ec:DataTrigger Value="True" Binding="{Binding IsExpanded}" >
-                								<ec:ChangePropertyAction PropertyName="MaxHeight" Value="800" Duration="0:0:0.4" >
-                									<ec:ChangePropertyAction.Ease>
-                										<CubicEase EasingMode="EaseInOut"/>
-                									</ec:ChangePropertyAction.Ease>
-                								</ec:ChangePropertyAction>
-                							</ec:DataTrigger>
-                							<ec:DataTrigger Value="False" Binding="{Binding IsExpanded}" >
-                								<ec:ChangePropertyAction PropertyName="MaxHeight" Duration="0:0:0.4" Value="140" >
-                									<ec:ChangePropertyAction.Ease>
-                										<CubicEase EasingMode="EaseInOut"/>
-                									</ec:ChangePropertyAction.Ease>
-                								</ec:ChangePropertyAction>
-                							</ec:DataTrigger>
-                						</i:Interaction.Triggers>
-                					</TextBlock>
+                					<TextBlock TextWrapping="Wrap" Text="{Binding Episode.Description}" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" VerticalAlignment="Top"/>
                 				</Grid>
                 			</DataTemplate>
                 		</toolkit:LongListSelector.ItemTemplate>

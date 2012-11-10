@@ -65,7 +65,22 @@ namespace SeriesTracker
 
         public async Task<ObservableCollection<TvDbSeries>> GetSubscribed()
         {
-            return await subscriptionManager.GetSubscriptions();
+            var subscriptions = await subscriptionManager.GetSubscriptions();
+            foreach (var sub in subscriptions.ToList())
+            {
+                CheckUpdateSeries(sub);
+            }
+
+            return subscriptions;
+        }
+
+        private async Task CheckUpdateSeries(TvDbSeries series)
+        {
+            bool needsUpdating = DateTime.Now - series.Updated > TimeSpan.FromMinutes(30);
+            if (needsUpdating)
+            {
+                await UpdateData(series);
+            }
         }
 
         public async Task Subscribe(TvDbSeries series)

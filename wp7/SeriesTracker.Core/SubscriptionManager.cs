@@ -29,17 +29,14 @@ namespace SeriesTracker
         private object saveLock = new object();
         public async Task Subscribe(TvDbSeries series) {
             series.IsSubscribed = true;
+            var subscriptions = await GetCachedSubscriptions();
+            subscriptions.Add(series);
 
             await Task.Factory.StartNew(() =>
             {
                 lock (saveLock)
                 {
-                    GetCachedSubscriptions().ContinueWith(s =>
-                    {
-                        ObservableCollection<TvDbSeries> subscriptions = s.Result;
-                        DispatcherHelper.UIDispatcher.InvokeAsync(() => subscriptions.Add(series)).Wait();
-                    }).ContinueWith(async t => await SaveSubscriptions())
-                    .Wait();
+                    SaveSubscriptions().Wait();
                 }
             });
         }
@@ -47,17 +44,14 @@ namespace SeriesTracker
         public async Task Unsubscribe(TvDbSeries series)
         {
             series.IsSubscribed = false;
+            var subscriptions = await GetCachedSubscriptions();
+            subscriptions.RemoveAllThatMatch(m => series.Id == m.Id);
 
             await Task.Factory.StartNew(() =>
             {
                 lock (saveLock)
                 {
-                    GetCachedSubscriptions().ContinueWith(s =>
-                    {
-                        ObservableCollection<TvDbSeries> subscriptions = s.Result;
-                        DispatcherHelper.UIDispatcher.InvokeAsync(() => subscriptions.RemoveAllThatMatch(m => series.Id == m.Id)).Wait();
-                    }).ContinueWith(async t => await SaveSubscriptions())
-                    .Wait();
+                    SaveSubscriptions().Wait();
                 }
             });
         }
@@ -87,6 +81,7 @@ namespace SeriesTracker
 
         ObservableCollection<TvDbSeries> subscriptions = null;
         private object key = new object();
+
         private async Task<ObservableCollection<TvDbSeries>> GetCachedSubscriptions() {
             return subscriptions ?? await Task.Factory.StartNew(() =>
             {
