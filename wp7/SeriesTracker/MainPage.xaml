@@ -71,7 +71,7 @@
                         </Image.Source>
                     </Image>
 					<StackPanel Width="311">
-						<TextBlock Text="{Binding Title, Converter={StaticResource ToUpper}}" TextWrapping="Wrap" Style="{StaticResource ItemTitle}" Margin="{StaticResource PhoneHorizontalMargin}"/>
+						<TextBlock Text="{Binding Title, Converter={StaticResource ToUpper}}" TextWrapping="Wrap" Style="{StaticResource ItemTitle}" Margin="12,-5,12,0"/>
 						<TextBlock Text="{Binding Rating}" TextWrapping="Wrap"  Style="{StaticResource ItemDescription}" />
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Tap">
@@ -114,7 +114,7 @@
                                 <BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Thumbnail}" />
                             </Image.Source>
                         </Image>
-                        <Grid x:Name="tick" Width="100" Height="100" Visibility="Visible" Opacity="0"><Path Data="F1M57.0078,13.3424C54.8815,11.3346,51.5313,11.4283,49.5221,13.5521L23.7877,39.6022 14.0924,31.125C11.8854,29.2084 8.53906,29.4531 6.62231,31.6666 4.71094,33.8776 4.95313,37.224 7.16528,39.1342L19.9426,50.3125C20.1731,50.5131 20.4244,50.6771 20.6809,50.8307 22.8112,52.6484 26.0065,52.5143 27.9479,50.4557L57.2161,20.8295C59.2291,18.7045,59.1354,15.3516,57.0078,13.3424z" Stretch="Uniform" Fill="{StaticResource PhoneAccentBrush}" Width="60" Height="60" Margin="0,0,0,0" /></Grid>
+                        <Grid x:Name="tick" Width="100" Height="100" Visibility="Visible" Opacity="0" CacheMode="BitmapCache"><Path Data="F1M57.0078,13.3424C54.8815,11.3346,51.5313,11.4283,49.5221,13.5521L23.7877,39.6022 14.0924,31.125C11.8854,29.2084 8.53906,29.4531 6.62231,31.6666 4.71094,33.8776 4.95313,37.224 7.16528,39.1342L19.9426,50.3125C20.1731,50.5131 20.4244,50.6771 20.6809,50.8307 22.8112,52.6484 26.0065,52.5143 27.9479,50.4557L57.2161,20.8295C59.2291,18.7045,59.1354,15.3516,57.0078,13.3424z" Stretch="Uniform" Fill="{StaticResource PhoneAccentBrush}" Width="60" Height="60" Margin="0,0,0,0" /></Grid>
 					</Canvas>
 					<StackPanel Width="311">
                         <i:Interaction.Triggers>
@@ -143,6 +143,7 @@
 			<!--Panorama item one-->
 			<controls:PanoramaItem Header="followed">
 				<StackPanel Margin="0,0,-12,0" Orientation="Vertical" d:LayoutOverrides="Height">
+					<!--Double line list with text wrapping-->
 					<toolkit:PerformanceProgressBar x:Name="subsProgressBar" Height="10" Margin="0,-15,0,5" IsIndeterminate="True" Visibility="Collapsed"/>
 					<!--Double line list with text wrapping-->
 					<ListBox Margin="0,0,-12,0" ItemsSource="{Binding Series}" Foreground="Black" ItemTemplate="{StaticResource SeriesTemplate}" />

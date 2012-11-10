@@ -34,11 +34,12 @@ namespace SeriesTracker
             {
                 lock (saveLock)
                 {
-                    var subs = GetCachedSubscriptions();
-                    subs.ContinueWith(async s => {
-                        await DispatcherHelper.UIDispatcher.InvokeAsync(async () => (await s).Add(series));
-                    }).Unwrap().Wait();
-                    SaveSubscriptions();
+                    GetCachedSubscriptions().ContinueWith(s =>
+                    {
+                        ObservableCollection<TvDbSeries> subscriptions = s.Result;
+                        DispatcherHelper.UIDispatcher.InvokeAsync(() => subscriptions.Add(series)).Wait();
+                    }).ContinueWith(async t => await SaveSubscriptions())
+                    .Wait();
                 }
             });
         }
@@ -53,17 +54,15 @@ namespace SeriesTracker
                 {
                     GetCachedSubscriptions().ContinueWith(s =>
                     {
-                        DispatcherHelper.UIDispatcher.InvokeAsync(() => {
-                            ObservableCollection<TvDbSeries> subscriptions = s.Result;
-                            subscriptions.RemoveAllThatMatch(m => series.Id == m.Id);
-                        }).Wait();
-                    }).Wait();
-                    SaveSubscriptions();
+                        ObservableCollection<TvDbSeries> subscriptions = s.Result;
+                        DispatcherHelper.UIDispatcher.InvokeAsync(() => subscriptions.RemoveAllThatMatch(m => series.Id == m.Id)).Wait();
+                    }).ContinueWith(async t => await SaveSubscriptions())
+                    .Wait();
                 }
             });
         }
 
-        private async void SaveSubscriptions()
+        private async Task SaveSubscriptions()
         {
             using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
             using (IsolatedStorageFileStream file = new IsolatedStorageFileStream("subscriptions.xml", FileMode.Truncate, storage))

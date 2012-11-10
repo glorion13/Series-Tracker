@@ -29,28 +29,12 @@ namespace SeriesTracker
             }
         }
 
-        private TvDbSeriesEpisode selectedEpisode = null;
-        public TvDbSeriesEpisode SelectedEpisode
+        private ICommand toggleExpanded;
+        public ICommand ToggleExpanded
         {
             get
             {
-                return selectedEpisode;
-            }
-            set
-            {
-                Set(() => SelectedEpisode, ref selectedEpisode, value);
-            }
-        }
-
-        private ICommand episodeSelected;
-        public ICommand EpisodeSelected
-        {
-            get
-            {
-                return episodeSelected ?? (episodeSelected = new RelayCommand<SelectionChangedEventArgs>(s =>
-                    {
-                        SelectedEpisode = s.AddedItems.OfType<LongListSelectorItem>().Select(i => i.Item as TvDbSeriesEpisode).FirstOrDefault();
-                    }));
+                return toggleExpanded ?? (toggleExpanded = new RelayCommand<EpisodeViewModel>(e => e.IsExpanded = !e.IsExpanded));
             }
         }
 
@@ -124,13 +108,53 @@ namespace SeriesTracker
             }
         }
 
-        public LongListCollection<TvDbSeriesEpisode, string> Episodes
+        public class EpisodeViewModel : ViewModelBase, IComparable<EpisodeViewModel>
+        {
+            private TvDbSeriesEpisode episode = null;
+            public TvDbSeriesEpisode Episode
+            {
+                get
+                {
+                    return episode;
+                }
+                set
+                {
+                    Set(() => Episode, ref episode, value);
+                }
+            }
+
+            private bool isExpanded = false;
+            public bool IsExpanded
+            {
+                get
+                {
+                    return isExpanded;
+                }
+                set
+                {
+                    Set(() => IsExpanded, ref isExpanded, value);
+                }
+            }
+
+            public EpisodeViewModel(TvDbSeriesEpisode episode) {
+                this.episode = episode;
+            }
+
+            public int CompareTo(EpisodeViewModel other)
+            {
+                if (other == null) return 1;
+
+                return this.episode.CompareTo(other.episode);
+            }
+        }
+
+        public LongListCollection<EpisodeViewModel, string> Episodes
         {
             get
             {
-                return new LongListCollection<TvDbSeriesEpisode, string>(
-                    series.Episodes.OrderByDescending(l => l.SeriesNumber).ThenByDescending(l => l.EpisodeNumber),
-                    e => e.SeriesNumber,
+                return new LongListCollection<EpisodeViewModel, string>(
+                    series.Episodes.OrderByDescending(l => l.SeriesNumber).ThenByDescending(l => l.EpisodeNumber).Select(x => new EpisodeViewModel(x)),
+                    e => e.Episode.SeriesNumber,
                     series.Episodes.Select(e => e.SeriesNumber).ToList());
             }
         }
