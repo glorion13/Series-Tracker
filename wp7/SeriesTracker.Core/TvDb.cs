@@ -119,7 +119,7 @@ namespace SeriesTracker
                 SeriesNumber = e.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
                 EpisodeNumber = e.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault(),
                 Description = e.Descendants("Overview").Select(n => n.Value).FirstOrDefault(),
-                Image = e.Descendants("filename").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault()
+                Image = e.Descendants("filename").Select(n => string.Format("http://imageresizer-1.apphb.com/resize?url={0}/banners/{1}&width=162", mirror, n.Value)).FirstOrDefault()
             });
 
             series.Updated = updated;

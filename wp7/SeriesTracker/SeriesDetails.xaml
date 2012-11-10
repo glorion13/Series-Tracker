@@ -7,8 +7,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" 
-    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" xmlns:ec="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions" 
-    xmlns:toolkitPrimitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit" xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP71" 
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+	xmlns:ec="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions" 
+    xmlns:toolkitPrimitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit"
+	xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP71" 
     x:Class="SeriesTracker.SeriesDetails" 
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
     SupportedOrientations="Portrait"  Orientation="Portrait"
@@ -16,7 +18,7 @@
 	>
 	<phone:PhoneApplicationPage.Resources>
 		<DataTemplate x:Key="TitleTemplate">
-			<Grid MinHeight="140">
+			<Grid MinHeight="132">
 				<TextBlock Text="{Binding Title}" Style="{StaticResource PhoneTextTitle3Style}" Visibility="{Binding Banner, ConverterParameter=True, Converter={StaticResource VisibleIfNotNullOrEmpty}}" Opacity="0.85" VerticalAlignment="Top" Margin="12,303,12,0" />
 			</Grid>
 		</DataTemplate>
@@ -80,7 +82,7 @@
             <!--Panorama item two-->
             <controls:PanoramaItem Header="episodes">
                 <Grid>
-                	<toolkit:LongListSelector x:Name="episodeList" SelectedItem="{Binding SelectedEpisode, Mode=TwoWay}" toolkit:TiltEffect.IsTiltEnabled="True" ItemsSource="{Binding Episodes}" ShowListFooter="False" ShowListHeader="False" GroupItemTemplate="{StaticResource DataTemplate1}">	
+                	<toolkit:LongListSelector x:Name="episodeList" toolkit:TiltEffect.IsTiltEnabled="True" ItemsSource="{Binding Episodes}" ShowListFooter="False" ShowListHeader="False" GroupItemTemplate="{StaticResource DataTemplate1}">	
                 		<toolkit:LongListSelector.GroupItemsPanel>
                 			<ItemsPanelTemplate>
                 				<toolkit:WrapPanel/>
@@ -99,21 +101,25 @@
                 				<Grid Margin="0,0,-28,12" Width="425">
                 					<Grid.RowDefinitions>
                 						<RowDefinition Height="Auto"/>
-                						<RowDefinition/>
+                						<RowDefinition />
                 					</Grid.RowDefinitions>
                 					<Grid.ColumnDefinitions>
                 						<ColumnDefinition Width="0.382*"/>
                 						<ColumnDefinition Width="0.618*"/>
                 					</Grid.ColumnDefinitions>
-                					<Image Source="{Binding Image}" Height="90" Stretch="UniformToFill" d:LayoutOverrides="GridBox" />
+                					<Image Height="90" Stretch="UniformToFill">
+                						<Image.Source>
+                							<BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Image}" />     						
+										</Image.Source>
+									</Image>
                 					<Grid VerticalAlignment="Top" Grid.Row="1">
-                						<Rectangle Fill="{StaticResource PhoneAccentBrush}" d:LayoutOverrides="GridBox"/>
-                						<TextBlock TextWrapping="Wrap" Text="{Binding Name, Converter={StaticResource ToUpper}}" d:LayoutOverrides="Width, Height" FontSize="18.667" Margin="{StaticResource PhoneMargin}" Foreground="{StaticResource PhoneForegroundBrush}" Style="{StaticResource PhoneTextBlockBase}" FontFamily="Rockwell Condensed"/>
+                						<Rectangle Fill="{StaticResource PhoneAccentBrush}" />
+                						<TextBlock TextWrapping="Wrap" Text="{Binding Name, Converter={StaticResource ToUpper}}" FontSize="18.667" Margin="{StaticResource PhoneMargin}" Foreground="{StaticResource PhoneForegroundBrush}" Style="{StaticResource PhoneTextBlockBase}" FontFamily="Rockwell Condensed"/>
                 					</Grid>
                 					<TextBlock TextWrapping="Wrap" Text="{Binding Description}" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" MaxHeight="140" VerticalAlignment="Top">
                 						<i:Interaction.Triggers>
                 							<ec:DataTrigger Value="{Binding}" Binding="{Binding SeriesDetails.SelectedEpisode, Source={StaticResource Locator}}" >
-                								<ec:ChangePropertyAction PropertyName="MaxHeight" Value="800" Duration="0:0:0.3" >
+                								<ec:ChangePropertyAction PropertyName="MaxHeight" Value="800" Duration="0:0:0.4" >
                 									<ec:ChangePropertyAction.Ease>
                 										<CubicEase EasingMode="EaseInOut"/>
                 									</ec:ChangePropertyAction.Ease>

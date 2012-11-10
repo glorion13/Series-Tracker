@@ -13,6 +13,7 @@ using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using GalaSoft.MvvmLight.Threading;
+using System.Windows.Media.Imaging;
 
 namespace SeriesTracker
 {
@@ -131,6 +132,9 @@ namespace SeriesTracker
             {
                 RootFrame.Navigate(m);
             });
+
+            App.Current.Resources.Remove("CreateOption");
+            App.Current.Resources.Add("CreateOption", BitmapCreateOptions.BackgroundCreation | BitmapCreateOptions.DelayCreation);
 
             // Ensure we don't initialize again
             phoneApplicationInitialized = true;
