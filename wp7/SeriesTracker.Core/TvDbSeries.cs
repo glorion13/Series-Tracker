@@ -5,6 +5,7 @@ using System.Text;
 using GalaSoft.MvvmLight;
 using System.Xml.Serialization;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace SeriesTracker
 {
@@ -135,6 +136,68 @@ namespace SeriesTracker
             set
             {
                 Set(() => Updated, ref updated, value);
+            }
+        }
+
+        private string airsTime = string.Empty;
+        public string AirsTime
+        {
+            get
+            {
+                return airsTime;
+            }
+            set
+            {
+                Set(() => AirsTime, ref airsTime, value);
+                RaisePropertyChanged(() => Airs);
+            }
+        }
+
+        private int? airsDayOfWeek = null;
+        public int? AirsDayOfWeek
+        {
+            get
+            {
+                return airsDayOfWeek;
+            }
+            set
+            {
+                Set(() => AirsDayOfWeek, ref airsDayOfWeek, value);
+                RaisePropertyChanged(() => Airs);
+            }
+        }
+
+
+        public string Airs
+        {
+            get
+            {
+                switch (airsDayOfWeek)
+                {
+                    case null:
+                        return string.Empty;
+                    case -1:
+                        return "irregularly";
+                    default:
+                        return CultureInfo.InvariantCulture.DateTimeFormat.DayNames[airsDayOfWeek.Value] + " " + AirsTime;
+                }
+            }
+        }
+
+        public DateTime? GetNextEpisodeAirTime()
+        {
+            return episodes.Where(e => e.FirstAired != null && e.FirstAired >= DateTime.Today).Select(e => e.FirstAired.Value).OrderBy(x => x).FirstOrDefault();
+        }
+
+        public string NextEpisodeAirs
+        {
+            get
+            {
+                var date = GetNextEpisodeAirTime();
+                if (date == null) {
+                    return "N/A";
+                }
+                return  date.Value.ToShortDateString() + " " + AirsTime;
             }
         }
     }

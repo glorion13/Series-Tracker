@@ -78,6 +78,8 @@ namespace SeriesTracker
             return list;
         }
 
+        private static List<string> daysOfWeek = CultureInfo.InvariantCulture.DateTimeFormat.DayNames.Select(d => d.ToLowerInvariant()).ToList();
+
         public async Task UpdateData(TvDbSeries series)
         {
             await EnsureInitialized();
@@ -111,6 +113,24 @@ namespace SeriesTracker
                 }
             }
 
+            var airsTime = doc.Descendants("Airs_Time").FirstOrDefault();
+            if (airsTime != null)
+            {
+                if (!string.IsNullOrEmpty(airsTime.Value))
+                {
+                    series.AirsTime = airsTime.Value;
+                }
+            }
+
+            var airsDayOfWeek = doc.Descendants("Airs_DayOfWeek").FirstOrDefault();
+            if (airsDayOfWeek != null)
+            {
+                if (!string.IsNullOrEmpty(airsDayOfWeek.Value))
+                {
+                    series.AirsDayOfWeek = daysOfWeek.IndexOf(airsDayOfWeek.Value.Trim().ToLowerInvariant());
+                }
+            }
+
             series.Episodes = new ObservableCollection<TvDbSeriesEpisode>(
             from e in doc.Descendants("Episode")
             select new TvDbSeriesEpisode()
@@ -119,6 +139,13 @@ namespace SeriesTracker
                 SeriesNumber = e.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
                 EpisodeNumber = e.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault(),
                 Description = e.Descendants("Overview").Select(n => n.Value).FirstOrDefault(),
+                FirstAired = e.Descendants("FirstAired").Select(n => {
+                    DateTime date;
+                    if (DateTime.TryParse(n.Value, out date))
+                        return (DateTime?)date;
+
+                    return null;
+                }).FirstOrDefault(),
                 Image = e.Descendants("filename").Select(n => string.Format("http://imageresizer-1.apphb.com/resize?url={0}/banners/{1}&width=162", mirror, n.Value)).FirstOrDefault()
             });
 

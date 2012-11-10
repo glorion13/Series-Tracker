@@ -15,12 +15,32 @@
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
     SupportedOrientations="Portrait"  Orientation="Portrait"
     shell:SystemTray.IsVisible="False"
-	>
+	DataContext="{Binding SeriesDetails, Source={StaticResource Locator}}">
+	
+	<toolkit:TransitionService.NavigationInTransition>
+	    <toolkit:NavigationInTransition>
+	    	<toolkit:NavigationInTransition.Forward>
+	            <toolkit:TurnstileTransition Mode="ForwardIn"/>
+	        </toolkit:NavigationInTransition.Forward>
+	        <toolkit:NavigationInTransition.Backward>
+	            <toolkit:TurnstileTransition Mode="BackwardIn"/>
+	        </toolkit:NavigationInTransition.Backward>
+	    </toolkit:NavigationInTransition>
+	</toolkit:TransitionService.NavigationInTransition>
+	<toolkit:TransitionService.NavigationOutTransition>
+	    <toolkit:NavigationOutTransition>
+	        <toolkit:NavigationOutTransition.Backward>
+	            <toolkit:TurnstileTransition Mode="BackwardOut"/>
+	        </toolkit:NavigationOutTransition.Backward>
+	        <toolkit:NavigationOutTransition.Forward>
+	            <toolkit:TurnstileTransition Mode="ForwardOut"/>
+	        </toolkit:NavigationOutTransition.Forward>
+	    </toolkit:NavigationOutTransition>
+	</toolkit:TransitionService.NavigationOutTransition>
+	
 	<phone:PhoneApplicationPage.Resources>
 		<DataTemplate x:Key="TitleTemplate">
-			<Grid MinHeight="130">
-				<TextBlock Text="{Binding Title}" Style="{StaticResource PhoneTextTitle3Style}" Visibility="{Binding Banner, ConverterParameter=True, Converter={StaticResource VisibleIfNotNullOrEmpty}}" Opacity="0.85" VerticalAlignment="Top" Margin="12,303,12,0" />
-			</Grid>
+			<Grid MinHeight="130"/>
 		</DataTemplate>
 		<DataTemplate x:Key="HeaderTemplate">
 			<Grid>
@@ -34,19 +54,6 @@
 		</DataTemplate>
 	</phone:PhoneApplicationPage.Resources>
 
-	<phone:PhoneApplicationPage.FontFamily>
-		<StaticResource ResourceKey="PhoneFontFamilyNormal"/>
-	</phone:PhoneApplicationPage.FontFamily>
-	<phone:PhoneApplicationPage.FontSize>
-		<StaticResource ResourceKey="PhoneFontSizeNormal"/>
-	</phone:PhoneApplicationPage.FontSize>
-	<phone:PhoneApplicationPage.Foreground>
-		<StaticResource ResourceKey="PhoneForegroundBrush"/>
-	</phone:PhoneApplicationPage.Foreground>
-	<phone:PhoneApplicationPage.DataContext>
-		<Binding Path="SeriesDetails" Source="{StaticResource Locator}"/>
-	</phone:PhoneApplicationPage.DataContext>
-
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <Grid x:Name="LayoutRoot">
         <controls:Panorama HeaderTemplate="{StaticResource HeaderTemplate}"  Title="{Binding Series}"  TitleTemplate="{StaticResource TitleTemplate}" RenderTransformOrigin="0.5,0.5">
@@ -55,12 +62,16 @@
         	</controls:Panorama.Background>
 
             <!--Panorama item one-->
-            <controls:PanoramaItem Header="details">
+            <controls:PanoramaItem Header=" ">
                 <Grid>
                 	<Grid.RowDefinitions>
                 		<RowDefinition Height="Auto"/>
                 		<RowDefinition Height="Auto"/>
-                		<RowDefinition Height="0.831*"/>
+                		<RowDefinition Height="Auto"/>
+                		<RowDefinition Height="Auto"/>
+                		<RowDefinition Height="Auto"/>
+                		<RowDefinition Height="Auto"/>
+                		<RowDefinition Height="0.826*"/>
                 	</Grid.RowDefinitions>
                 	<Grid.ColumnDefinitions>
                 		<ColumnDefinition Width="0.757*"/>
@@ -77,7 +88,11 @@
                 			</i:EventTrigger>
                 		</i:Interaction.Triggers>
                 	</toolkitPrimitives:ToggleSwitchButton>
-                	<TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Subscribed" VerticalAlignment="Center" Margin="12,12,0,12" Grid.Row="1"/>
+                	<TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Subscribed" VerticalAlignment="Center" Margin="12,12,0,12" Grid.Row="1" Style="{StaticResource PhoneTextNormalStyle}"/>
+                	<TextBlock Margin="12,18,12,6" TextWrapping="Wrap" Text="Airs" d:LayoutOverrides="Height" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextNormalStyle}"/>
+                	<TextBlock Margin="{StaticResource PhoneHorizontalMargin}" TextWrapping="Wrap" Text="{Binding Series.Airs, Mode=OneWay}" d:LayoutOverrides="Height, GridBox" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextAccentStyle}"/>
+                	<TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next episode" d:LayoutOverrides="Height" Grid.Row="4" Margin="12,18,12,6" Style="{StaticResource PhoneTextNormalStyle}"/>
+                	<TextBlock Margin="{StaticResource PhoneHorizontalMargin}" TextWrapping="Wrap" Text="{Binding Series.NextEpisodeAirs, Mode=OneWay}" d:LayoutOverrides="Height" Grid.Row="5" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextAccentStyle}"/>
                 </Grid>
             </controls:PanoramaItem>
 
@@ -96,7 +111,7 @@
                 					<Border.Background>
                 						<SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                 					</Border.Background>
-									<TextBlock Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource PhoneTextExtraLargeStyle}" Margin="6,6,6,0" /></Border>
+									<TextBlock Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource PhoneTextLargeStyle}" Margin="6,6,6,0" /></Border>
                 			</DataTemplate>
                 		</toolkit:LongListSelector.GroupHeaderTemplate>
                 		<toolkit:LongListSelector.ItemTemplate>

@@ -79,6 +79,8 @@ namespace SeriesTracker
                     Thumbnail = "http://thetvdb.com/banners/posters/73871-2.jpg",
                     Banner = "http://thetvdb.com/banners/graphical/121361-g19.jpg",
                     Rating = 5,
+                    AirsTime = "9 PM",
+                    AirsDayOfWeek = 6,
                     Episodes = new ObservableCollection<TvDbSeriesEpisode>() {
                         new TvDbSeriesEpisode() {
                             Name = "Episode 1",
@@ -91,6 +93,7 @@ namespace SeriesTracker
                             Name = "Episode 2",
                             SeriesNumber = "1",
                             EpisodeNumber = "2",
+                            FirstAired = DateTime.Today.AddDays(2),
                             Description = "bla bla bla bla bla lba",
                             Image = "http://thetvdb.com/banners/episodes/121361/3254641.jpg"
                         },
@@ -103,8 +106,6 @@ namespace SeriesTracker
                         }
                     } 
                 };
-
-                
             }
         }
 

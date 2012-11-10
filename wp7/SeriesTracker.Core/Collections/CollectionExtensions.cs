@@ -1,8 +1,11 @@
-﻿using System;
+﻿using GalaSoft.MvvmLight.Threading;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace SeriesTracker
 {
@@ -17,14 +20,14 @@ namespace SeriesTracker
             }
         }
 
-        public static void AddAll<T>(this Collection<T> collection, IEnumerable<T> items)
+        public static async Task AddAll<T>(this Collection<T> collection, IEnumerable<T> items)
         {
             if (items == null)
                 return;
 
             foreach (var item in items)
             {
-                collection.Add(item);
+                await DispatcherHelper.UIDispatcher.InvokeAsync(() => collection.Add(item));                
             }
         }
     }

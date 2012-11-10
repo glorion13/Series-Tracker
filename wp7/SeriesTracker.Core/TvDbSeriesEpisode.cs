@@ -73,6 +73,19 @@ namespace SeriesTracker
             }
         }
 
+        private DateTime? firstAired = null;
+        public DateTime? FirstAired
+        {
+            get
+            {
+                return firstAired;
+            }
+            set
+            {
+                Set(() => FirstAired, ref firstAired, value);
+            }
+        }
+
         public int CompareTo(TvDbSeriesEpisode other)
         {
             if (other == null) return 1;

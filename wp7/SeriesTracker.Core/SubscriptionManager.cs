@@ -87,12 +87,20 @@ namespace SeriesTracker
             {
                 lock (key)
                 {
-                    return subscriptions ?? (subscriptions = LoadSubscriptios());
+                    if (subscriptions == null)
+                    {
+                        LoadSubscriptions().ContinueWith(t =>
+                        {
+                            subscriptions = t.Result;
+                        }).Wait();
+                    }
+
+                    return subscriptions;
                 }
             });
         }
 
-        private ObservableCollection<TvDbSeries> LoadSubscriptios()
+        private async Task<ObservableCollection<TvDbSeries>> LoadSubscriptions()
         {
             using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
             {
@@ -102,7 +110,7 @@ namespace SeriesTracker
                     {
                         XmlSerializer serializer = new XmlSerializer(typeof(List<TvDbSeries>));
                         var collection = new SelfSortingObservableCollection<TvDbSeries, string>(s => s.Title);
-                        collection.AddAll(serializer.Deserialize(file) as List<TvDbSeries>);
+                        await collection.AddAll(serializer.Deserialize(file) as List<TvDbSeries>);
                         return collection;                        
                     }
                     else

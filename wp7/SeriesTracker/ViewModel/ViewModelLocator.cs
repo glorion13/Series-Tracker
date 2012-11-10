@@ -16,6 +16,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Threading;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
+using ImageTools.IO.Gif;
 
 namespace SeriesTracker
 {
@@ -23,18 +24,27 @@ namespace SeriesTracker
     /// This class contains static references to all the view models in the
     /// application and provides an entry point for the bindings.
     /// </summary>
-    public class ViewModelLocator
+    public class ViewModelLocator : ViewModelBase
     {
         public ViewModelLocator()
         {
-            //DispatcherHelper.Initialize();
-
+            DispatcherHelper.Initialize();
+            ImageTools.IO.Decoders.AddDecoder<GifDecoder>();
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
+            if (!IsInDesignMode)
+            {
+                SimpleIoc.Default.Register<ViewModelLocator>(() => this);
+            }
+
             SimpleIoc.Default.Register<TvDbSeriesRepository>();
-            SimpleIoc.Default.Register<SubscriptionManager>();
-            SimpleIoc.Default.Register<MainViewModel>(true);
+            SimpleIoc.Default.Register<SubscriptionManager>(true);
+            
+            SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<SeriesDetailsViewModel>(true);
+
+            
+            SimpleIoc.Default.Register<SplashViewModel>(true);
         }
 
         public MainViewModel MainViewModel
@@ -52,5 +62,15 @@ namespace SeriesTracker
                 return ServiceLocator.Current.GetInstance<SeriesDetailsViewModel>();
             }
         }
+
+        public SplashViewModel SplashScreen
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<SplashViewModel>();
+            }
+        }
+
+        
     }
 }

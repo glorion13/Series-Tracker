@@ -60,10 +60,6 @@ namespace SeriesTracker
 
                 searchResults = new SelfSortingObservableCollection<TvDbSeries, float>(s => s.Rating, order: SortOrder.Desc);
                 //series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
-
-                LoadSubscriptions();
-                SetupSearch();
-
             }
             else if (IsInDesignMode)
             {
@@ -85,6 +81,12 @@ namespace SeriesTracker
                     Rating = 10
                 });
             }
+        }
+
+        public async Task Initialize()
+        {
+            await LoadSubscriptions();
+            SetupSearch();
         }
 
         private void SetupSearch()
@@ -145,7 +147,7 @@ namespace SeriesTracker
             }
         }
 
-        private bool isLoadingSubscriptions;
+        private bool isLoadingSubscriptions = true;
         public bool IsLoadingSubscriptions
         {
             get
