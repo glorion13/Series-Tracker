@@ -77,7 +77,7 @@
                 		<ColumnDefinition Width="0.757*"/>
                 		<ColumnDefinition Width="Auto"/>
                 	</Grid.ColumnDefinitions>
-                	<TextBlock TextWrapping="Wrap" Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Grid.ColumnSpan="2" Style="{StaticResource ItemTitle}" FontFamily="Segoe UI" Foreground="{StaticResource PhoneForegroundBrush}"/>
+                	<TextBlock TextWrapping="Wrap" Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Grid.ColumnSpan="2" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}"/>
                 	<toolkitPrimitives:ToggleSwitchButton Content="ToggleSwitchButton" HorizontalAlignment="Left" Grid.Column="1" d:LayoutOverrides="Height" IsChecked="{Binding Series.IsSubscribed, Mode=OneWay}" Grid.Row="1">
                 		<i:Interaction.Triggers>
                 			<i:EventTrigger EventName="Unchecked">
@@ -127,7 +127,7 @@
                 					</Grid.ColumnDefinitions>
                 					<Image Height="90" Stretch="UniformToFill">
                 						<Image.Source>
-                							<BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Episode.Image}" />     						
+                							<BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Episode.Image, Converter={StaticResource Resizer}, ConverterParameter=162}" />     						
                 						</Image.Source>
                 					</Image>
                 					<Grid VerticalAlignment="Top" Grid.Row="1">

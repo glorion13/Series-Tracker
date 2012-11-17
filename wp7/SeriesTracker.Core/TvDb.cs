@@ -84,7 +84,7 @@ namespace SeriesTracker
         {
             await EnsureInitialized();
             
-            var url = mirror + "/api/" + ApiKey + "/series/" + series.Id + "/all/en.xml";
+            var url = string.Format("{0}/api/{1}/series/{2}/all/en.xml", mirror, ApiKey, series.Id);
             var wc = new WebClient();
             var updated = DateTime.Now;
 
@@ -95,41 +95,14 @@ namespace SeriesTracker
             if (poster != null ) {
                 if (!string.IsNullOrEmpty(poster.Value))
                 {
-                    var originalUrl = mirror + "/banners/" + poster.Value;
-                    var newUrl = "http://imageresizer-1.apphb.com/resize?url=" + originalUrl + "&width=147";
-
-                    series.Image = originalUrl;
-                    series.Thumbnail = newUrl;
+                    series.Image =  string.Format("{0}/banners/{1}", mirror, poster.Value);
                 }
             }
 
-            var rating = doc.Descendants("Rating").FirstOrDefault();
-            if (rating != null)
-            {
-                if (!string.IsNullOrEmpty(rating.Value))
-                {
-                    var newRating = float.Parse(rating.Value, CultureInfo.InvariantCulture.NumberFormat);
-                    series.Rating = newRating;
-                }
-            }
-
-            var airsTime = doc.Descendants("Airs_Time").FirstOrDefault();
-            if (airsTime != null)
-            {
-                if (!string.IsNullOrEmpty(airsTime.Value))
-                {
-                    series.AirsTime = airsTime.Value;
-                }
-            }
-
-            var airsDayOfWeek = doc.Descendants("Airs_DayOfWeek").FirstOrDefault();
-            if (airsDayOfWeek != null)
-            {
-                if (!string.IsNullOrEmpty(airsDayOfWeek.Value))
-                {
-                    series.AirsDayOfWeek = daysOfWeek.IndexOf(airsDayOfWeek.Value.Trim().ToLowerInvariant());
-                }
-            }
+            ParseFromDetailsDoc(doc, "Rating", value => series.Rating = float.Parse(value, CultureInfo.InvariantCulture.NumberFormat));
+            ParseFromDetailsDoc(doc, "Airs_Time", value => series.AirsTime = value);
+            ParseFromDetailsDoc(doc, "Airs_DayOfWeek", value => series.AirsDayOfWeek = daysOfWeek.IndexOf(value.Trim().ToLowerInvariant()));
+            ParseFromDetailsDoc(doc, "Runtime", value => series.Runtime = int.Parse(value));
 
             series.Episodes = new ObservableCollection<TvDbSeriesEpisode>(
             from e in doc.Descendants("Episode")
@@ -146,10 +119,22 @@ namespace SeriesTracker
 
                     return null;
                 }).FirstOrDefault(),
-                Image = e.Descendants("filename").Select(n => string.Format("http://imageresizer-1.apphb.com/resize?url={0}/banners/{1}&width=162", mirror, n.Value)).FirstOrDefault()
+                Image = e.Descendants("filename").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault()
             });
 
             series.Updated = updated;
+        }
+
+        private static void ParseFromDetailsDoc(XDocument doc, string nodeName, Action<string> processValue)
+        {
+            var node = doc.Descendants(nodeName).FirstOrDefault();
+            if (node != null)
+            {
+                if (!string.IsNullOrEmpty(node.Value))
+                {
+                    processValue(node.Value);
+                }
+            }
         }
     }
 }

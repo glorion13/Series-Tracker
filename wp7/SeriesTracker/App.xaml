@@ -14,10 +14,8 @@
         	<BitmapCreateOptions x:Key="CreateOption">DelayCreation</BitmapCreateOptions> 
             <app:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
             <app:UppercaseConverter x:Key="ToUpper" />
-            <app:VisibleIfNotNullOrEmpty x:Key="VisibleIfNotNullOrEmpty" />
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Styles.xaml" />
-            </ResourceDictionary.MergedDictionaries>
+            <app:VisibleIfNotNullOrEmptyConverter x:Key="VisibleIfNotNullOrEmpty" />
+			<app:ResizeImageUrlConverter x:Key="Resizer" />
         </ResourceDictionary>
     </Application.Resources>
   <Application.ApplicationLifetimeObjects>

@@ -53,20 +53,6 @@ namespace SeriesTracker
             }
         }
 
-        private string thumbnail;
-        public string Thumbnail
-        {
-            get
-            {
-                return thumbnail;
-            }
-
-            set
-            {
-                Set(() => Thumbnail, ref thumbnail, value);
-            }
-        }
-
         private string banner;
         public string Banner
         {
@@ -184,20 +170,80 @@ namespace SeriesTracker
             }
         }
 
-        public DateTime? GetNextEpisodeAirTime()
+        private int? runtime;
+        public int? Runtime
         {
-            return episodes.Where(e => e.FirstAired != null && e.FirstAired >= DateTime.Today).Select(e => e.FirstAired.Value).OrderBy(x => x).FirstOrDefault();
+            get
+            {
+                return runtime;
+            }
+            set
+            {
+                Set(() => Runtime, ref runtime, value);
+            }
+        }
+
+        public DateTime? NextEpisodeAirDateTime
+        {
+            get
+            {
+                var date = episodes.Where(e => e.FirstAired != null && e.FirstAired >= DateTime.Today).Select(e => e.FirstAired).OrderBy(x => x).FirstOrDefault();
+                if (date == null)
+                    return null;
+                
+                var offset = TimeZoneInfo.Local.BaseUtcOffset;
+                decimal airsTime;
+                var parsed = decimal.TryParse(new string(AirsTime.Where(ch => char.IsDigit(ch)).ToArray()), NumberStyles.Number, CultureInfo.InvariantCulture.NumberFormat, out airsTime);
+                if (!parsed)
+                {
+                    airsTime = 0;
+                }
+
+                date = date.Value.Date.Add(offset).AddMinutes((int)(airsTime * 60));
+
+                return date;
+            }
+        }
+
+        public string NextEpisodeETA
+        {
+            get
+            {
+                DateTime? date = NextEpisodeAirDateTime as DateTime?;
+                if (date == null)
+                    return null;
+
+                var durationMinutes = Runtime ?? 30;
+
+                var delta = date.Value - DateTime.Now;
+                if (delta.TotalDays > 30)
+                    return date.Value.ToShortDateString();
+
+                return delta.Days > 0 ? string.Format("{0}d {1}h", delta.Days, delta.Hours) :
+                    delta.Hours > 0 ? string.Format("{0}h {1}m", delta.Hours, delta.Minutes) :
+                    delta.Minutes > 2 ? string.Format("{0}m {1}s", delta.Minutes, delta.Seconds) :
+                    delta.Ticks > 0 ? "due" :
+                    delta.TotalMinutes >= durationMinutes ? "LIVE" :
+                        "ended";
+            }
         }
 
         public string NextEpisodeAirs
         {
             get
             {
-                var date = GetNextEpisodeAirTime();
+                var date = NextEpisodeAirDateTime;
                 if (date == null) {
                     return "N/A";
                 }
-                return  date.Value.ToShortDateString() + " " + AirsTime;
+
+                string airs = AirsTime.Trim();
+                if (!string.IsNullOrEmpty(airs))
+                {
+                    airs += " EST";
+                }
+
+                return date.Value.ToShortDateString() + " " + airs;
             }
         }
     }

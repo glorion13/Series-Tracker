@@ -76,7 +76,6 @@ namespace SeriesTracker
                 {
                     Title = "Futurama",
                     Image = "http://thetvdb.com/banners/posters/73871-2.jpg",
-                    Thumbnail = "http://thetvdb.com/banners/posters/73871-2.jpg",
                     Banner = "http://thetvdb.com/banners/graphical/121361-g19.jpg",
                     Rating = 5,
                     AirsTime = "9 PM",

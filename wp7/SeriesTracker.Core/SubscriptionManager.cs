@@ -56,7 +56,7 @@ namespace SeriesTracker
             });
         }
 
-        private async Task SaveSubscriptions()
+        public async Task SaveSubscriptions()
         {
             using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
             using (IsolatedStorageFileStream file = new IsolatedStorageFileStream("subscriptions.xml", FileMode.Truncate, storage))
@@ -109,7 +109,7 @@ namespace SeriesTracker
                     if (file.Length > 0)
                     {
                         XmlSerializer serializer = new XmlSerializer(typeof(List<TvDbSeries>));
-                        var collection = new SelfSortingObservableCollection<TvDbSeries, string>(s => s.Title);
+                        var collection = new SelfSortingObservableCollection<TvDbSeries, DateTime?>(s => s.NextEpisodeAirDateTime);
                         await collection.AddAll(serializer.Deserialize(file) as List<TvDbSeries>);
                         return collection;                        
                     }

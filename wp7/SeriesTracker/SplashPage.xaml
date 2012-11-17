@@ -21,30 +21,13 @@
 	    </toolkit:NavigationOutTransition>
 	</toolkit:TransitionService.NavigationOutTransition>
 	
-	<phone:PhoneApplicationPage.Resources>
-		<imagetools:ImageConverter x:Key="ImageConverter" />
-	</phone:PhoneApplicationPage.Resources>
 	<phone:PhoneApplicationPage.DataContext>
 		<Binding Mode="OneWay" Path="SplashScreen" Source="{StaticResource Locator}"/>
 	</phone:PhoneApplicationPage.DataContext>
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot">
     	<VisualStateManager.VisualStateGroups>
-    		<VisualStateGroup x:Name="LoadingAnimation">
-    			<VisualState x:Name="Display">
-    				<Storyboard>
-    					<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="animatedImage">
-    						<EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
-    						<EasingDoubleKeyFrame KeyTime="0:0:0.7" Value="1">
-    							<EasingDoubleKeyFrame.EasingFunction>
-    								<CubicEase EasingMode="EaseInOut"/>
-    							</EasingDoubleKeyFrame.EasingFunction>
-    						</EasingDoubleKeyFrame>
-    					</DoubleAnimationUsingKeyFrames>
-    				</Storyboard>
-    			</VisualState>
-    		</VisualStateGroup>
-    		<VisualStateGroup x:Name="Title">
+    		<VisualStateGroup x:Name="TitleVisible">
     			<VisualState x:Name="Shown">
     				<Storyboard Completed="Storyboard_Completed_1">
     					<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="textBlock">
@@ -71,20 +54,12 @@
     	</Grid.Background>
     	<i:Interaction.Triggers>
     		<i:EventTrigger>
-    			<ec:GoToStateAction StateName="Display"/>
-    		</i:EventTrigger>
-    		<i:EventTrigger>
     			<GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding Initialize, Mode=OneWay}"/>
     		</i:EventTrigger>
     	</i:Interaction.Triggers>
     	<i:Interaction.Behaviors>
     		<ec:DataStateBehavior Binding="{Binding IsLoaded}" Value="True" TrueState="Shown"/>
     	</i:Interaction.Behaviors>
-    	<imagetools:AnimatedImage x:Name="animatedImage" Source="{Binding TvContent, Converter={StaticResource ImageConverter}}" Grid.Row="1" Grid.Column="1" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5" Opacity="0" >
-    		<imagetools:AnimatedImage.RenderTransform>
-    			<CompositeTransform/>
-    		</imagetools:AnimatedImage.RenderTransform>
-    	</imagetools:AnimatedImage>
     	<TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="Series Tracker" VerticalAlignment="Top" d:LayoutOverrides="Width" Grid.Row="14" Grid.ColumnSpan="2" HorizontalAlignment="Center" Style="{StaticResource PhoneTextTitle1Style}" FontSize="64" RenderTransformOrigin="0.5,0.5">
     		<TextBlock.RenderTransform>
     			<CompositeTransform TranslateX="-500"/>

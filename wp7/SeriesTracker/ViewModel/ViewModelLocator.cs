@@ -16,7 +16,6 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Threading;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
-using ImageTools.IO.Gif;
 
 namespace SeriesTracker
 {
@@ -29,13 +28,7 @@ namespace SeriesTracker
         public ViewModelLocator()
         {
             DispatcherHelper.Initialize();
-            ImageTools.IO.Decoders.AddDecoder<GifDecoder>();
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
-
-            if (!IsInDesignMode)
-            {
-                SimpleIoc.Default.Register<ViewModelLocator>(() => this);
-            }
 
             SimpleIoc.Default.Register<TvDbSeriesRepository>();
             SimpleIoc.Default.Register<SubscriptionManager>(true);

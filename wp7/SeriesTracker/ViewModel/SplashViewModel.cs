@@ -4,15 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SeriesTracker
 {
     public class SplashViewModel : ViewModelBase
     {
-        private ViewModelLocator locator;
-        public SplashViewModel(ViewModelLocator locator)
+        private MainViewModel main;
+        public SplashViewModel(MainViewModel main)
         {
-            this.locator = locator;
+            this.main = main;
 
             TvContent = new Uri("tv_white_noise.gif", UriKind.Relative);
         }
@@ -49,10 +51,12 @@ namespace SeriesTracker
             get
             {
                 return initialize ?? (initialize = new RelayCommand(async () =>
-                  {
-                      await locator.MainViewModel.Initialize();
-                      IsLoaded = true;
-                  }));
+                {
+                    var delayTask = Task.Factory.StartNew(() => Thread.Sleep(4000));
+                    var initTask = main.Initialize();
+                    await Task.Factory.StartNew(() => Task.WaitAny(delayTask, initTask));
+                    IsLoaded = true;
+                }));
             }
         }
     }

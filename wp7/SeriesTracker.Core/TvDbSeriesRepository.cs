@@ -67,7 +67,11 @@ namespace SeriesTracker
         {
             var subscriptions = await subscriptionManager.GetSubscriptions();
             var updates = subscriptions.ToList().Select(s => CheckUpdateSeries(s)).ToArray();
-            await Task.Factory.ContinueWhenAll(updates, t => { });
+            if (updates.Length > 0)
+            {
+                await Task.Factory.ContinueWhenAll(updates, t => { });
+                subscriptionManager.SaveSubscriptions();
+            }
 
             return subscriptions;
         }

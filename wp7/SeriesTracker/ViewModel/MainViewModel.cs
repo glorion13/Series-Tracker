@@ -70,16 +70,46 @@ namespace SeriesTracker
                 series.Add(new TvDbSeries()
                 {
                     Title = "Futurama",
-                    Thumbnail = "http://thetvdb.com/banners/posters/73871-2.jpg",
-                    Rating = 5
+                    Image = "http://thetvdb.com/banners/posters/73871-2.jpg",
+                    Rating = 5,
+                    AirsTime = "11 PM",
+                    Episodes = new ObservableCollection<TvDbSeriesEpisode>()
+                    {
+                        new TvDbSeriesEpisode() {
+                            Name = "Episode 1",
+                            FirstAired = DateTime.Now.AddDays(14).AddHours(5),
+                            SeriesNumber = "1",
+                            EpisodeNumber = "1",
+                            Description = "bla bla bla bla bla lba",
+                            Image = "http://thetvdb.com/banners/episodes/121361/3254641.jpg"
+                        },
+                        new TvDbSeriesEpisode() {
+                            Name = "Episode 2",
+                            FirstAired = DateTime.Now.AddDays(7),
+                            SeriesNumber = "1",
+                            EpisodeNumber = "2",
+                            Description = "bla bla bla bla bla lba",
+                            Image = "http://thetvdb.com/banners/episodes/121361/3254641.jpg"
+                        },
+                        new TvDbSeriesEpisode() {
+                            Name = "Episode 1",
+                            FirstAired = DateTime.Now,
+                            SeriesNumber = "2",
+                            EpisodeNumber = "1",
+                            Description = "bla bla bla bla bla lba",
+                            Image = "http://thetvdb.com/banners/episodes/121361/3254641.jpg"
+                        }
+                    }
                 });
 
                 series.Add(new TvDbSeries()
                 {
                     Title = "Simpsons",
-                    Thumbnail = "http://thetvdb.com/banners/posters/71663-10.jpg",
+                    Image = "http://thetvdb.com/banners/posters/71663-10.jpg",
                     Rating = 10
                 });
+
+                searchResults = series;
             }
         }
 
