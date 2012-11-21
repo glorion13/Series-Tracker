@@ -12,6 +12,8 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Windows.Threading;
+using GalaSoft.MvvmLight.Threading;
 
 namespace SeriesTracker
 {
@@ -95,7 +97,10 @@ namespace SeriesTracker
             if (poster != null ) {
                 if (!string.IsNullOrEmpty(poster.Value))
                 {
-                    series.Image =  string.Format("{0}/banners/{1}", mirror, poster.Value);
+                    DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                    {
+                        series.Image = string.Format("{0}/banners/{1}", mirror, poster.Value);
+                    });
                 }
             }
 
@@ -104,7 +109,7 @@ namespace SeriesTracker
             ParseFromDetailsDoc(doc, "Airs_DayOfWeek", value => series.AirsDayOfWeek = daysOfWeek.IndexOf(value.Trim().ToLowerInvariant()));
             ParseFromDetailsDoc(doc, "Runtime", value => series.Runtime = int.Parse(value));
 
-            series.Episodes = new ObservableCollection<TvDbSeriesEpisode>(
+            var episodes = new ObservableCollection<TvDbSeriesEpisode>(
             from e in doc.Descendants("Episode")
             select new TvDbSeriesEpisode()
             {
@@ -112,7 +117,8 @@ namespace SeriesTracker
                 SeriesNumber = e.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
                 EpisodeNumber = e.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault(),
                 Description = e.Descendants("Overview").Select(n => n.Value).FirstOrDefault(),
-                FirstAired = e.Descendants("FirstAired").Select(n => {
+                FirstAired = e.Descendants("FirstAired").Select(n =>
+                {
                     DateTime date;
                     if (DateTime.TryParse(n.Value, out date))
                         return (DateTime?)date;
@@ -122,7 +128,12 @@ namespace SeriesTracker
                 Image = e.Descendants("filename").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault()
             });
 
-            series.Updated = updated;
+            DispatcherHelper.CheckBeginInvokeOnUI(() =>
+            {
+                series.Episodes = episodes;
+
+                series.Updated = updated;
+            });
         }
 
         private static void ParseFromDetailsDoc(XDocument doc, string nodeName, Action<string> processValue)
@@ -132,7 +143,10 @@ namespace SeriesTracker
             {
                 if (!string.IsNullOrEmpty(node.Value))
                 {
-                    processValue(node.Value);
+                    DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                    {
+                        processValue(node.Value);
+                    });
                 }
             }
         }

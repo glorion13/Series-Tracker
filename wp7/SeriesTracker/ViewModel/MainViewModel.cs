@@ -127,22 +127,13 @@ namespace SeriesTracker
                 searchResults.Clear();
                 IsSearching = true;
 
-                var results = await repository.Find(change.Value);
+                var results = await repository.FindAsync(change.Value);
 
-                results.ToObservable()
-                    .Do(s => searchResults.Add(s))
-                    .Select(sb => repository.UpdateData(sb))
-                    .ObserveOn(new NewThreadScheduler())
-                    .ToArray()
-                    .Do(l => Task.WaitAll(l))
-                    .Finally(() =>
-                        {
-                            DispatcherHelper.UIDispatcher.BeginInvoke(() =>
-                            {
-                                IsSearching = false;
-                            });
-                        })
-                    .Subscribe();
+                await searchResults.AddAll(results.Keys);
+
+                await TaskEx.WhenAll(results.Values);
+
+                IsSearching = false;
             });
         }
 
@@ -150,17 +141,14 @@ namespace SeriesTracker
         {
             IsLoadingSubscriptions = true;
 
-            Series = await repository.GetSubscribed();
-            /*foreach (var s in subs)
+            try
             {
-                series.Add(new SeriesRecord(s));
-                s.ObservableForProperty(i => i.IsSubscribed).Where(x => x).Subscribe(item =>
-                {
-                    series.Remove(item);
-                });
-            }*/
-
-            IsLoadingSubscriptions = false;
+                Series = await repository.GetSubscribedAsync();
+            }
+            finally
+            {
+                IsLoadingSubscriptions = false;
+            }
         }
 
         private string search;
@@ -213,12 +201,12 @@ namespace SeriesTracker
                     if (!s.IsSubscribed)
                     {
                         //series.Add(new SeriesRecord(s));
-                        repository.Subscribe(s);
+                        repository.SubscribeAsync(s);
                     }
                     else
                     {
                         //series.Remove(series.FirstOrDefault(old => old.Series.Id == s.Id));
-                        repository.Unsubscribe(s); 
+                        repository.UnsubscribeAsync(s); 
                     }
                 }));
             }

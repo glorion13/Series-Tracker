@@ -14,7 +14,7 @@ namespace SeriesTracker
 {
     public class SeriesDetailsViewModel : ViewModelBase
     {
-        private SubscriptionManager subscriptionManager;
+        private TvDbSeriesRepository repository;
 
         private TvDbSeries series;
         public TvDbSeries Series
@@ -43,9 +43,9 @@ namespace SeriesTracker
         {
             get
             {
-                return subscribe ?? (subscribe = new RelayCommand(() =>
+                return subscribe ?? (subscribe = new RelayCommand(async () =>
                 {
-                    subscriptionManager.Subscribe(series);
+                    await repository.SubscribeAsync(series);
                 }));
             }
         }
@@ -55,16 +55,16 @@ namespace SeriesTracker
         {
             get
             {
-                return unsubscribe ?? (unsubscribe = new RelayCommand(() =>
+                return unsubscribe ?? (unsubscribe = new RelayCommand(async () =>
                 {
-                    subscriptionManager.Unsubscribe(series);
+                    await repository.UnsubscribeAsync(series);
                 }));
             }
         }
 
-        public SeriesDetailsViewModel(SubscriptionManager subscriptionManager)
+        public SeriesDetailsViewModel(TvDbSeriesRepository repository)
         {
-            this.subscriptionManager = subscriptionManager;
+            this.repository = repository;
 
             if (!IsInDesignMode)
             {
