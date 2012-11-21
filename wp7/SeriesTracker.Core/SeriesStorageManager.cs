@@ -98,9 +98,13 @@ namespace SeriesTracker
                 {
                     foreach (var file in files)
                     {
-                        using (var stream = new IsolatedStorageFileStream(file, FileMode.Open, storage)) {
+                        using (var stream = new IsolatedStorageFileStream(string.Format(@"subscriptions\{0}", file), FileMode.Open, storage))
+                        {
                             var series = (TvDbSeries)Serializer.Deserialize(stream);
-                            collection.Add(series);
+                            DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                            {
+                                collection.Add(series);
+                            });
                         }
                     }
                 }
