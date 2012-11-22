@@ -77,7 +77,7 @@
                 		<ColumnDefinition Width="0.757*"/>
                 		<ColumnDefinition Width="Auto"/>
                 	</Grid.ColumnDefinitions>
-                	<TextBlock TextWrapping="Wrap" Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Grid.ColumnSpan="2" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}"/>
+                	<TextBlock TextWrapping="Wrap" Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Grid.ColumnSpan="2" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#SteelTongs" FontSize="64"/>
                 	<toolkitPrimitives:ToggleSwitchButton Content="ToggleSwitchButton" HorizontalAlignment="Left" Grid.Column="1" d:LayoutOverrides="Height" IsChecked="{Binding Series.IsSubscribed, Mode=OneWay}" Grid.Row="1">
                 		<i:Interaction.Triggers>
                 			<i:EventTrigger EventName="Unchecked">
@@ -132,7 +132,7 @@
                 					</Image>
                 					<Grid VerticalAlignment="Top" Grid.Row="1">
                 						<Rectangle Fill="{StaticResource PhoneAccentBrush}" />
-                						<TextBlock TextWrapping="Wrap" Text="{Binding Episode.Name, Converter={StaticResource ToUpper}}" FontSize="18.667" Margin="{StaticResource PhoneMargin}" Foreground="{StaticResource PhoneForegroundBrush}" Style="{StaticResource PhoneTextBlockBase}" FontFamily="Rockwell Condensed"/>
+                						<TextBlock Text="{Binding Episode.Name, Converter={StaticResource ToUpper}}" Foreground="{StaticResource PhoneForegroundBrush}" Style="{StaticResource PhoneTextBlockBase}" Margin="12,10,8,7" TextWrapping="Wrap" TextOptions.TextHintingMode="Animated" FontSize="16"/>
                 					</Grid>
                 					<TextBlock TextWrapping="Wrap" Text="{Binding Episode.Description}" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" VerticalAlignment="Top"/>
                 				</Grid>

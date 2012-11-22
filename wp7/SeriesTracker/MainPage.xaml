@@ -40,7 +40,7 @@
                             <BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Image, Converter={StaticResource Resizer}, ConverterParameter=100}" />
                         </Image.Source>
                     </Image>
-                    <TextBlock Text="{Binding Title}" d:LayoutOverrides="Width, Height" Style="{StaticResource PhoneTextNormalStyle}" HorizontalAlignment="Right" Grid.ColumnSpan="2" Margin="12,6,12,0"/>
+                    <TextBlock Text="{Binding Title}" d:LayoutOverrides="Width, Height" HorizontalAlignment="Right" Grid.ColumnSpan="2" Margin="12,6,12,0" FontSize="21.333"/>
                     <TextBlock Text="next up" Grid.Column="1" Style="{StaticResource PhoneTextSubtleStyle}" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" Grid.Row="1" VerticalAlignment="Bottom" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
                     <TextBlock Text="{Binding NextEpisodeETA}" d:LayoutOverrides="Width, Height" Grid.Row="2" Grid.Column="1" Style="{StaticResource PhoneTextExtraLargeStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" FontSize="38.667" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
                 </Grid>
@@ -83,16 +83,25 @@
                         <Path Data="F1M57.0078,13.3424C54.8815,11.3346,51.5313,11.4283,49.5221,13.5521L23.7877,39.6022 14.0924,31.125C11.8854,29.2084 8.53906,29.4531 6.62231,31.6666 4.71094,33.8776 4.95313,37.224 7.16528,39.1342L19.9426,50.3125C20.1731,50.5131 20.4244,50.6771 20.6809,50.8307 22.8112,52.6484 26.0065,52.5143 27.9479,50.4557L57.2161,20.8295C59.2291,18.7045,59.1354,15.3516,57.0078,13.3424z" Stretch="Uniform" Fill="{StaticResource PhoneAccentBrush}" Width="60" Height="60" Margin="0,0,0,0" />
                     </Grid>
                 </Canvas>
-                <StackPanel Width="311">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Tap">
-                            <GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding}" Command="{Binding MainViewModel.ViewDetails, Source={StaticResource Locator}}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <TextBlock Text="{Binding Title, Converter={StaticResource ToUpper}}" />
-                    <TextBlock Text="{Binding Rating}" />
-                </StackPanel>
+                <Grid Width="311">
+                	<Grid.RowDefinitions>
+                		<RowDefinition/>
+                		<RowDefinition Height="Auto"/>
+                	</Grid.RowDefinitions>
+                	<i:Interaction.Triggers>
+                		<i:EventTrigger EventName="Tap">
+                			<GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding}" Command="{Binding MainViewModel.ViewDetails, Source={StaticResource Locator}}"/>
+                		</i:EventTrigger>
+                	</i:Interaction.Triggers>
+                	<TextBlock Text="{Binding Title, Converter={StaticResource ToUpper}}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#SteelTongs" FontSize="44" d:LayoutOverrides="Height" Margin="0,-6,0,0" TextWrapping="Wrap" TextTrimming="WordEllipsis" />
+                	<TextBlock Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,26,0"><Run Text="{Binding Rating}" /><Run>/10</Run></TextBlock>
+                </Grid>
             </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="PanoramaTitle">
+        	<Grid>
+        		<TextBlock Margin="0,60,0,-27" Text="SERIES TRACKER" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#SteelTongs"/>     	
+        		</Grid>
         </DataTemplate>
     </phone:PhoneApplicationPage.Resources>
 	<phone:PhoneApplicationPage.FontFamily>
@@ -153,10 +162,7 @@
 			<ec:ExtendedVisualStateManager/>
 		</VisualStateManager.CustomVisualStateManager>
 		
-		<controls:Panorama>
-			<controls:Panorama.Title>		
-				<TextBlock FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Andy" Margin="0,44,0,-57"><Run Text="Series Tracker"/></TextBlock>     	
-			</controls:Panorama.Title>
+		<controls:Panorama TitleTemplate="{StaticResource PanoramaTitle}">
  
 			<controls:PanoramaItem Header="followed" toolkit:TiltEffect.IsTiltEnabled="True">
 				<Grid Width="420">
