@@ -136,6 +136,8 @@ namespace SeriesTracker
             {
                 Set(() => AirsTime, ref airsTime, value);
                 RaisePropertyChanged(() => Airs);
+                RaisePropertyChanged(() => NextEpisodeAirDateTime);
+                RaisePropertyChanged(() => NextEpisodeETA);
             }
         }
 
@@ -150,6 +152,8 @@ namespace SeriesTracker
             {
                 Set(() => AirsDayOfWeek, ref airsDayOfWeek, value);
                 RaisePropertyChanged(() => Airs);
+                RaisePropertyChanged(() => NextEpisodeAirDateTime);
+                RaisePropertyChanged(() => NextEpisodeETA);
             }
         }
 
@@ -189,17 +193,25 @@ namespace SeriesTracker
             {
                 var date = episodes.Where(e => e.FirstAired != null && e.FirstAired >= DateTime.Today).Select(e => e.FirstAired).OrderBy(x => x).FirstOrDefault();
                 if (date == null)
-                    return null;
-                
-                var offset = TimeZoneInfo.Local.BaseUtcOffset;
-                decimal airsTime;
-                var parsed = decimal.TryParse(new string(AirsTime.Where(ch => char.IsDigit(ch)).ToArray()), NumberStyles.Number, CultureInfo.InvariantCulture.NumberFormat, out airsTime);
-                if (!parsed)
                 {
-                    airsTime = 0;
+                    return null;
+                }
+                else
+                {
+                    date = date.Value.Date;
+                }
+                
+                var localOffset = TimeZoneInfo.Local.BaseUtcOffset;
+
+                DateTime time; 
+                if (!string.IsNullOrEmpty(AirsTime) && DateTime.TryParse(AirsTime, out time))
+                {
+                    ///TODO: take daylight saving time into account
+                    date = date.Value.AddHours(5); // EST to UTC
+                    date = date.Value.Add(time.TimeOfDay);
                 }
 
-                date = date.Value.Date.Add(offset).AddMinutes((int)(airsTime * 60));
+                date = date.Value.Add(localOffset);
 
                 return date;
             }

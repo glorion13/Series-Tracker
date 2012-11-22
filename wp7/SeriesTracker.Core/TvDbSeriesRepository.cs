@@ -9,7 +9,6 @@ using System.Xml;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
-using SeriesTracker.Core;
 using GalaSoft.MvvmLight.Threading;
 
 namespace SeriesTracker
