@@ -51,8 +51,8 @@ namespace SeriesTracker
         {
             var subs = await storageManager.GetSavedSeries();
             var isSubscribed = subs.Any(s => series.Id == s.Id);
-
             series.IsSubscribed = isSubscribed;
+            series.MarkSeenEpisodes();
         }
 
         public async Task<ObservableCollection<TvDbSeries>> GetSubscribedAsync()
@@ -69,7 +69,7 @@ namespace SeriesTracker
         private async Task CheckUpdateSeriesAsync(TvDbSeries series)
         {
             await Task.Factory.StartNew(() => {
-                bool needsUpdating = (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1));
+                bool needsUpdating = (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.Hours(1));
                 if (needsUpdating)
                 {
                     Task update;
