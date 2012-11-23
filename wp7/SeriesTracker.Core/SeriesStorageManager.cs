@@ -70,7 +70,6 @@ namespace SeriesTracker
         {
             return await GetCachedSubscriptions();
         }
-
         
         private object key = new object();
         ObservableCollection<TvDbSeries> subscriptions = null;

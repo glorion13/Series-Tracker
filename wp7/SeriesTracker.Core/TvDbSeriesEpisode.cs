@@ -73,6 +73,19 @@ namespace SeriesTracker
             }
         }
 
+        private bool isSeen;
+        public bool IsSeen
+        {
+            get
+            {
+                return isSeen;
+            }
+            set
+            {
+                Set(() => IsSeen, ref isSeen, value);
+            }
+        }
+
         private DateTime? firstAired = null;
         public DateTime? FirstAired
         {

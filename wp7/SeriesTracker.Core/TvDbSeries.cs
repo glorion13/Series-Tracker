@@ -108,8 +108,23 @@ namespace SeriesTracker
             }
         }
 
+        private ObservableCollection<TvDbSeriesEpisode> seenEpisodes;
+        public ObservableCollection<TvDbSeriesEpisode> SeenEpisodes
+        {
+            get
+            {
+                return seenEpisodes;
+            }
+
+            set
+            {
+                Set(() => SeenEpisodes, ref seenEpisodes, value);
+            }
+        }
+
         public TvDbSeries() {
             episodes = new ObservableCollection<TvDbSeriesEpisode>();
+            seenEpisodes = new ObservableCollection<TvDbSeriesEpisode>();
         }
 
         private DateTime? updated = null;

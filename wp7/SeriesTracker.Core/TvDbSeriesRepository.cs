@@ -109,6 +109,37 @@ namespace SeriesTracker
             }
         }
 
+        public async Task MarkSeenAsync(TvDbSeries series, TvDbSeriesEpisode episode)
+        {
+            episode.IsSeen = true;
+            series.SeenEpisodes.Add(episode);
+            await Task.Factory.StartNew(() =>
+            {
+                lock (subscriptionLock)
+                {
+                    if (!updates.ContainsKey(series))
+                    {
+                        storageManager.Save(series);
+                    }
+                }
+            });
+        }
+        public async Task UnmarkSeenAsync(TvDbSeries series, TvDbSeriesEpisode episode)
+        {
+            episode.IsSeen = false;
+            series.SeenEpisodes.Add(episode);
+            await Task.Factory.StartNew(() =>
+            {
+                lock (subscriptionLock)
+                {
+                    if (!updates.ContainsKey(series))
+                    {
+                        storageManager.Save(series);
+                    }
+                }
+            });
+        }
+
         public async Task SubscribeAsync(TvDbSeries series) {
             series.IsSubscribed = true;
             var subscriptions = await storageManager.GetSavedSeries();

@@ -62,6 +62,28 @@ namespace SeriesTracker
             }
         }
 
+        private RelayCommand<EpisodeViewModel> toggleEpisodeSeen;
+        public RelayCommand<EpisodeViewModel> ToggleEpisodeSeen
+        {
+            get
+            {
+                return toggleEpisodeSeen ?? (toggleEpisodeSeen = new RelayCommand<EpisodeViewModel>(s =>
+                {
+                    if (!s.Episode.IsSeen)
+                    {
+                        repository.MarkSeenAsync(Series, s.Episode);
+                        //series.Add(new SeriesRecord(s));
+                    }
+                    else
+                    {
+                        repository.UnmarkSeenAsync(Series, s.Episode);
+                        //series.Remove(series.FirstOrDefault(old => old.Series.Id == s.Id));
+                        //repository.UnsubscribeAsync(s);
+                    }
+                }));
+            }
+        }
+
         public SeriesDetailsViewModel(TvDbSeriesRepository repository)
         {
             this.repository = repository;
