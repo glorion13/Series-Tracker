@@ -19,6 +19,7 @@ namespace SeriesTracker
         private readonly TvDb tvdb;
         private readonly Dictionary<TvDbSeries, Task> updates;
         private readonly object subscriptionLock = new object();
+        private readonly object seenLock = new object();
 
         public TvDbSeriesRepository(SeriesStorageManager storageManager)
         {
@@ -47,14 +48,6 @@ namespace SeriesTracker
             }
         }
 
-        private async Task UpdateSubscirptionStatusAsync(TvDbSeries series)
-        {
-            var subs = await storageManager.GetSavedSeries();
-            var isSubscribed = subs.Any(s => series.Id == s.Id);
-            series.IsSubscribed = isSubscribed;
-            series.MarkSeenEpisodes();
-        }
-
         public async Task<ObservableCollection<TvDbSeries>> GetSubscribedAsync()
         {
             var subscriptions = await storageManager.GetSavedSeries();
@@ -69,7 +62,7 @@ namespace SeriesTracker
         private async Task CheckUpdateSeriesAsync(TvDbSeries series)
         {
             await Task.Factory.StartNew(() => {
-                bool needsUpdating = (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.Hours(1));
+                bool needsUpdating = (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1));
                 if (needsUpdating)
                 {
                     Task update;
@@ -100,6 +93,7 @@ namespace SeriesTracker
 
                 await update;
                 await subs;
+                await Task.Factory.StartNew(() => storageManager.SetSeenEpisodes(series));;
                 return;
             }
             catch (XmlException e)
@@ -109,17 +103,23 @@ namespace SeriesTracker
             }
         }
 
+        private async Task UpdateSubscirptionStatusAsync(TvDbSeries series)
+        {
+            var subs = await storageManager.GetSavedSeries();
+            var isSubscribed = subs.Any(s => series.Id == s.Id);
+            series.IsSubscribed = isSubscribed;
+        }
+
         public async Task MarkSeenAsync(TvDbSeries series, TvDbSeriesEpisode episode)
         {
             episode.IsSeen = true;
-            series.SeenEpisodes.Add(episode);
             await Task.Factory.StartNew(() =>
             {
-                lock (subscriptionLock)
+                lock (seenLock)
                 {
                     if (!updates.ContainsKey(series))
                     {
-                        storageManager.Save(series);
+                        storageManager.SaveSeen(series);
                     }
                 }
             });
@@ -127,14 +127,13 @@ namespace SeriesTracker
         public async Task UnmarkSeenAsync(TvDbSeries series, TvDbSeriesEpisode episode)
         {
             episode.IsSeen = false;
-            series.SeenEpisodes.Add(episode);
             await Task.Factory.StartNew(() =>
             {
-                lock (subscriptionLock)
+                lock (seenLock)
                 {
                     if (!updates.ContainsKey(series))
                     {
-                        storageManager.Save(series);
+                        storageManager.SaveSeen(series);
                     }
                 }
             });

@@ -3,11 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace SeriesTracker
 {
     public class TvDbSeriesEpisode : ViewModelBase, IComparable<TvDbSeriesEpisode>
     {
+        public string EpisodeId
+        {
+            get
+            {
+                return string.Format("{0}-{1}", seriesNumber, episodeNumber);
+            }
+        }
+
         private string name;
         public string Name
         {
@@ -74,6 +83,7 @@ namespace SeriesTracker
         }
 
         private bool isSeen;
+        [XmlIgnore]
         public bool IsSeen
         {
             get

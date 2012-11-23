@@ -105,43 +105,11 @@ namespace SeriesTracker
             set
             {
                 Set(() => Episodes, ref episodes, value);
-                MarkSeenEpisodes();
-            }
-        }
-
-        public void MarkSeenEpisodes()
-        {
-            foreach (TvDbSeriesEpisode episode in Episodes)
-            {
-                foreach (TvDbSeriesEpisode seenEpisode in SeenEpisodes)
-                {
-                    var isSeen = (seenEpisode.SeriesNumber == episode.SeriesNumber) && (seenEpisode.EpisodeNumber == episode.EpisodeNumber);
-                    if (isSeen)
-                    {
-                        episode.IsSeen = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        private ObservableCollection<TvDbSeriesEpisode> seenEpisodes;
-        public ObservableCollection<TvDbSeriesEpisode> SeenEpisodes
-        {
-            get
-            {
-                return seenEpisodes;
-            }
-
-            set
-            {
-                Set(() => SeenEpisodes, ref seenEpisodes, value);
             }
         }
 
         public TvDbSeries() {
             episodes = new ObservableCollection<TvDbSeriesEpisode>();
-            seenEpisodes = new ObservableCollection<TvDbSeriesEpisode>();
         }
 
         private DateTime? updated = null;
@@ -154,7 +122,6 @@ namespace SeriesTracker
             set
             {
                 Set(() => Updated, ref updated, value);
-                MarkSeenEpisodes();
             }
         }
 
