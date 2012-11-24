@@ -77,7 +77,7 @@
                 		<ColumnDefinition Width="0.757*"/>
                 		<ColumnDefinition Width="Auto"/>
                 	</Grid.ColumnDefinitions>
-                	<TextBlock TextWrapping="Wrap" Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Grid.ColumnSpan="2" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#SteelTongs" FontSize="64"/>
+                	<TextBlock TextWrapping="Wrap" Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Grid.ColumnSpan="2" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48"/>
                 	<toolkitPrimitives:ToggleSwitchButton Content="ToggleSwitchButton" HorizontalAlignment="Left" Grid.Column="1" d:LayoutOverrides="Height" IsChecked="{Binding Series.IsSubscribed, Mode=OneWay}" Grid.Row="1">
                 		<i:Interaction.Triggers>
                 			<i:EventTrigger EventName="Unchecked">
@@ -107,11 +107,11 @@
                 		</toolkit:LongListSelector.GroupItemsPanel>
                 		<toolkit:LongListSelector.GroupHeaderTemplate>
                 			<DataTemplate>
-                				<Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneMargin}" MinHeight="64" MinWidth="64">
+                				<Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneMargin}" MinHeight="72" MinWidth="72">
                 					<Border.Background>
                 						<SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                 					</Border.Background>
-									<TextBlock Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource PhoneTextLargeStyle}" Margin="6,6,6,0" /></Border>
+									<TextBlock Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource PhoneTextLargeStyle}" FontSize="37.333" Margin="12,13,12,11" /></Border>
                 			</DataTemplate>
                 		</toolkit:LongListSelector.GroupHeaderTemplate>
                 		<toolkit:LongListSelector.ItemTemplate>
@@ -155,12 +155,12 @@
                 							<BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Episode.Image, Converter={StaticResource Resizer}, ConverterParameter=162}" />     						
                 						</Image.Source>
                 					</Image>
-                                    <Grid x:Name="tick" Width="100" Height="100" Visibility="Visible" Opacity="0" CacheMode="BitmapCache">
+                                    <Grid x:Name="tick" Width="90" Height="90" Visibility="Visible" Opacity="0" CacheMode="BitmapCache">
                                         <Path Data="F1M57.0078,13.3424C54.8815,11.3346,51.5313,11.4283,49.5221,13.5521L23.7877,39.6022 14.0924,31.125C11.8854,29.2084 8.53906,29.4531 6.62231,31.6666 4.71094,33.8776 4.95313,37.224 7.16528,39.1342L19.9426,50.3125C20.1731,50.5131 20.4244,50.6771 20.6809,50.8307 22.8112,52.6484 26.0065,52.5143 27.9479,50.4557L57.2161,20.8295C59.2291,18.7045,59.1354,15.3516,57.0078,13.3424z" Stretch="Uniform" Fill="{StaticResource PhoneAccentBrush}" Width="60" Height="60" Margin="0,0,0,0" />
                                     </Grid>
                                     <Grid VerticalAlignment="Top" Grid.Row="1">
                 						<Rectangle Fill="{StaticResource PhoneAccentBrush}" />
-                						<TextBlock Text="{Binding Episode.Name, Converter={StaticResource ToUpper}}" Foreground="{StaticResource PhoneForegroundBrush}" Style="{StaticResource PhoneTextBlockBase}" Margin="12,10,8,7" TextWrapping="Wrap" TextOptions.TextHintingMode="Animated" FontSize="16"/>
+                						<TextBlock Text="{Binding Episode.Name, Converter={StaticResource ToUpper}}" Foreground="{StaticResource PhoneForegroundBrush}" Style="{StaticResource PhoneTextBlockBase}" Margin="12,10,8,7" TextWrapping="Wrap" TextOptions.TextHintingMode="Animated" FontSize="18.667" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue"/>
                 					</Grid>
                 					<TextBlock TextWrapping="Wrap" Text="{Binding Episode.Description}" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" VerticalAlignment="Top"/>
                 				</Grid>

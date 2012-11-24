@@ -97,14 +97,14 @@
         					<GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding}" Command="{Binding MainViewModel.ViewDetails, Source={StaticResource Locator}}"/>
         				</i:EventTrigger>
         			</i:Interaction.Triggers>
-        			<TextBlock Text="{Binding Title, Converter={StaticResource ToUpper}}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#SteelTongs" FontSize="44" Margin="0,0,0,-1" TextWrapping="Wrap" LineStackingStrategy="BlockLineHeight" LineHeight="41.333" />
-        			<TextBlock Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,26,0"><Run Text="{Binding Rating}" /><Run Text="/10"/></TextBlock>
+        			<TextBlock Text="{Binding Title, Converter={StaticResource ToUpper}}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48" Margin="0,0,0,-3" TextWrapping="Wrap" LineStackingStrategy="BlockLineHeight" LineHeight="45.333" />
+        			<TextBlock Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,0,-3"><Run Text="{Binding Rating}" /><Run Text="/10"/></TextBlock>
         		</Grid>
         	</Grid>
         </DataTemplate>
         <DataTemplate x:Key="PanoramaTitle">
         	<Grid>
-        		<TextBlock Margin="0,60,0,-27" Text="SERIES TRACKER" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#SteelTongs"/>     	
+        		<TextBlock Margin="0,53,0,-33" Text="SERIES TRACKER" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#SteelTongs"/>     	
         		</Grid>
         </DataTemplate>
     </phone:PhoneApplicationPage.Resources>
@@ -204,7 +204,7 @@
 								<VisualStateManager.CustomVisualStateManager>
 									<ec:ExtendedVisualStateManager/>
 								</VisualStateManager.CustomVisualStateManager>
-								<TextBox Text="{Binding Search, Mode=TwoWay}"/>
+								<TextBox Text="{Binding Search, Mode=TwoWay}" Margin="0,-12,0,0"/>
 								<toolkit:PerformanceProgressBar x:Name="searchProgressBar" Height="10" IsIndeterminate="True" Visibility="Collapsed" VerticalAlignment="Bottom" />
 							</Grid>						
 						</DataTemplate>
