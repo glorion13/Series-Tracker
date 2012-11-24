@@ -32,7 +32,10 @@ namespace SeriesTracker
         {
             try
             {
-                var results = await tvdb.FindSeries(seriesName);
+                var results = from result in await tvdb.FindSeries(seriesName)
+                              join subscribed in await storageManager.GetSavedSeries() on result.Id equals subscribed.Id into matches
+                              from match in matches.DefaultIfEmpty()
+                              select match ?? result;
                 
                 var dict = new Dictionary<TvDbSeries, Task>();
                 foreach (var series in results) {
