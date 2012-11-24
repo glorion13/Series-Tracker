@@ -50,15 +50,20 @@ namespace SeriesTracker
             lock (ioLock)
             {
                 using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
-                using (IsolatedStorageFileStream file = new IsolatedStorageFileStream(string.Format(@"subscriptions\{0}\data.xml", series.Id), FileMode.Create, storage))
                 {
-                    try
+                    if (!storage.DirectoryExists(string.Format(@"subscriptions\{0}", series.Id)))
+                        storage.CreateDirectory(string.Format(@"subscriptions\{0}", series.Id));
+
+                    using (IsolatedStorageFileStream file = new IsolatedStorageFileStream(string.Format(@"subscriptions\{0}\data.xml", series.Id), FileMode.Create, storage))
                     {
-                        Serializer.Serialize(file, series);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.WriteLine(e.Message);
+                        try
+                        {
+                            Serializer.Serialize(file, series);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.WriteLine(e.Message);
+                        }
                     }
                 }
             }
