@@ -77,7 +77,7 @@ namespace SeriesTracker
                     {
                         try
                         {
-                            SeenSerializer.Serialize(file, series.Episodes.Where(e => e.IsSeen).Select(e => e.EpisodeId).ToList());
+                            SeenSerializer.Serialize(file, series.Episodes.Where(e => e.IsSeen).Select(e => e.Id).ToList());
                         }
                         catch (Exception e)
                         {
@@ -168,7 +168,7 @@ namespace SeriesTracker
                         {
                             foreach (var episodeId in seen)
                             {
-                                var episode = series.Episodes.FirstOrDefault(e => e.EpisodeId.Equals(episodeId));
+                                var episode = series.Episodes.FirstOrDefault(e => e.Id.Equals(episodeId));
                                 if (episode != null)
                                     episode.IsSeen = true;
                             }

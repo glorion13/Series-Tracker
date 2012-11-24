@@ -9,12 +9,17 @@ namespace SeriesTracker
 {
     public class TvDbSeriesEpisode : ViewModelBase, IComparable<TvDbSeriesEpisode>
     {
-        public string EpisodeId
+        public string Id
         {
             get
             {
-                return string.Format("{0}-{1}", seriesNumber, episodeNumber);
+                return GetEpisodeId(seriesNumber, episodeNumber);
             }
+        }
+
+        public static string GetEpisodeId(string seriesNumber, string episodeNumber)
+        {
+            return string.Format("{0}-{1}", seriesNumber, episodeNumber);
         }
 
         private string name;

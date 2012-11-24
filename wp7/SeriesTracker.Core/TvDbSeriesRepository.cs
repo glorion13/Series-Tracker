@@ -61,27 +61,26 @@ namespace SeriesTracker
 
         private async Task CheckUpdateSeriesAsync(TvDbSeries series)
         {
-            await Task.Factory.StartNew(() => {
-                bool needsUpdating = (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1));
-                if (needsUpdating)
+            bool needsUpdating = (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1));
+            if (needsUpdating)
+            {
+                Task update;
+                lock (subscriptionLock)
                 {
-                    Task update;
+                    update = UpdateDataAsync(series);
+                    updates.Add(series, update);
+                }
+                await update.ContinueWith(_ =>
+                {
                     lock (subscriptionLock)
                     {
-                        update = UpdateDataAsync(series);
-                        updates.Add(series, update);
+                        updates.Remove(series);
+                        if (series.IsSubscribed)
+                            storageManager.Save(series);
                     }
-                    update.ContinueWith(_ =>
-                    {
-                        lock (subscriptionLock)
-                        {
-                            updates.Remove(series);
-                            if (series.IsSubscribed)
-                                storageManager.Save(series);
-                        }
-                    });
-                }
-            });
+                });
+            }                            
+            await Task.Factory.StartNew(() => storageManager.SetSeenEpisodes(series));
         }
 
         private async Task UpdateDataAsync(TvDbSeries series)
@@ -93,7 +92,6 @@ namespace SeriesTracker
 
                 await update;
                 await subs;
-                await Task.Factory.StartNew(() => storageManager.SetSeenEpisodes(series));;
                 return;
             }
             catch (XmlException e)

@@ -109,29 +109,39 @@ namespace SeriesTracker
             ParseFromDetailsDoc(doc, "Airs_DayOfWeek", value => series.AirsDayOfWeek = daysOfWeek.IndexOf(value.Trim().ToLowerInvariant()));
             ParseFromDetailsDoc(doc, "Runtime", value => series.Runtime = int.Parse(value));
 
-            var episodes = new ObservableCollection<TvDbSeriesEpisode>(
-            from e in doc.Descendants("Episode")
-            select new TvDbSeriesEpisode()
-            {
-                Name = e.Descendants("EpisodeName").Select(n => n.Value).FirstOrDefault(),
-                SeriesNumber = e.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
-                EpisodeNumber = e.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault(),
-                Description = e.Descendants("Overview").Select(n => n.Value).FirstOrDefault(),
-                FirstAired = e.Descendants("FirstAired").Select(n =>
-                {
-                    DateTime date;
-                    if (DateTime.TryParse(n.Value, out date))
-                        return (DateTime?)date;
+            var episodeUpdates = from newData in doc.Descendants("Episode")
+                                 join episode in series.Episodes on TvDbSeriesEpisode.GetEpisodeId(
+                                     newData.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
+                                     newData.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault())
+                                     equals episode.Id into matches
+                                 from update in matches.DefaultIfEmpty(new TvDbSeriesEpisode())
+                                 select new { Episode = update, Data = newData };
 
-                    return null;
-                }).FirstOrDefault(),
-                Image = e.Descendants("filename").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault()
-            });
+            foreach (var update in episodeUpdates)
+            {
+                DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                {
+                    update.Episode.Name = update.Data.Descendants("EpisodeName").Select(n => n.Value).FirstOrDefault();
+                    update.Episode.SeriesNumber = update.Data.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault();
+                    update.Episode.EpisodeNumber = update.Data.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault();
+                    update.Episode.Description = update.Data.Descendants("Overview").Select(n => n.Value).FirstOrDefault();
+                    update.Episode.FirstAired = update.Data.Descendants("FirstAired").Select(n =>
+                    {
+                        DateTime date;
+                        if (DateTime.TryParse(n.Value, out date))
+                            return (DateTime?)date;
+
+                        return null;
+                    }).FirstOrDefault();
+                    update.Episode.Image = update.Data.Descendants("filename").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault();
+
+                    if (!series.Episodes.Contains(update.Episode))
+                        series.Episodes.Add(update.Episode);
+                });               
+            }
 
             DispatcherHelper.CheckBeginInvokeOnUI(() =>
             {
-                series.Episodes = episodes;
-
                 series.Updated = updated;
             });
         }
