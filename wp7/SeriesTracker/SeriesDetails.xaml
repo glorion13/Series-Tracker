@@ -167,7 +167,7 @@
                                         <toolkit:ContextMenu>
                                             <toolkit:MenuItem CommandParameter="{Binding}" Command="{Binding SeriesDetails.ToggleEpisodeSeen, Source={StaticResource Locator}}">
                                                 <toolkit:MenuItem.Header>
-                                                    <TextBlock Text="{Binding Episode.IsSeen, Converter={StaticResource SubscriptionToFollow}}" />
+                                                    <TextBlock Text="{Binding Episode.IsSeen, Converter={StaticResource BooleanToSeen}}" />
                                                 </toolkit:MenuItem.Header>
                                             </toolkit:MenuItem>
                                         </toolkit:ContextMenu>

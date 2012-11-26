@@ -125,7 +125,7 @@
     </Compile>
     <Compile Include="Collections\LongListCollection.cs" />
     <Compile Include="Converters\ResizeImageUrlConverter.cs" />
-    <Compile Include="Converters\SubscriptionToFollowConverter.cs" />
+    <Compile Include="Converters\BooleanToSeenConverter.cs" />
     <Compile Include="Converters\VisibleIfNotNullOrEmptyCoverter.cs" />
     <Compile Include="Converters\UppercaseConverter.cs" />
     <Compile Include="MainPage.xaml.cs">

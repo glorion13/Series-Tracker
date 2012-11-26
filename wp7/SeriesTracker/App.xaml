@@ -14,7 +14,7 @@
         	<BitmapCreateOptions x:Key="CreateOption">DelayCreation</BitmapCreateOptions> 
             <app:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
             <app:UppercaseConverter x:Key="ToUpper" />
-            <app:SubscriptionToFollowConverter x:Key="SubscriptionToFollow" />
+            <app:BooleanToSeenConverter x:Key="BooleanToSeen" />
             <app:VisibleIfNotNullOrEmptyConverter x:Key="VisibleIfNotNullOrEmpty" />
 			<app:ResizeImageUrlConverter x:Key="Resizer" />
 			<Thickness x:Key="LabelMargin">12,18,12,6</Thickness>
