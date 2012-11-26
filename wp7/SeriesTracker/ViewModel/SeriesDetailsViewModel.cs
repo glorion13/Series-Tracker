@@ -84,6 +84,20 @@ namespace SeriesTracker
             }
         }
 
+        private ICommand openImdbLink;
+        public ICommand OpenImdbLink
+        {
+            get
+            {
+                return openImdbLink ?? (openImdbLink = new RelayCommand(() =>
+                {
+                    var task = new Microsoft.Phone.Tasks.WebBrowserTask();
+                    task.Uri = new Uri("http://www.imdb.com/title/" + Series.ImdbId + "/");
+                    task.Show();
+                }));
+            }
+        }
+
         public SeriesDetailsViewModel(TvDbSeriesRepository repository)
         {
             this.repository = repository;
@@ -180,5 +194,6 @@ namespace SeriesTracker
                     series.Episodes.Select(e => e.SeriesNumber).ToList());
             }
         }
+
     }
 }

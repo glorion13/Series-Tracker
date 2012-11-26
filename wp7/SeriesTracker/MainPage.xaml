@@ -21,6 +21,17 @@
         <DataTemplate x:Key="SeriesTemplate">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,17">
                 <Grid Background="{StaticResource PhoneAccentBrush}" Width="420" Height="120">
+
+                    <toolkit:ContextMenuService.ContextMenu>
+                        <toolkit:ContextMenu>
+                            <toolkit:MenuItem CommandParameter="{Binding}" Command="{Binding MainViewModel.ToggleSubscribed, Source={StaticResource Locator}}">
+                                <toolkit:MenuItem.Header>
+                                    <TextBlock Text="Unfollow" />
+                                </toolkit:MenuItem.Header>
+                            </toolkit:MenuItem>
+                        </toolkit:ContextMenu>
+                    </toolkit:ContextMenuService.ContextMenu>
+
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Tap">
                             <GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding}" Command="{Binding MainViewModel.ViewDetails, Source={StaticResource Locator}}"/>
@@ -48,7 +59,20 @@
         </DataTemplate>
         <DataTemplate x:Key="SearchResultTemplate">
             <Grid Background="#00000000" Height="100" toolkit:TiltEffect.IsTiltEnabled="True" Margin="0,0,0,12">
-            	<Grid.ColumnDefinitions>
+
+               <!-- 
+                NEED TO CREATE CONVERTER FOR THE BOOLEAN TO SHOW 'Follow' OR 'Unfollow'
+                <toolkit:ContextMenuService.ContextMenu>
+                    <toolkit:ContextMenu>
+                        <toolkit:MenuItem CommandParameter="{Binding}" Command="{Binding MainViewModel.ToggleSubscribed, Source={StaticResource Locator}}">
+                            <toolkit:MenuItem.Header>
+                                <TextBlock Text="{Binding IsSubscribed}" />
+                            </toolkit:MenuItem.Header>
+                        </toolkit:MenuItem>
+                    </toolkit:ContextMenu>
+                </toolkit:ContextMenuService.ContextMenu> -->
+
+                <Grid.ColumnDefinitions>
             		<ColumnDefinition Width="Auto"/>
             		<ColumnDefinition Width="0.731*"/>
             	</Grid.ColumnDefinitions>

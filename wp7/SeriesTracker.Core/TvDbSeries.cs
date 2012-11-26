@@ -25,6 +25,20 @@ namespace SeriesTracker
             }
         }
 
+        private string imdbId;
+        public string ImdbId
+        {
+            get
+            {
+                return imdbId;
+            }
+
+            set
+            {
+                Set(() => ImdbId, ref imdbId, value);
+            }
+        }
+
         private string title;
         public string Title
         {

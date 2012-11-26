@@ -125,6 +125,7 @@
     </Compile>
     <Compile Include="Collections\LongListCollection.cs" />
     <Compile Include="Converters\ResizeImageUrlConverter.cs" />
+    <Compile Include="Converters\SubscriptionToFollowConverter.cs" />
     <Compile Include="Converters\VisibleIfNotNullOrEmptyCoverter.cs" />
     <Compile Include="Converters\UppercaseConverter.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -192,6 +193,7 @@
     <Content Include="Background.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="imdb.ico" />
     <Content Include="README_FIRST.txt" />
     <Content Include="Toolkit.Content\ApplicationBar.Cancel.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Check.png" />

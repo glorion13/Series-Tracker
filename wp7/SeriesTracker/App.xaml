@@ -14,6 +14,7 @@
         	<BitmapCreateOptions x:Key="CreateOption">DelayCreation</BitmapCreateOptions> 
             <app:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
             <app:UppercaseConverter x:Key="ToUpper" />
+            <app:SubscriptionToFollowConverter x:Key="SubscriptionToFollow" />
             <app:VisibleIfNotNullOrEmptyConverter x:Key="VisibleIfNotNullOrEmpty" />
 			<app:ResizeImageUrlConverter x:Key="Resizer" />
         </ResourceDictionary>
