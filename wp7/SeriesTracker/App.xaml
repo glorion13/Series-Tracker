@@ -17,6 +17,7 @@
             <app:SubscriptionToFollowConverter x:Key="SubscriptionToFollow" />
             <app:VisibleIfNotNullOrEmptyConverter x:Key="VisibleIfNotNullOrEmpty" />
 			<app:ResizeImageUrlConverter x:Key="Resizer" />
+			<Thickness x:Key="LabelMargin">12,18,12,6</Thickness>
         </ResourceDictionary>
     </Application.Resources>
   <Application.ApplicationLifetimeObjects>

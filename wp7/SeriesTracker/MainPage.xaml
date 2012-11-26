@@ -51,7 +51,7 @@
                             <BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Image, Converter={StaticResource Resizer}, ConverterParameter=100}" />
                         </Image.Source>
                     </Image>
-                    <TextBlock Text="{Binding Title}" d:LayoutOverrides="Width, Height" HorizontalAlignment="Right" Grid.ColumnSpan="2" Margin="12,6,12,0" FontSize="21.333"/>
+                    <TextBlock Text="{Binding Title}" d:LayoutOverrides="Width, Height" HorizontalAlignment="Right" Grid.ColumnSpan="2" Margin="12,6,12,0" Style="{StaticResource PhoneTextNormalStyle}"/>
                     <TextBlock Text="next up" Grid.Column="1" Style="{StaticResource PhoneTextSubtleStyle}" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" Grid.Row="1" VerticalAlignment="Bottom" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
                     <TextBlock Text="{Binding NextEpisodeETA}" d:LayoutOverrides="Width, Height" Grid.Row="2" Grid.Column="1" Style="{StaticResource PhoneTextExtraLargeStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" FontSize="38.667" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
                 </Grid>
