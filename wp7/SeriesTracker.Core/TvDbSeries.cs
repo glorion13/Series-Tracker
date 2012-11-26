@@ -67,6 +67,20 @@ namespace SeriesTracker
             }
         }
 
+        private string overview;
+        public string Overview
+        {
+            get
+            {
+                return overview;
+            }
+
+            set
+            {
+                Set(() => Overview, ref overview, value);
+            }
+        }
+
         private float rating;
         public float Rating
         {

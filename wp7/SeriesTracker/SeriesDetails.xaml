@@ -63,37 +63,42 @@
 
             <!--Panorama item one-->
             <controls:PanoramaItem Header=" ">
-                <Grid>
-                	<Grid.RowDefinitions>
-                		<RowDefinition Height="Auto"/>
-                		<RowDefinition Height="Auto"/>
-                		<RowDefinition Height="Auto"/>
-                		<RowDefinition Height="Auto"/>
-                		<RowDefinition Height="Auto"/>
-                		<RowDefinition Height="Auto"/>
-                		<RowDefinition Height="0.826*"/>
-                	</Grid.RowDefinitions>
-                	<Grid.ColumnDefinitions>
-                		<ColumnDefinition Width="0.757*"/>
-                		<ColumnDefinition Width="Auto"/>
-                	</Grid.ColumnDefinitions>
-                	<TextBlock TextWrapping="Wrap" Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Grid.ColumnSpan="2" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48"/>
-                	<toolkitPrimitives:ToggleSwitchButton Content="ToggleSwitchButton" HorizontalAlignment="Left" Grid.Column="1" d:LayoutOverrides="Height" IsChecked="{Binding Series.IsSubscribed, Mode=OneWay}" Grid.Row="1">
-                		<i:Interaction.Triggers>
-                			<i:EventTrigger EventName="Unchecked">
-                				<GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding Unsunscribe, Mode=OneWay}"/>
-                			</i:EventTrigger>
-                			<i:EventTrigger EventName="Checked">
-                				<GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding Subscribe, Mode=OneWay}"/>
-                			</i:EventTrigger>
-                		</i:Interaction.Triggers>
-                	</toolkitPrimitives:ToggleSwitchButton>
-                	<TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Subscribed" VerticalAlignment="Center" Margin="12,12,0,12" Grid.Row="1" Style="{StaticResource PhoneTextNormalStyle}"/>
-                	<TextBlock Margin="12,18,12,6" TextWrapping="Wrap" Text="Airs" d:LayoutOverrides="Height" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextNormalStyle}"/>
-                	<TextBlock Margin="{StaticResource PhoneHorizontalMargin}" TextWrapping="Wrap" Text="{Binding Series.Airs, Mode=OneWay}" d:LayoutOverrides="Height, GridBox" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextAccentStyle}"/>
-                	<TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next episode" d:LayoutOverrides="Height" Grid.Row="4" Margin="12,18,12,6" Style="{StaticResource PhoneTextNormalStyle}"/>
-                	<TextBlock Margin="{StaticResource PhoneHorizontalMargin}" TextWrapping="Wrap" Text="{Binding Series.NextEpisodeAirs, Mode=OneWay}" d:LayoutOverrides="Height" Grid.Row="5" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextAccentStyle}"/>
-                </Grid>
+                <StackPanel>
+                    <Grid>
+                	    <Grid.RowDefinitions>
+                		    <RowDefinition Height="Auto"/>
+                		    <RowDefinition Height="Auto"/>
+                		    <RowDefinition Height="Auto"/>
+                		    <RowDefinition Height="Auto"/>
+                		    <RowDefinition Height="Auto"/>
+                		    <RowDefinition Height="Auto"/>
+                		    <RowDefinition Height="0.826*"/>
+                	    </Grid.RowDefinitions>
+                	    <Grid.ColumnDefinitions>
+                		    <ColumnDefinition Width="0.757*"/>
+                		    <ColumnDefinition Width="Auto"/>
+                	    </Grid.ColumnDefinitions>
+                	    <TextBlock TextWrapping="Wrap" Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Grid.ColumnSpan="2" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48"/>
+                	    <toolkitPrimitives:ToggleSwitchButton Content="ToggleSwitchButton" HorizontalAlignment="Left" Grid.Column="1" d:LayoutOverrides="Height" IsChecked="{Binding Series.IsSubscribed, Mode=OneWay}" Grid.Row="1">
+                		    <i:Interaction.Triggers>
+                			    <i:EventTrigger EventName="Unchecked">
+                				    <GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding Unsunscribe, Mode=OneWay}"/>
+                			    </i:EventTrigger>
+                			    <i:EventTrigger EventName="Checked">
+                				    <GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding Subscribe, Mode=OneWay}"/>
+                			    </i:EventTrigger>
+                		    </i:Interaction.Triggers>
+                	    </toolkitPrimitives:ToggleSwitchButton>
+                	    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Subscribed" VerticalAlignment="Center" Margin="12,12,0,12" Grid.Row="1" Style="{StaticResource PhoneTextNormalStyle}"/>
+                	    <TextBlock Margin="12,18,12,6" TextWrapping="Wrap" Text="Airs" d:LayoutOverrides="Height" Grid.Row="2" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextNormalStyle}"/>
+                	    <TextBlock Margin="{StaticResource PhoneHorizontalMargin}" TextWrapping="Wrap" Text="{Binding Series.Airs, Mode=OneWay}" d:LayoutOverrides="Height, GridBox" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextAccentStyle}"/>
+                	    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next episode" d:LayoutOverrides="Height" Grid.Row="4" Margin="12,18,12,6" Style="{StaticResource PhoneTextNormalStyle}"/>
+                	    <TextBlock Margin="{StaticResource PhoneHorizontalMargin}" TextWrapping="Wrap" Text="{Binding Series.NextEpisodeAirs, Mode=OneWay}" d:LayoutOverrides="Height" Grid.Row="5" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextAccentStyle}"/>
+                    </Grid>
+                    <ScrollViewer>
+                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding Series.Overview, Mode=OneWay}" Style="{StaticResource PhoneTextNormalStyle}"/>
+                    </ScrollViewer>
+                </StackPanel>
             </controls:PanoramaItem>
 
             <!--Panorama item two-->
