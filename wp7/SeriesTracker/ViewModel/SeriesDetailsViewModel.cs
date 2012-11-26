@@ -84,6 +84,60 @@ namespace SeriesTracker
             }
         }
 
+        private RelayCommand<string> markSeenSeason;
+        public RelayCommand<string> MarkSeenSeason
+        {
+            get
+            {
+                return markSeenSeason ?? (markSeenSeason = new RelayCommand<string>(s =>
+                {
+                    foreach (var episode in series.Episodes)
+                        if (episode.SeriesNumber == s)
+                            repository.MarkSeenAsync(Series, episode);
+                }));
+            }
+        }
+
+        private RelayCommand<string> unmarkSeenSeason;
+        public RelayCommand<string> UnmarkSeenSeason
+        {
+            get
+            {
+                return unmarkSeenSeason ?? (unmarkSeenSeason = new RelayCommand<string>(s =>
+                {
+                    foreach (var episode in series.Episodes)
+                        if (episode.SeriesNumber == s)
+                            repository.UnmarkSeenAsync(Series, episode);
+                }));
+            }
+        }
+
+        private ICommand markSeenAll;
+        public ICommand MarkSeenAll
+        {
+            get
+            {
+                return markSeenAll ?? (markSeenAll = new RelayCommand(() =>
+                {
+                    foreach (var episode in series.Episodes)
+                        repository.MarkSeenAsync(Series, episode);
+                }));
+            }
+        }
+
+        private ICommand unmarkSeenAll;
+        public ICommand UnmarkSeenAll
+        {
+            get
+            {
+                return unmarkSeenAll ?? (unmarkSeenAll = new RelayCommand(() =>
+                {
+                    foreach (var episode in series.Episodes)
+                        repository.UnmarkSeenAsync(Series, episode);
+                }));
+            }
+        }
+
         private ICommand openImdbLink;
         public ICommand OpenImdbLink
         {
