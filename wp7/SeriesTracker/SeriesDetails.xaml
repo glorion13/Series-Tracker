@@ -56,11 +56,16 @@
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <Grid x:Name="LayoutRoot">
-        <controls:Panorama HeaderTemplate="{StaticResource HeaderTemplate}"  Title="{Binding Series}"  TitleTemplate="{StaticResource TitleTemplate}" RenderTransformOrigin="0.5,0.5">
-        	<controls:Panorama.Background>
-        		<ImageBrush ImageSource="{Binding SeriesDetails.Series.Banner, Source={StaticResource Locator}}" AlignmentX="Left" AlignmentY="Top" Stretch="Uniform" Opacity="0.381"/>
-        	</controls:Panorama.Background>
-
+    	<i:Interaction.Triggers>
+    		<i:EventTrigger>
+    			<ec:ChangePropertyAction TargetName="panorama" PropertyName="Background">
+    				<ec:ChangePropertyAction.Value>
+    					<ImageBrush ImageSource="{Binding SeriesDetails.Series.Banner, Source={StaticResource Locator}, Converter={StaticResource Resizer}, ConverterParameter=860}" AlignmentX="Left" AlignmentY="Top" Stretch="Uniform" Opacity="0.381"/>				
+					</ec:ChangePropertyAction.Value>
+				</ec:ChangePropertyAction>
+    		</i:EventTrigger>
+    	</i:Interaction.Triggers>
+        <controls:Panorama x:Name="panorama" HeaderTemplate="{StaticResource HeaderTemplate}"  Title="{Binding Series}"  TitleTemplate="{StaticResource TitleTemplate}" RenderTransformOrigin="0.5,0.5">
             <!--Panorama item one-->
             <controls:PanoramaItem Header=" ">
                 <ScrollViewer>
