@@ -81,6 +81,12 @@
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.12-beta\lib\sl4-windowsphone71\Microsoft.Threading.Tasks.Extensions.Phone.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib.Extensions" />
+    <Reference Include="Nito.AsyncEx">
+      <HintPath>..\lib\Nito.AsyncEx\Nito.AsyncEx.dll</HintPath>
+    </Reference>
+    <Reference Include="Nito.AsyncEx.Enlightenment">
+      <HintPath>..\lib\Nito.AsyncEx\Nito.AsyncEx.Enlightenment.dll</HintPath>
+    </Reference>
     <Reference Include="ReactiveUI.Blend_WP7">
       <HintPath>..\packages\reactiveui-wp7.2.5.1.0\lib\sl3-wp\ReactiveUI.Blend_WP7.dll</HintPath>
     </Reference>

@@ -27,7 +27,7 @@ namespace SeriesTracker.ManualTest
             {
                 AirsDayOfWeek = 0,
                 AirsTime = "9 PM",
-                Episodes = new System.Collections.ObjectModel.ObservableCollection<TvDbSeriesEpisode>()
+                Episodes = new List<TvDbSeriesEpisode>()
                 {
                      new TvDbSeriesEpisode() {
                         FirstAired = DateTime.Today.AddDays(1)

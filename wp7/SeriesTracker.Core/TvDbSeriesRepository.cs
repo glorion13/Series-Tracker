@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight.Threading;
+using Nito.AsyncEx;
 
 namespace SeriesTracker
 {
@@ -18,8 +19,8 @@ namespace SeriesTracker
         private readonly SeriesStorageManager storageManager;
         private readonly TvDb tvdb;
         private readonly Dictionary<TvDbSeries, Task> updates;
-        private readonly object subscriptionLock = new object();
-        private readonly object seenLock = new object();
+        private readonly AsyncLock subscriptionLock = new AsyncLock();
+        private readonly AsyncLock seenLock = new AsyncLock();
 
         public TvDbSeriesRepository(SeriesStorageManager storageManager)
         {
@@ -64,25 +65,27 @@ namespace SeriesTracker
 
         private async Task CheckUpdateSeriesAsync(TvDbSeries series)
         {
-            bool needsUpdating = (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1));
-            if (needsUpdating)
+            Task update = null;
+            using (await subscriptionLock.LockAsync())
             {
-                Task update;
-                lock (subscriptionLock)
+                var needsUpdating = !updates.ContainsKey(series) && (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1));
+                if (needsUpdating)
                 {
                     update = UpdateDataAsync(series);
                     updates.Add(series, update);
                 }
-                await update.ContinueWith(_ =>
+            }
+            if (update != null)
+            {
+                await update;
+                using (await subscriptionLock.LockAsync())
                 {
-                    lock (subscriptionLock)
-                    {
-                        updates.Remove(series);
-                        if (series.IsSubscribed)
-                            storageManager.Save(series);
-                    }
-                });
-            }                            
+                    updates.Remove(series);
+                    if (series.IsSubscribed)
+                        storageManager.Save(series);
+                }
+            }
+                    
             await Task.Factory.StartNew(() => storageManager.SetSeenEpisodes(series));
         }
 
@@ -114,59 +117,62 @@ namespace SeriesTracker
         public async Task MarkSeenAsync(TvDbSeries series, TvDbSeriesEpisode episode)
         {
             episode.IsSeen = true;
-            await Task.Factory.StartNew(() =>
-            {
-                lock (seenLock)
-                {
-                    if (!updates.ContainsKey(series))
-                    {
-                        storageManager.SaveSeen(series);
-                    }
-                }
-            });
+
+            await SaveSeenAsync(series);
         }
+
         public async Task UnmarkSeenAsync(TvDbSeries series, TvDbSeriesEpisode episode)
         {
             episode.IsSeen = false;
-            await Task.Factory.StartNew(() =>
+            
+            await SaveSeenAsync(series);
+        }
+
+        private async Task SaveSeenAsync(TvDbSeries series)
+        {
+            using (await seenLock.LockAsync())
             {
-                lock (seenLock)
-                {
-                    if (!updates.ContainsKey(series))
-                    {
-                        storageManager.SaveSeen(series);
-                    }
-                }
-            });
+                await Task.Factory.StartNew(() => storageManager.SaveSeen(series));
+            }
         }
 
         public async Task SubscribeAsync(TvDbSeries series) {
-            series.IsSubscribed = true;
-            var subscriptions = await storageManager.GetSavedSeries();
-            subscriptions.Add(series);
-            await Task.Factory.StartNew(() =>
+            try
             {
-                lock (subscriptionLock)
+                series.IsSubscribed = true;
+                var subscriptions = await storageManager.GetSavedSeries();
+                subscriptions.Add(series);
+
+                using (await subscriptionLock.LockAsync())
                 {
-                    if (!updates.ContainsKey(series)) {
+                    if (!updates.ContainsKey(series))
+                    {
                         storageManager.Save(series);
                     }
                 }
-            });
+            }
+            catch
+            {
+                Debug.WriteLine("Error unsubscribing");
+            }
         }
 
         public async Task UnsubscribeAsync(TvDbSeries series)
         {
-            series.IsSubscribed = false;
-            var subscriptions = await storageManager.GetSavedSeries();
-            subscriptions.RemoveAllThatMatch(m => series.Id == m.Id);
-            await Task.Factory.StartNew(() =>
+            try
             {
-                lock (subscriptionLock)
+                series.IsSubscribed = false;
+                var subscriptions = await storageManager.GetSavedSeries();
+                subscriptions.RemoveAllThatMatch(m => series.Id == m.Id);
+                using (await subscriptionLock.LockAsync())
                 {
                     storageManager.Remove(series);
                 }
-            });
+            }
+            catch
+            {
+                Debug.WriteLine("Error unsubscribing");
+            }
         }
     }
 }

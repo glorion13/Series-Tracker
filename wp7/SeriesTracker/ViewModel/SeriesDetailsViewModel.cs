@@ -170,7 +170,7 @@ namespace SeriesTracker
                     Rating = 5,
                     AirsTime = "9 PM",
                     AirsDayOfWeek = 6,
-                    Episodes = new ObservableCollection<TvDbSeriesEpisode>() {
+                    Episodes = new List<TvDbSeriesEpisode>() {
                         new TvDbSeriesEpisode() {
                             Name = "Episode 1",
                             SeriesNumber = "1",

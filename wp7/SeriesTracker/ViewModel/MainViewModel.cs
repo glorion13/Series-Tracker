@@ -73,7 +73,7 @@ namespace SeriesTracker
                     Image = "http://thetvdb.com/banners/posters/73871-2.jpg",
                     Rating = 5,
                     AirsTime = "11 PM",
-                    Episodes = new ObservableCollection<TvDbSeriesEpisode>()
+                    Episodes = new List<TvDbSeriesEpisode>()
                     {
                         new TvDbSeriesEpisode() {
                             Name = "Episode 1",

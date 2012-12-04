@@ -122,8 +122,8 @@ namespace SeriesTracker
             }
         }
 
-        private ObservableCollection<TvDbSeriesEpisode> episodes;
-        public ObservableCollection<TvDbSeriesEpisode> Episodes
+        private List<TvDbSeriesEpisode> episodes;
+        public List<TvDbSeriesEpisode> Episodes
         {
             get
             {
@@ -133,11 +133,14 @@ namespace SeriesTracker
             set
             {
                 Set(() => Episodes, ref episodes, value);
+                RaisePropertyChanged(() => NextEpisodeAirDateTime);
+                RaisePropertyChanged(() => NextEpisodeETA);
+                RaisePropertyChanged(() => NextEpisodeAirs);
             }
         }
 
         public TvDbSeries() {
-            episodes = new ObservableCollection<TvDbSeriesEpisode>();
+            episodes = new List<TvDbSeriesEpisode>();
         }
 
         private DateTime? updated = null;
