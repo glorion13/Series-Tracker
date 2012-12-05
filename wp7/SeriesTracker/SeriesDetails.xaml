@@ -99,7 +99,7 @@
                             </toolkitPrimitives:ToggleSwitchButton>
                             <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next episode" d:LayoutOverrides="Height" Grid.Row="2" Style="{StaticResource PhoneTextNormalStyle}" Margin="12,18,0,6"/>
                             <TextBlock Margin="{StaticResource PhoneHorizontalMargin}" TextWrapping="Wrap" Text="{Binding Series.NextEpisodeAirs, Mode=OneWay}" d:LayoutOverrides="Height" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextAccentStyle}"/>
-                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="IMDd" Grid.Row="4" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}" d:LayoutOverrides="Height"/>
+                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="IMDb" Grid.Row="4" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}" d:LayoutOverrides="Height"/>
                             <HyperlinkButton Content="Read more at IMDb" Command="{Binding OpenImdbLink, Mode=OneWay}" Grid.Row="5" FontSize="20" HorizontalAlignment="Left" >
                             	<HyperlinkButton.Foreground>
                             		<SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
