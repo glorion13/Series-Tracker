@@ -17,23 +17,23 @@ namespace SeriesTracker
     public class TvDbSeriesRepository
     {
         private readonly SeriesStorageManager storageManager;
-        private readonly TvDb tvdb;
+        private readonly TvDb tvDb;
         private readonly Dictionary<TvDbSeries, Task> updates;
         private readonly AsyncLock subscriptionLock = new AsyncLock();
         private readonly AsyncLock seenLock = new AsyncLock();
 
-        public TvDbSeriesRepository(SeriesStorageManager storageManager)
+        public TvDbSeriesRepository(SeriesStorageManager storageManager, TvDb tvDb)
         {
             this.storageManager = storageManager;
             updates = new Dictionary<TvDbSeries, Task>();
-            tvdb = new TvDb();
+            this.tvDb = tvDb;
         }
 
         public async Task<IDictionary<TvDbSeries, Task>> FindAsync(string seriesName)
         {
             try
             {
-                var results = from result in await tvdb.FindSeries(seriesName)
+                var results = from result in await tvDb.FindSeries(seriesName)
                               join subscribed in await storageManager.GetSavedSeries() on result.Id equals subscribed.Id into matches
                               from match in matches.DefaultIfEmpty()
                               select match ?? result;
@@ -93,7 +93,7 @@ namespace SeriesTracker
         {
             try
             {
-                var update = tvdb.UpdateData(series);
+                var update = tvDb.UpdateData(series);
                 var subs = UpdateSubscirptionStatusAsync(series);
 
                 await update;

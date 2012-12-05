@@ -28,7 +28,21 @@ namespace SeriesTracker
 {
     public class MainViewModel : ViewModelBase
     {
-        private TvDbSeriesRepository repository;
+        private readonly TvDbSeriesRepository repository;
+        private readonly ConnectivityService connectivityService;
+
+        private bool connectionDown;
+        public bool ConnectionDown
+        {
+            get
+            {
+                return connectionDown;
+            }
+            set
+            {
+                Set(() => ConnectionDown, ref connectionDown, value);
+            }
+        }
 
         private ObservableCollection<TvDbSeries> series;
         public ObservableCollection<TvDbSeries> Series
@@ -52,8 +66,12 @@ namespace SeriesTracker
             }
         }
 
-        public MainViewModel(TvDbSeriesRepository repository)
+        public MainViewModel(TvDbSeriesRepository repository, ConnectivityService connectivityService)
         {
+            this.connectivityService = connectivityService;
+            connectivityService.InternetDown += connectivityService_InternetDown;
+            connectivityService.InternetUp += connectivityService_InternetUp;
+
             if (!IsInDesignMode)
             {
                 this.repository = repository;
@@ -111,6 +129,16 @@ namespace SeriesTracker
 
                 searchResults = series;
             }
+        }
+
+        void connectivityService_InternetUp(object sender, EventArgs e)
+        {
+            DispatcherHelper.CheckBeginInvokeOnUI(() => ConnectionDown = false);
+        }
+
+        void connectivityService_InternetDown(object sender, EventArgs e)
+        {
+            DispatcherHelper.CheckBeginInvokeOnUI(() => ConnectionDown = true);
         }
 
         public async Task Initialize()
