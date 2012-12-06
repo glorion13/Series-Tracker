@@ -252,5 +252,17 @@ namespace SeriesTracker
                     }));
             }
         }
+
+        private ICommand viewAboutPage;
+        public ICommand ViewAboutPage
+        {
+            get
+            {
+                return viewAboutPage ?? (viewAboutPage = new RelayCommand<TvDbSeries>(s =>
+                {
+                    MessengerInstance.Send(new Uri("/About.xaml", UriKind.Relative));
+                }));
+            }
+        }
     }
 }
