@@ -32,6 +32,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Support e-mail:" />
@@ -41,9 +42,17 @@
                     </HyperlinkButton.Foreground>
                 </HyperlinkButton>
             </StackPanel>
-            <TextBlock Margin="0,20" Grid.Row="1" Text="We hope you enjoy this app and that you find it useful; remember if you have ideas about features you'd like to see just let us know and we'll do our best to add them!"
+            <StackPanel Orientation="Horizontal" Grid.Row="1">
+                <TextBlock Text="Support e-mail:" />
+                <HyperlinkButton Grid.Row="0" Content="seriestracker@outlook.com" Command="{Binding OpenImdbLink, Mode=OneWay}" FontSize="20" HorizontalAlignment="Left" >
+                    <HyperlinkButton.Foreground>
+                        <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
+                    </HyperlinkButton.Foreground>
+                </HyperlinkButton>
+            </StackPanel>
+            <TextBlock Margin="0,20" Grid.Row="2" Text="We hope you enjoy this app and that you find it useful; remember if you have ideas about features you'd like to see just let us know and we'll do our best to add them!"
                       TextWrapping="Wrap" />
-            <TextBlock HorizontalAlignment="Right" Grid.Row="2" Text="Ondrej Pialek, Alexandros Gouvatsos" />
+            <TextBlock HorizontalAlignment="Right" Grid.Row="3" Text="Ondrej Pialek, Alexandros Gouvatsos" />
         </Grid>
     </Grid>
 
