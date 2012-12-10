@@ -38,10 +38,8 @@ namespace SeriesTracker
             
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<SeriesDetailsViewModel>(true);
+            SimpleIoc.Default.Register<AboutViewModel>(true);
 
-            
-
-            
             SimpleIoc.Default.Register<SplashViewModel>(true);
         }
 
@@ -58,6 +56,14 @@ namespace SeriesTracker
             get
             {
                 return ServiceLocator.Current.GetInstance<SeriesDetailsViewModel>();
+            }
+        }
+
+        public AboutViewModel About
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<AboutViewModel>();
             }
         }
 

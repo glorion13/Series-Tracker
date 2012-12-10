@@ -11,6 +11,7 @@
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     mc:Ignorable="d"
+    xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP71"
     shell:SystemTray.IsVisible="True">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
@@ -30,29 +31,30 @@
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="20"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Support e-mail:" />
-                <HyperlinkButton Grid.Row="0" Content="seriestracker@outlook.com" Command="{Binding OpenImdbLink, Mode=OneWay}" FontSize="20" HorizontalAlignment="Left" >
+                <HyperlinkButton Content="seriestracker@outlook.com" Command="{Binding OpenEmailLink, Mode=OneWay}" FontSize="20" HorizontalAlignment="Left" >
                     <HyperlinkButton.Foreground>
                         <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                     </HyperlinkButton.Foreground>
                 </HyperlinkButton>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Grid.Row="1">
-                <TextBlock Text="Support e-mail:" />
-                <HyperlinkButton Grid.Row="0" Content="seriestracker@outlook.com" Command="{Binding OpenImdbLink, Mode=OneWay}" FontSize="20" HorizontalAlignment="Left" >
+            <StackPanel Orientation="Horizontal" Grid.Row="2">
+                <TextBlock Text="Social networks:" />
+                <HyperlinkButton Content="Follow us on Facebook" Command="{Binding OpenFacebookLink, Mode=OneWay}" FontSize="20" HorizontalAlignment="Left" >
                     <HyperlinkButton.Foreground>
                         <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                     </HyperlinkButton.Foreground>
                 </HyperlinkButton>
             </StackPanel>
-            <TextBlock Margin="0,20" Grid.Row="2" Text="We hope you enjoy this app and that you find it useful; remember if you have ideas about features you'd like to see just let us know and we'll do our best to add them!"
+            <TextBlock Margin="0,20" Grid.Row="3" Text="We hope you enjoy this app and that you find it useful; remember if you have ideas about features you'd like to see just let us know and we'll do our best to add them! You can either contact us by e-mail or through our facebook page. In fact, make sure you have a look on our facebook page for the latest updates and discussions on Series Tracker."
                       TextWrapping="Wrap" />
-            <TextBlock HorizontalAlignment="Right" Grid.Row="3" Text="Ondrej Pialek, Alexandros Gouvatsos" />
+            <TextBlock HorizontalAlignment="Right" Grid.Row="4" Text="Ondrej Pialek, Alexandros Gouvatsos" />
         </Grid>
     </Grid>
 
