@@ -185,7 +185,16 @@ namespace SeriesTracker
                             {
                                 var episode = series.Episodes.FirstOrDefault(e => e.Id.Equals(episodeId));
                                 if (episode != null)
-                                    episode.IsSeen = true;
+                                    episode.IsSeen = true;                                    
+                            }
+                            int episodeCount = series.Episodes.Count - seen.Count;
+                            if (episodeCount > 0)
+                            {
+                                series.UnseenEpisodeCount = episodeCount.ToString();
+                            }
+                            else
+                            {
+                                series.UnseenEpisodeCount = null;
                             }
                         });
                     }

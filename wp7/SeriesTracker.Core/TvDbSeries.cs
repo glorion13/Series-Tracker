@@ -188,7 +188,6 @@ namespace SeriesTracker
             }
         }
 
-
         public string Airs
         {
             get
@@ -245,6 +244,19 @@ namespace SeriesTracker
                 date = date.Value.Add(localOffset);
 
                 return date;
+            }
+        }
+
+        private string unseenEpisodeCount;
+        public string UnseenEpisodeCount
+        {
+            get
+            {
+                return unseenEpisodeCount;
+            }
+            set
+            {
+                Set(() => UnseenEpisodeCount, ref unseenEpisodeCount, value);
             }
         }
 

@@ -19,6 +19,7 @@
     SupportedOrientations="Portrait"
 	Orientation="Portrait"
     shell:SystemTray.IsVisible="False">
+    
 	<phone:PhoneApplicationPage.Resources>
         <DataTemplate x:Key="SeriesTemplate">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,17">
@@ -53,9 +54,23 @@
                             <BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Image, ConverterParameter=100, Converter={StaticResource Resizer}}" />
                         </Image.Source>
                     </Image>
-                    <TextBlock Text="{Binding Title}" d:LayoutOverrides="Width, Height" HorizontalAlignment="Right" Grid.ColumnSpan="2" Margin="12,6,12,0" Style="{StaticResource PhoneTextNormalStyle}"/>
-                    <TextBlock Text="next up" Grid.Column="1" Style="{StaticResource PhoneTextSubtleStyle}" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" Grid.Row="1" VerticalAlignment="Bottom" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
-                    <TextBlock Text="{Binding NextEpisodeETA}" d:LayoutOverrides="Width, Height" Grid.Row="2" Grid.Column="1" Style="{StaticResource PhoneTextExtraLargeStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" FontSize="38.667" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                    <TextBlock Text="{Binding Title}" d:LayoutOverrides="Width, Height"  HorizontalAlignment="Right" Grid.ColumnSpan="2" Margin="12,6,12,0" Style="{StaticResource PhoneTextNormalStyle}"/>
+                    <Grid Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Right" Margin="0,0,15,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="next up" Grid.Column="0" Grid.Row="0" Style="{StaticResource PhoneTextSubtleStyle}" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" VerticalAlignment="Bottom" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                        <TextBlock Text="{Binding NextEpisodeETA}" Grid.Column="0" Grid.Row="1" d:LayoutOverrides="Width, Height" Style="{StaticResource PhoneTextExtraLargeStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" FontSize="38.667" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                        <Rectangle Width="1" Height="60" Grid.Column="0" Grid.RowSpan="2" HorizontalAlignment="Right" Fill="White" StrokeThickness="0" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}" />
+                        <TextBlock Text="not seen" Grid.Column="1" Grid.Row="0" Style="{StaticResource PhoneTextSubtleStyle}" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" VerticalAlignment="Bottom" Visibility="{Binding UnseenEpisodeCount, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                        <TextBlock Text="{Binding UnseenEpisodeCount}" d:LayoutOverrides="Width, Height" Grid.Column="1" Grid.Row="1" Style="{StaticResource PhoneTextExtraLargeStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" FontSize="38.667" Visibility="{Binding UnseenEpisodeCount, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                        <Rectangle Width="1" Height="60" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Right" Fill="White" StrokeThickness="0" Visibility="{Binding UnseenEpisodeCount, Converter={StaticResource VisibleIfNotNullOrEmpty}}" />
+                    </Grid>
                 </Grid>
             </StackPanel>
         </DataTemplate>

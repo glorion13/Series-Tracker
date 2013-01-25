@@ -132,7 +132,21 @@ namespace SeriesTracker
         {
             using (await seenLock.LockAsync())
             {
+                updateSeriesUnseenEpisodeCount(series);
                 await Task.Factory.StartNew(() => storageManager.SaveSeen(series));
+            }
+        }
+
+        private void updateSeriesUnseenEpisodeCount(TvDbSeries series)
+        {
+            int episodeCount = series.Episodes.Count<TvDbSeriesEpisode>(e => !e.IsSeen);
+            if (episodeCount > 0)
+            {
+                series.UnseenEpisodeCount = episodeCount.ToString();
+            }
+            else
+            {
+                series.UnseenEpisodeCount = null;
             }
         }
 
