@@ -23,13 +23,28 @@ using System.Reactive;
 using GalaSoft.MvvmLight.Threading;
 using System.Windows.Navigation;
 using System.Threading.Tasks;
+using Microsoft.Phone.Shell;
 
 namespace SeriesTracker
 {
     public class MainViewModel : ViewModelBase
     {
+        public class LiveTileUpdater
+        {
+            private MainViewModel mvm;
+            public LiveTileUpdater(MainViewModel mvm)
+            {
+                this.mvm = mvm;
+            }
+            public void updateLiveTile()
+            {
+
+            }
+        }
+
         private readonly TvDbSeriesRepository repository;
         private readonly ConnectivityService connectivityService;
+        private LiveTileUpdater ltUpdater;
 
         private bool connectionDown;
         public bool ConnectionDown
@@ -75,8 +90,8 @@ namespace SeriesTracker
             if (!IsInDesignMode)
             {
                 this.repository = repository;
-
                 searchResults = new SelfSortingObservableCollection<TvDbSeries, float>(s => s.Rating, order: SortOrder.Desc);
+                ltUpdater = new LiveTileUpdater(this);
                 //series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
             }
             else if (IsInDesignMode)
@@ -262,6 +277,33 @@ namespace SeriesTracker
                 {
                     MessengerInstance.Send(new Uri("/About.xaml", UriKind.Relative));
                 }));
+            }
+        }
+
+        // Live Tile stuff
+        private void initialiseLiveTile()
+        {
+            ShellTile PrimaryTile = ShellTile.ActiveTiles.First();
+
+            if (PrimaryTile != null)
+            {
+                StandardTileData tile = new StandardTileData();
+
+                tile.Count = 0;
+                tile.Title = "Series Tracker";
+                PrimaryTile.Update(tile);
+            }
+        }
+        private int allUnseenEpisodes;
+        public int AllUnseenEpisodes
+        {
+            get
+            {
+                return allUnseenEpisodes;
+            }
+            set
+            {
+                allUnseenEpisodes = value;
             }
         }
     }

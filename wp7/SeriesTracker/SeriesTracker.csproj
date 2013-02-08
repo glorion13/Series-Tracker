@@ -141,6 +141,7 @@
     <Compile Include="Converters\BooleanToSeenConverter.cs" />
     <Compile Include="Converters\VisibleIfNotNullOrEmptyCoverter.cs" />
     <Compile Include="Converters\UppercaseConverter.cs" />
+    <Compile Include="Converters\NoneIfZero.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

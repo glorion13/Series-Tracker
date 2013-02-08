@@ -74,7 +74,6 @@ namespace SeriesTracker
                 return ServiceLocator.Current.GetInstance<SplashViewModel>();
             }
         }
-
         
     }
 }

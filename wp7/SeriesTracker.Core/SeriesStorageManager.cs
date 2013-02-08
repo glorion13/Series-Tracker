@@ -187,15 +187,6 @@ namespace SeriesTracker
                                 if (episode != null)
                                     episode.IsSeen = true;                                    
                             }
-                            int episodeCount = series.Episodes.Count - seen.Count;
-                            if (episodeCount > 0)
-                            {
-                                series.UnseenEpisodeCount = episodeCount.ToString();
-                            }
-                            else
-                            {
-                                series.UnseenEpisodeCount = null;
-                            }
                         });
                     }
                 }

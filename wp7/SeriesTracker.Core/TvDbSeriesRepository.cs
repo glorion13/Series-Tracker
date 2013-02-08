@@ -87,6 +87,7 @@ namespace SeriesTracker
             }
                     
             await Task.Factory.StartNew(() => storageManager.SetSeenEpisodes(series));
+            updateSeriesUnseenEpisodeCount(series);
         }
 
         private async Task UpdateDataAsync(TvDbSeries series)
@@ -124,8 +125,14 @@ namespace SeriesTracker
         public async Task UnmarkSeenAsync(TvDbSeries series, TvDbSeriesEpisode episode)
         {
             episode.IsSeen = false;
-            
+
             await SaveSeenAsync(series);
+        }
+
+        private void updateSeriesUnseenEpisodeCount(TvDbSeries series)
+        {
+            int episodeCount = series.Episodes.Count<TvDbSeriesEpisode>(e => !e.IsSeen);
+            series.UnseenEpisodeCount = (episodeCount > 0) ? episodeCount.ToString() : "None";
         }
 
         private async Task SaveSeenAsync(TvDbSeries series)
@@ -133,20 +140,8 @@ namespace SeriesTracker
             using (await seenLock.LockAsync())
             {
                 updateSeriesUnseenEpisodeCount(series);
-                await Task.Factory.StartNew(() => storageManager.SaveSeen(series));
-            }
-        }
 
-        private void updateSeriesUnseenEpisodeCount(TvDbSeries series)
-        {
-            int episodeCount = series.Episodes.Count<TvDbSeriesEpisode>(e => !e.IsSeen);
-            if (episodeCount > 0)
-            {
-                series.UnseenEpisodeCount = episodeCount.ToString();
-            }
-            else
-            {
-                series.UnseenEpisodeCount = null;
+                await Task.Factory.StartNew(() => storageManager.SaveSeen(series));
             }
         }
 
@@ -161,6 +156,7 @@ namespace SeriesTracker
                 {
                     if (!updates.ContainsKey(series))
                     {
+                        updateSeriesUnseenEpisodeCount(series);
                         storageManager.Save(series);
                     }
                 }
