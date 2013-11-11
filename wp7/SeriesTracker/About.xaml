@@ -4,19 +4,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
-    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" 
-    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-	xmlns:ec="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions" 
-    xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP71"
-    xmlns:toolkitPrimitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     mc:Ignorable="d"
+    xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP71"
     shell:SystemTray.IsVisible="True">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
@@ -43,7 +38,7 @@
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Support e-mail:" />
-                <HyperlinkButton Content="seriestracker@outlook.com" Command="{Binding About.OpenEmailLink, Mode=OneWay, Source={StaticResource Locator}}" FontSize="20" HorizontalAlignment="Left" >
+                <HyperlinkButton Content="seriestracker@outlook.com" Command="{Binding OpenEmailLink, Mode=OneWay}" FontSize="20" HorizontalAlignment="Left" >
                     <HyperlinkButton.Foreground>
                         <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                     </HyperlinkButton.Foreground>
@@ -51,7 +46,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Grid.Row="2">
                 <TextBlock Text="Social networks:" />
-                <HyperlinkButton Content="Follow us on Facebook" Command="{Binding About.OpenFacebookLink, Mode=OneWay, Source={StaticResource Locator}}" FontSize="20" HorizontalAlignment="Left" >
+                <HyperlinkButton Content="Follow us on Facebook" Command="{Binding OpenFacebookLink, Mode=OneWay}" FontSize="20" HorizontalAlignment="Left" >
                     <HyperlinkButton.Foreground>
                         <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                     </HyperlinkButton.Foreground>
