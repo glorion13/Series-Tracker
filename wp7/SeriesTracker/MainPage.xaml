@@ -13,7 +13,8 @@
     xmlns:bar="clr-namespace:BindableApplicationBar;assembly=BindableApplicationBar"
     xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP71"
     xmlns:SeriesTracker_Converters="clr-namespace:SeriesTracker.Converters"
-    xmlns:eim="clr-namespace:Microsoft.Expression.Interactivity.Media;assembly=Microsoft.Expression.Interactions"
+    xmlns:ctrl="clr-namespace:SeriesTracker.Controls"
+    xmlns:eim="clr-namespace:Microsoft.Expression.Interactivity.Media;assembly=Microsoft.Expression.Interactions"    
     x:Class="SeriesTracker.MainPage"
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
     SupportedOrientations="Portrait"
@@ -224,8 +225,14 @@
 	    </toolkit:NavigationOutTransition>
 	</toolkit:TransitionService.NavigationOutTransition>
 
-	<Grid x:Name="LayoutRoot"> 
-		<i:Interaction.Behaviors>
+	<Grid x:Name="LayoutRoot">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <i:Interaction.Behaviors>
 	        <ec:DataStateBehavior Binding="{Binding IsLoadingSubscriptions}" TrueState="Loading" FalseState="NotLoading" Value="True"/>
 	    </i:Interaction.Behaviors>	
 		<VisualStateManager.VisualStateGroups>
@@ -290,8 +297,14 @@
 						<toolkit:LongListSelector.ListHeaderTemplate>
 							<DataTemplate>
 								<Grid>
-									<TextBox Text="{Binding Search, Mode=TwoWay}" Margin="0,-12,0,0"/>
-								</Grid>						
+                                    <TextBox Text="{Binding Search, Mode=TwoWay}" IsEnabled="{Binding IsSearchBoxEnabled}" Margin="0,-12,0,0">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="KeyDown">
+                                                <GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding CloseSoftKeyboard}" PassEventArgsToCommand="True" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBox>
+                                </Grid>						
 							</DataTemplate>
 						</toolkit:LongListSelector.ListHeaderTemplate>
 					</toolkit:LongListSelector>
@@ -324,7 +337,9 @@
 				</Canvas>
 			</Grid>
 		</Popup>
-	</Grid>
+
+        <ctrl:FeedbackOverlay Grid.RowSpan="2" EnableAnimation="True" />
+    </Grid>
 
     <bar:Bindable.ApplicationBar>
         <bar:BindableApplicationBar IsVisible="True" Opacity="0.5">

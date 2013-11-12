@@ -90,6 +90,7 @@ namespace SeriesTracker
             if (!IsInDesignMode)
             {
                 this.repository = repository;
+                IsSearchBoxEnabled = true;
                 searchResults = new SelfSortingObservableCollection<TvDbSeries, float>(s => s.Rating, order: SortOrder.Desc);
                 ltUpdater = new LiveTileUpdater(this);
                 //series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
@@ -205,6 +206,34 @@ namespace SeriesTracker
             set
             {
                 Set(() => Search, ref search, value);
+            }
+        }
+        private bool isSearchBoxEnabled;
+        public bool IsSearchBoxEnabled
+        {
+            get
+            {
+                return isSearchBoxEnabled;
+            }
+
+            set
+            {
+                Set(() => IsSearchBoxEnabled, ref isSearchBoxEnabled, value);
+            }
+        }
+        private RelayCommand<KeyEventArgs> closeSoftKeyboard;
+        public RelayCommand<KeyEventArgs> CloseSoftKeyboard
+        {
+            get
+            {
+                return closeSoftKeyboard ?? (closeSoftKeyboard = new RelayCommand<KeyEventArgs>(a =>
+                {
+                    if (a.Key == Key.Enter)
+                    {
+                        IsSearchBoxEnabled = false;
+                        IsSearchBoxEnabled = true;
+                    }
+                }));
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Deployment xmlns="http://schemas.microsoft.com/windowsphone/2009/deployment" AppPlatformVersion="7.1">
-  <App xmlns="" ProductID="{e45afa26-ada4-4435-a63d-97390c52f337}" Title="SeriesTracker" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="SeriesTracker author" Description="Sample description" Publisher="SeriesTracker">
+  <App xmlns="" ProductID="{e45afa26-ada4-4435-a63d-97390c52f337}" Title="Series Tracker" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Ondrej Pialek, Alexandros Gouvatsos" Description="Hate missing your favourite TV shows? Series Tracker helps you keep track of the TV series and shows you watch! Know exactly what and when to watch it!" Publisher="Series Tracker">
     <IconPath IsRelative="true" IsResource="false">ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />
@@ -13,7 +13,7 @@
         <TemplateType5>
           <BackgroundImageURI IsRelative="true" IsResource="false">Background.png</BackgroundImageURI>
           <Count>0</Count>
-          <Title>SeriesTracker</Title>
+          <Title>Series Tracker</Title>
         </TemplateType5>
       </PrimaryToken>
     </Tokens>
