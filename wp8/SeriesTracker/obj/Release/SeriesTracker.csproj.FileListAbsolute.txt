@@ -309,7 +309,6 @@ D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\Bin\Release\ko\M
 D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\Bin\Release\ru\Microsoft.Expression.Interactions.resources.dll
 D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\Bin\Release\zh-Hans\Microsoft.Expression.Interactions.resources.dll
 D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\Bin\Release\zh-Hant\Microsoft.Expression.Interactions.resources.dll
-D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\SeriesTracker.csprojResolveAssemblyReference.cache
 D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\App.g.cs
 D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\About.g.cs
 D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\Controls\FeedbackOverlay.g.cs
