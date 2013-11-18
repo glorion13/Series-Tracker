@@ -1,0 +1,352 @@
+﻿<phone:PhoneApplicationPage
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+	xmlns:scm="clr-namespace:System.ComponentModel;assembly=System.Windows"
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+    xmlns:ec="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions" 
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:bar="clr-namespace:BindableApplicationBar;assembly=BindableApplicationBar"
+    xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP8"
+    xmlns:SeriesTracker_Converters="clr-namespace:SeriesTracker.Converters"
+    xmlns:ctrl="clr-namespace:SeriesTracker.Controls"
+    xmlns:eim="clr-namespace:Microsoft.Expression.Interactivity.Media;assembly=Microsoft.Expression.Interactions"    
+    x:Class="SeriesTracker.MainPage"
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
+    SupportedOrientations="Portrait"
+	Orientation="Portrait"
+    shell:SystemTray.IsVisible="False">
+    
+	<phone:PhoneApplicationPage.Resources>
+        <DataTemplate x:Key="SeriesTemplate">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,17">
+                <Grid Background="{StaticResource PhoneAccentBrush}" Width="420" Height="120">
+
+                    <toolkit:ContextMenuService.ContextMenu>
+                        <toolkit:ContextMenu>
+                            <toolkit:MenuItem CommandParameter="{Binding}" Command="{Binding MainViewModel.ToggleSubscribed, Source={StaticResource Locator}}">
+                                <toolkit:MenuItem.Header>
+                                    <TextBlock Text="Unfollow" />
+                                </toolkit:MenuItem.Header>
+                            </toolkit:MenuItem>
+                        </toolkit:ContextMenu>
+                    </toolkit:ContextMenuService.ContextMenu>
+
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Tap">
+                            <GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding}" Command="{Binding MainViewModel.ViewDetails, Source={StaticResource Locator}}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.RowSpan="3" Stretch="UniformToFill">
+                        <Image.Source>
+                            <BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Image, ConverterParameter=100, Converter={StaticResource Resizer}}" />
+                        </Image.Source>
+                    </Image>
+                    <TextBlock Text="{Binding Title}" d:LayoutOverrides="Width, Height"  HorizontalAlignment="Right" Grid.ColumnSpan="2" Margin="12,6,12,0" Style="{StaticResource PhoneTextNormalStyle}"/>
+                    <Grid Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Right" Margin="0,0,15,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="next up" Grid.Column="0" Grid.Row="0" Style="{StaticResource PhoneTextSubtleStyle}" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" VerticalAlignment="Bottom" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                        <TextBlock Text="{Binding NextEpisodeETA}" Grid.Column="0" Grid.Row="1" d:LayoutOverrides="Width, Height" Style="{StaticResource PhoneTextExtraLargeStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" FontSize="38.667" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                        <Rectangle Width="1" Height="60" Grid.Column="0" Grid.RowSpan="2" HorizontalAlignment="Right" Fill="White" StrokeThickness="0" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}" />
+                        <TextBlock Text="to see" Grid.Column="1" Grid.Row="0" Style="{StaticResource PhoneTextSubtleStyle}" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" VerticalAlignment="Bottom" />
+                        <TextBlock Text="{Binding UnseenEpisodeCount}" d:LayoutOverrides="Width, Height" Grid.Column="1" Grid.Row="1" Style="{StaticResource PhoneTextExtraLargeStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" FontSize="38.667" />
+                        <Rectangle Width="1" Height="60" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Right" Fill="White" StrokeThickness="0" Visibility="{Binding UnseenEpisodeCount, Converter={StaticResource VisibleIfNotNullOrEmpty}}" />
+                    </Grid>
+                </Grid>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="SearchResultTemplate">
+            <Grid Background="#00000000" Height="100" toolkit:TiltEffect.IsTiltEnabled="True" Margin="0,0,0,12">
+
+               <!-- 
+                NEED TO CREATE CONVERTER FOR THE BOOLEAN TO SHOW 'Follow' OR 'Unfollow'
+                <toolkit:ContextMenuService.ContextMenu>
+                    <toolkit:ContextMenu>
+                        <toolkit:MenuItem CommandParameter="{Binding}" Command="{Binding MainViewModel.ToggleSubscribed, Source={StaticResource Locator}}">
+                            <toolkit:MenuItem.Header>
+                                <TextBlock Text="{Binding IsSubscribed}" />
+                            </toolkit:MenuItem.Header>
+                        </toolkit:MenuItem>
+                    </toolkit:ContextMenu>
+                </toolkit:ContextMenuService.ContextMenu> -->
+
+                <Grid.ColumnDefinitions>
+            		<ColumnDefinition Width="Auto"/>
+            		<ColumnDefinition Width="0.731*"/>
+            	</Grid.ColumnDefinitions>
+        		<i:Interaction.Behaviors>
+        			<ec:DataStateBehavior Binding="{Binding IsSubscribed}" Value="True" TrueState="Subscribed" FalseState="NotSubscribed"/>
+        		</i:Interaction.Behaviors>
+        		<VisualStateManager.CustomVisualStateManager>
+        			<ec:ExtendedVisualStateManager/>
+        		</VisualStateManager.CustomVisualStateManager>
+        		<VisualStateManager.VisualStateGroups>
+        			<VisualStateGroup x:Name="IsSubscribed" ec:ExtendedVisualStateManager.UseFluidLayout="True">
+        				<VisualStateGroup.Transitions>
+        					<VisualTransition GeneratedDuration="0:0:0.5"/>
+        				</VisualStateGroup.Transitions>
+        				<VisualState x:Name="Subscribed">
+        					<Storyboard>
+        						<DoubleAnimation Duration="0" To="0.18" Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="image" d:IsOptimized="True"/>
+        						<DoubleAnimation Duration="0" To="1" Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="tick" d:IsOptimized="True"/>
+        					</Storyboard>
+        				</VisualState>
+        				<VisualState x:Name="NotSubscribed"/>
+        			</VisualStateGroup>
+        		</VisualStateManager.VisualStateGroups>
+        		<Canvas Margin="12,0,0,0" Background="#00000000" Width="100" Height="100">
+        			<i:Interaction.Triggers>
+        				<i:EventTrigger EventName="Tap">
+        					<GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding Mode=OneWay}" Command="{Binding MainViewModel.ToggleSubscribed, Mode=OneWay, Source={StaticResource Locator}}"/>
+        				</i:EventTrigger>
+        			</i:Interaction.Triggers>
+        			<Image Height="100" Width="100" Stretch="UniformToFill" x:Name="image">
+        				<Image.Source>
+        					<BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Image, ConverterParameter=100, Converter={StaticResource Resizer}}" />
+        				</Image.Source>
+        			</Image>
+        			<Grid x:Name="tick" Width="100" Height="100" Visibility="Visible" Opacity="0" CacheMode="BitmapCache">
+        				<Path Data="F1M57.0078,13.3424C54.8815,11.3346,51.5313,11.4283,49.5221,13.5521L23.7877,39.6022 14.0924,31.125C11.8854,29.2084 8.53906,29.4531 6.62231,31.6666 4.71094,33.8776 4.95313,37.224 7.16528,39.1342L19.9426,50.3125C20.1731,50.5131 20.4244,50.6771 20.6809,50.8307 22.8112,52.6484 26.0065,52.5143 27.9479,50.4557L57.2161,20.8295C59.2291,18.7045,59.1354,15.3516,57.0078,13.3424z" Stretch="Uniform" Fill="{StaticResource PhoneAccentBrush}" Width="60" Height="60" Margin="0,0,0,0" />
+        			</Grid>
+        		</Canvas>
+        		<Grid d:LayoutOverrides="Width, Height" Grid.Column="1" Margin="6,0,12,0">
+        			<Grid.RowDefinitions>
+        				<RowDefinition/>
+        				<RowDefinition Height="Auto"/>
+        			</Grid.RowDefinitions>
+        			<i:Interaction.Triggers>
+        				<i:EventTrigger EventName="Tap">
+        					<GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding}" Command="{Binding MainViewModel.ViewDetails, Source={StaticResource Locator}}"/>
+        				</i:EventTrigger>
+        			</i:Interaction.Triggers>
+        			<TextBlock Text="{Binding Title, Converter={StaticResource ToUpper}}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48" Margin="0,0,0,-3" TextWrapping="Wrap" LineStackingStrategy="BlockLineHeight" LineHeight="45.333" />
+        			<TextBlock Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,0,-3"><Run Text="{Binding Rating}" /><Run Text="/10"/></TextBlock>
+        		</Grid>
+        	</Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="PanoramaTitle">
+        	<Grid>
+        		<TextBlock Margin="0,53,0,-33" Text="SERIES TRACKER" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#SteelTongs"/>     	
+        		</Grid>
+        </DataTemplate>
+        <Storyboard x:Name="AnimatePopup">
+        	<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="popup">
+        		<EasingDoubleKeyFrame KeyTime="0" Value="0">
+        			<EasingDoubleKeyFrame.EasingFunction>
+        				<CircleEase EasingMode="EaseInOut"/>
+        			</EasingDoubleKeyFrame.EasingFunction>
+        		</EasingDoubleKeyFrame>
+        		<EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="1">
+        			<EasingDoubleKeyFrame.EasingFunction>
+        				<CircleEase EasingMode="EaseInOut"/>
+        			</EasingDoubleKeyFrame.EasingFunction>
+        		</EasingDoubleKeyFrame>
+        		<EasingDoubleKeyFrame KeyTime="0:0:3.6" Value="1">
+        			<EasingDoubleKeyFrame.EasingFunction>
+        				<CircleEase EasingMode="EaseInOut"/>
+        			</EasingDoubleKeyFrame.EasingFunction>
+        		</EasingDoubleKeyFrame>
+        		<EasingDoubleKeyFrame KeyTime="0:0:4" Value="0">
+        			<EasingDoubleKeyFrame.EasingFunction>
+        				<CircleEase EasingMode="EaseInOut"/>
+        			</EasingDoubleKeyFrame.EasingFunction>
+        		</EasingDoubleKeyFrame>
+        	</DoubleAnimationUsingKeyFrames>
+        	<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="popup">
+        		<EasingDoubleKeyFrame KeyTime="0" Value="-480"/>
+        		<EasingDoubleKeyFrame KeyTime="0:0:0.4" Value="0">
+        			<EasingDoubleKeyFrame.EasingFunction>
+        				<QuadraticEase EasingMode="EaseOut"/>
+        			</EasingDoubleKeyFrame.EasingFunction>
+        		</EasingDoubleKeyFrame>
+        		<EasingDoubleKeyFrame KeyTime="0:0:3.6" Value="0">
+        			<EasingDoubleKeyFrame.EasingFunction>
+        				<QuadraticEase EasingMode="EaseIn"/>
+        			</EasingDoubleKeyFrame.EasingFunction>
+        		</EasingDoubleKeyFrame>
+        		<EasingDoubleKeyFrame KeyTime="0:0:4" Value="480">
+        			<EasingDoubleKeyFrame.EasingFunction>
+        				<ExponentialEase EasingMode="EaseOut"/>
+        			</EasingDoubleKeyFrame.EasingFunction>
+        		</EasingDoubleKeyFrame>
+        	</DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </phone:PhoneApplicationPage.Resources>
+	<phone:PhoneApplicationPage.FontFamily>
+		<StaticResource ResourceKey="PhoneFontFamilyNormal"/>
+	</phone:PhoneApplicationPage.FontFamily>
+	<phone:PhoneApplicationPage.FontSize>
+		<StaticResource ResourceKey="PhoneFontSizeNormal"/>
+	</phone:PhoneApplicationPage.FontSize>
+	<phone:PhoneApplicationPage.Foreground>
+		<StaticResource ResourceKey="PhoneForegroundBrush"/>
+	</phone:PhoneApplicationPage.Foreground>
+	<phone:PhoneApplicationPage.DataContext>
+		<Binding Mode="OneWay" Path="MainViewModel" Source="{StaticResource Locator}"/>
+	</phone:PhoneApplicationPage.DataContext>
+	<toolkit:TransitionService.NavigationInTransition>
+	    <toolkit:NavigationInTransition>
+	    	<toolkit:NavigationInTransition.Forward>
+	            <toolkit:TurnstileTransition Mode="ForwardIn"/>
+	        </toolkit:NavigationInTransition.Forward>
+	        <toolkit:NavigationInTransition.Backward>
+	            <toolkit:TurnstileTransition Mode="BackwardIn"/>
+	        </toolkit:NavigationInTransition.Backward>
+	    </toolkit:NavigationInTransition>
+	</toolkit:TransitionService.NavigationInTransition>
+	<toolkit:TransitionService.NavigationOutTransition>
+	    <toolkit:NavigationOutTransition>
+	        <toolkit:NavigationOutTransition.Backward>
+	            <toolkit:TurnstileTransition Mode="BackwardOut"/>
+	        </toolkit:NavigationOutTransition.Backward>
+	        <toolkit:NavigationOutTransition.Forward>
+	            <toolkit:TurnstileTransition Mode="ForwardOut"/>
+	        </toolkit:NavigationOutTransition.Forward>
+	    </toolkit:NavigationOutTransition>
+	</toolkit:TransitionService.NavigationOutTransition>
+
+	<Grid x:Name="LayoutRoot">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <i:Interaction.Behaviors>
+	        <ec:DataStateBehavior Binding="{Binding IsLoadingSubscriptions}" TrueState="Loading" FalseState="NotLoading" Value="True"/>
+	    </i:Interaction.Behaviors>	
+		<VisualStateManager.VisualStateGroups>
+			<VisualStateGroup x:Name="LoadingSubs">
+				<VisualState x:Name="Loading">
+					<Storyboard>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="subsProgressBar">
+							<DiscreteObjectKeyFrame KeyTime="0">
+								<DiscreteObjectKeyFrame.Value>
+									<Visibility>Visible</Visibility>
+								</DiscreteObjectKeyFrame.Value>
+							</DiscreteObjectKeyFrame>
+						</ObjectAnimationUsingKeyFrames>
+					</Storyboard>
+				</VisualState>
+				<VisualState x:Name="NotLoading"/>
+			</VisualStateGroup>
+			<VisualStateGroup x:Name="Search">
+				<VisualState x:Name="Searching">
+					<Storyboard>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="searchProgressBar">
+							<DiscreteObjectKeyFrame KeyTime="0">
+								<DiscreteObjectKeyFrame.Value>
+									<Visibility>Visible</Visibility>
+								</DiscreteObjectKeyFrame.Value>
+							</DiscreteObjectKeyFrame>
+						</ObjectAnimationUsingKeyFrames>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="searchProgressBar">
+							<DiscreteObjectKeyFrame KeyTime="0">
+								<DiscreteObjectKeyFrame.Value>
+									<Thickness>0,-10,0,0</Thickness>
+								</DiscreteObjectKeyFrame.Value>
+							</DiscreteObjectKeyFrame>
+						</ObjectAnimationUsingKeyFrames>
+					</Storyboard>
+				</VisualState>
+				<VisualState x:Name="NotSearching"/>
+			</VisualStateGroup>
+		</VisualStateManager.VisualStateGroups>
+	 
+		<VisualStateManager.CustomVisualStateManager>
+			<ec:ExtendedVisualStateManager/>
+		</VisualStateManager.CustomVisualStateManager>
+		
+		<controls:Panorama TitleTemplate="{StaticResource PanoramaTitle}">
+ 
+			<controls:PanoramaItem Header="followed" toolkit:TiltEffect.IsTiltEnabled="True">
+				<Grid Width="420">
+					<toolkit:PerformanceProgressBar x:Name="subsProgressBar" Height="10" IsIndeterminate="True" VerticalAlignment="Top" Visibility="Collapsed" Margin="0,-10,0,0" />
+					<ListBox ItemsSource="{Binding Series}" ItemTemplate="{StaticResource SeriesTemplate}" />
+				</Grid>
+			</controls:PanoramaItem>
+ 
+			<!--Use 'Orientation="Horizontal"' to enable a panel that lays out horizontally-->
+			<controls:PanoramaItem Header="search">
+				<Grid>
+				    <i:Interaction.Behaviors>
+				        <ec:DataStateBehavior Binding="{Binding IsSearching}" TrueState="Searching" FalseState="NotSearching" Value="True"/>
+				    </i:Interaction.Behaviors>	
+					<toolkit:PerformanceProgressBar x:Name="searchProgressBar" Height="10" IsIndeterminate="True" VerticalAlignment="Top" Visibility="Collapsed" Margin="0,-10,0,0" />
+                    <phone:LongListSelector ItemsSource="{Binding SearchResults}" ItemTemplate="{StaticResource SearchResultTemplate}" ListHeader="{Binding}" LayoutMode="List">
+                        <phone:LongListSelector.ListHeaderTemplate>
+							<DataTemplate>
+								<Grid>
+                                    <TextBox Text="{Binding Search, Mode=TwoWay}" IsEnabled="{Binding IsSearchBoxEnabled}" Margin="0,-12,0,0">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="KeyDown">
+                                                <GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding CloseSoftKeyboard}" PassEventArgsToCommand="True" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBox>
+                                </Grid>						
+							</DataTemplate>
+                        </phone:LongListSelector.ListHeaderTemplate>
+                    </phone:LongListSelector>
+				</Grid>
+			</controls:PanoramaItem>
+		</controls:Panorama>
+		<Popup x:Name="popup" IsOpen="{Binding ConnectionDown}" RenderTransformOrigin="0.5,0.5">
+			<i:Interaction.Triggers>
+				<i:EventTrigger EventName="Opened">
+					<eim:ControlStoryboardAction Storyboard="{StaticResource AnimatePopup}"/>
+				</i:EventTrigger>
+			</i:Interaction.Triggers>
+			<Popup.RenderTransform>
+				<CompositeTransform/>
+			</Popup.RenderTransform>
+			<Grid x:Name="grid" Background="{StaticResource PhoneAccentBrush}" HorizontalAlignment="Center" Height="120" Width="480" UseLayoutRounding="True">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="120" />
+					<ColumnDefinition />
+				</Grid.ColumnDefinitions>
+				<TextBlock Margin="{StaticResource PhoneTouchTargetLargeOverhang}" TextWrapping="Wrap" Text="Oh no! Looks like we are offline. Connect to the internet and try again! Until then we'll just show you local data." d:LayoutOverrides="Width, Height" Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Center" Grid.Column="1" VerticalAlignment="Center" TextOptions.TextHintingMode="Animated"/>
+				<Canvas x:Name="Vrstva_1" Width="16" Height="16" RenderTransformOrigin="0.5,0.5" Margin="12,0,-12,0">
+					<Canvas.RenderTransform>
+						<CompositeTransform ScaleY="5" ScaleX="5"/>
+					</Canvas.RenderTransform>
+					<Path Data="F1M298,66.1104C294.141,66.1104,291,62.9704,291,59.1104C291,55.2504,294.141,52.1104,298,52.1104C301.859,52.1104,305,55.2504,305,59.1104C305,62.9704,301.859,66.1104,298,66.1104 M298,51.1104C293.582,51.1104,290,54.6924,290,59.1104C290,63.5284,293.582,67.1104,298,67.1104C302.418,67.1104,306,63.5284,306,59.1104C306,54.6924,302.418,51.1104,298,51.1104" Fill="{StaticResource PhoneDisabledBrush}" Height="16" Canvas.Left="0" Stretch="Fill" Canvas.Top="0" Width="16"/>
+					<Path Data="F1M297,56.6104C297,55.7814,296.553,55.1104,296,55.1104C295.447,55.1104,295,55.7814,295,56.6104C295,57.4394,295.447,58.1104,296,58.1104C296.553,58.1104,297,57.4394,297,56.6104" Fill="{StaticResource PhoneDisabledBrush}" Height="3" Canvas.Left="5" Stretch="Fill" Canvas.Top="4" Width="2"/>
+					<Path Data="F1M300,55.1104C299.447,55.1104,299,55.7814,299,56.6104C299,57.4394,299.447,58.1104,300,58.1104C300.553,58.1104,301,57.4394,301,56.6104C301,55.7814,300.553,55.1104,300,55.1104" Fill="{StaticResource PhoneDisabledBrush}" Height="3" Canvas.Left="9" Stretch="Fill" Canvas.Top="4" Width="2"/>
+					<Path Data="F1M298,60.1104C296.896,60.1104,296,61.0064,296,62.1104C296,63.2144,296.896,64.1104,298,64.1104C299.105,64.1104,300,63.2144,300,62.1104C300,61.0064,299.105,60.1104,298,60.1104" Fill="{StaticResource PhoneDisabledBrush}" Height="4" Canvas.Left="6" Stretch="Fill" Canvas.Top="9" Width="4"/>
+				</Canvas>
+			</Grid>
+		</Popup>
+
+        <ctrl:FeedbackOverlay Grid.RowSpan="2" EnableAnimation="True" />
+    </Grid>
+
+    <bar:Bindable.ApplicationBar>
+        <bar:BindableApplicationBar IsVisible="True" Opacity="0.5">
+            <bar:BindableApplicationBar.MenuItems>
+                <bar:BindableApplicationBarMenuItem Command="{Binding ViewAboutPage}" Text="About" />
+            </bar:BindableApplicationBar.MenuItems>
+        </bar:BindableApplicationBar>
+    </bar:Bindable.ApplicationBar>
+
+</phone:PhoneApplicationPage>

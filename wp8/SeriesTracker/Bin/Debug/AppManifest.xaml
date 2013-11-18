@@ -1,0 +1,28 @@
+﻿<Deployment xmlns="http://schemas.microsoft.com/client/2007/deployment" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" EntryPointAssembly="SeriesTracker" EntryPointType="SeriesTracker.App" RuntimeVersion="4.7.50308.0">
+  <Deployment.Parts>
+    <AssemblyPart x:Name="SeriesTracker" Source="SeriesTracker.dll" />
+    <AssemblyPart x:Name="BindableApplicationBar" Source="BindableApplicationBar.dll" />
+    <AssemblyPart x:Name="GalaSoft.MvvmLight.Extras.WP8" Source="GalaSoft.MvvmLight.Extras.WP8.dll" />
+    <AssemblyPart x:Name="GalaSoft.MvvmLight.WP8" Source="GalaSoft.MvvmLight.WP8.dll" />
+    <AssemblyPart x:Name="Microsoft.Expression.Interactions" Source="Microsoft.Expression.Interactions.dll" />
+    <AssemblyPart x:Name="Microsoft.Phone.Controls" Source="Microsoft.Phone.Controls.dll" />
+    <AssemblyPart x:Name="Microsoft.Phone.Controls.Toolkit" Source="Microsoft.Phone.Controls.Toolkit.dll" />
+    <AssemblyPart x:Name="Microsoft.Practices.ServiceLocation" Source="Microsoft.Practices.ServiceLocation.dll" />
+    <AssemblyPart x:Name="Microsoft.Threading.Tasks" Source="Microsoft.Threading.Tasks.dll" />
+    <AssemblyPart x:Name="Microsoft.Threading.Tasks.Extensions" Source="Microsoft.Threading.Tasks.Extensions.dll" />
+    <AssemblyPart x:Name="Microsoft.Threading.Tasks.Extensions.Phone" Source="Microsoft.Threading.Tasks.Extensions.Phone.dll" />
+    <AssemblyPart x:Name="Nito.AsyncEx" Source="Nito.AsyncEx.dll" />
+    <AssemblyPart x:Name="Nito.AsyncEx.Enlightenment" Source="Nito.AsyncEx.Enlightenment.dll" />
+    <AssemblyPart x:Name="ReactiveUI.Blend" Source="ReactiveUI.Blend.dll" />
+    <AssemblyPart x:Name="ReactiveUI" Source="ReactiveUI.dll" />
+    <AssemblyPart x:Name="ReactiveUI.Xaml" Source="ReactiveUI.Xaml.dll" />
+    <AssemblyPart x:Name="SeriesTracker.Core" Source="SeriesTracker.Core.dll" />
+    <AssemblyPart x:Name="System.Reactive.Core" Source="System.Reactive.Core.dll" />
+    <AssemblyPart x:Name="System.Reactive.Interfaces" Source="System.Reactive.Interfaces.dll" />
+    <AssemblyPart x:Name="System.Reactive.Linq" Source="System.Reactive.Linq.dll" />
+    <AssemblyPart x:Name="System.Reactive.PlatformServices" Source="System.Reactive.PlatformServices.dll" />
+    <AssemblyPart x:Name="System.Reactive.Windows.Threading" Source="System.Reactive.Windows.Threading.dll" />
+    <AssemblyPart x:Name="System.Windows.Interactivity" Source="System.Windows.Interactivity.dll" />
+    <AssemblyPart Source="en-GB/SeriesTracker.resources.dll" />
+  </Deployment.Parts>
+</Deployment>
