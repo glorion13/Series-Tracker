@@ -57,7 +57,7 @@ namespace SeriesTracker
             var subscriptions = await storageManager.GetSavedSeries();
             foreach (var series in subscriptions)
             {
-                await CheckUpdateSeriesAsync(series);
+                CheckUpdateSeriesAsync(series);
             }
 
             return subscriptions;

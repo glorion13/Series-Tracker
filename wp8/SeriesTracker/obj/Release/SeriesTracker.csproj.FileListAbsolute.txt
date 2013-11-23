@@ -323,3 +323,4 @@ D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\en-G
 D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\SeriesTracker.dll
 D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\SeriesTracker.pdb
 D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\XapCacheFile.xml
+D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\SeriesTracker.csprojResolveAssemblyReference.cache
