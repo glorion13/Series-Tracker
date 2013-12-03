@@ -1,6 +1,6 @@
-﻿<xapCache source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\Bin\Release\SeriesTracker_Release_AnyCPU.xap" wasSigned="False" wasTritonized="False" certificateThumbprint="" TimeStampUrl="" signKeyFile="" signKeyPassword="" lastWriteTime="23/11/2013 11:53:45">
-  <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\SeriesTracker.dll" archivePath="SeriesTracker.dll" lastWriteTime="23/11/2013 11:53:42" />
-  <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\en-GB\SeriesTracker.resources.dll" archivePath="en-GB\SeriesTracker.resources.dll" lastWriteTime="23/11/2013 11:53:42" />
+﻿<xapCache source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\Bin\Release\SeriesTracker_Release_AnyCPU.xap" wasSigned="False" wasTritonized="False" certificateThumbprint="" TimeStampUrl="" signKeyFile="" signKeyPassword="" lastWriteTime="03/12/2013 14:27:55">
+  <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\SeriesTracker.dll" archivePath="SeriesTracker.dll" lastWriteTime="03/12/2013 14:27:53" />
+  <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\obj\Release\en-GB\SeriesTracker.resources.dll" archivePath="en-GB\SeriesTracker.resources.dll" lastWriteTime="03/12/2013 14:27:53" />
   <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\Background.png" archivePath="Background.png" lastWriteTime="11/11/2013 15:39:40" />
   <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\imdb.ico" archivePath="imdb.ico" lastWriteTime="11/11/2013 15:39:40" />
   <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\README_FIRST.txt" archivePath="README_FIRST.txt" lastWriteTime="18/11/2013 15:21:16" />
@@ -54,5 +54,5 @@
   <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\packages\Rx-PlatformServices.2.1.30214.0\lib\WP8\System.Reactive.PlatformServices.xml" archivePath="System.Reactive.PlatformServices.xml" lastWriteTime="18/11/2013 15:05:46" />
   <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\packages\Rx-XAML.2.1.30214.0\lib\WP8\System.Reactive.Windows.Threading.xml" archivePath="System.Reactive.Windows.Threading.xml" lastWriteTime="18/11/2013 15:05:49" />
   <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\tile_medium.png" archivePath="tile_medium.png" lastWriteTime="18/11/2013 17:56:39" />
-  <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\Bin\Release\Properties\WMAppManifest.xml" archivePath="WMAppManifest.xml" lastWriteTime="18/11/2013 18:35:25" />
+  <file source="D:\Alexandros\Documents\GitHub\Series-Tracker\wp8\SeriesTracker\Bin\Release\Properties\WMAppManifest.xml" archivePath="WMAppManifest.xml" lastWriteTime="03/12/2013 14:27:54" />
 </xapCache>

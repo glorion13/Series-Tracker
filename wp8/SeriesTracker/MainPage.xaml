@@ -292,7 +292,7 @@
 				    <i:Interaction.Behaviors>
 				        <ec:DataStateBehavior Binding="{Binding IsSearching}" TrueState="Searching" FalseState="NotSearching" Value="True"/>
 				    </i:Interaction.Behaviors>
-                    <ProgressBar x:Name="searchProgressBar" Height="10" VerticalAlignment="Top" IsIndeterminate="False" Visibility="Collapsed" Margin="0,-10,0,0" />
+                    <ProgressBar x:Name="searchProgressBar" Height="10" VerticalAlignment="Top" IsIndeterminate="True" Visibility="Collapsed" Margin="0,-10,0,0" />
                     <phone:LongListSelector ItemsSource="{Binding SearchResults}" ItemTemplate="{StaticResource SearchResultTemplate}" ListHeader="{Binding}" LayoutMode="List">
                         <phone:LongListSelector.ListHeaderTemplate>
 							<DataTemplate>
