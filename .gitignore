@@ -1,7 +1,6 @@
-
 *.user
 *.suo
-/wp7/*/Bin
-/wp7/*/obj
-PerformanceLogs
-/wp7/SeriesTracker/PerfLogs
+bin/
+obj/
+PerformanceLogs/
+PerfLogs/
