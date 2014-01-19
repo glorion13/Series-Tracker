@@ -11,7 +11,7 @@ namespace SeriesTracker
 {
     public class SplashViewModel : ViewModelBase
     {
-        private MainViewModel main;
+        private readonly MainViewModel main;
         public SplashViewModel(MainViewModel main)
         {
             this.main = main;
@@ -52,10 +52,12 @@ namespace SeriesTracker
             {
                 return initialize ?? (initialize = new RelayCommand(async () =>
                 {
-                    var delayTask = Task.Factory.StartNew(() => Thread.Sleep(4000));
-                    var initTask = main.Initialize();
-                    await Task.Factory.StartNew(() => Task.WaitAny(delayTask, initTask));
-                    IsLoaded = true;
+                    if (!IsInDesignMode)
+                    {
+                        //kicks of initialization and waits for max 4s, then hides the spalsh screen
+                        await Task.WhenAny(main.Initialize(), Task.Delay(4000));
+                        IsLoaded = true;
+                    }
                 }));
             }
         }

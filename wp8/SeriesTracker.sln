@@ -1,19 +1,18 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21126.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeriesTracker", "SeriesTracker\SeriesTracker.csproj", "{0FED0DFE-F60C-438D-AB17-8DB18B8E4C5F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FAC6C700-532A-4478-A4BD-B613A9396CCE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeriesTracker.Core", "SeriesTracker.Core\SeriesTracker.Core.csproj", "{34D61BBF-D269-4543-BA61-D537642E54DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeriesTracker.BackgroundAgent", "SeriesTracker.BackgroundAgent\SeriesTracker.BackgroundAgent.csproj", "{1094F5DD-F436-44FB-82A3-DDC4D3FD3B0A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B500E416-2D86-4553-90E5-C738CA55ACD9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeriesTracker.Agent", "SeriesTracker.Agent\SeriesTracker.Agent.csproj", "{EAEA755B-818F-405E-9297-90F15CC5A825}"
+EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = SeriesTracker.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
@@ -45,16 +44,23 @@ Global
 		{34D61BBF-D269-4543-BA61-D537642E54DF}.Release|ARM.Build.0 = Release|ARM
 		{34D61BBF-D269-4543-BA61-D537642E54DF}.Release|x86.ActiveCfg = Release|x86
 		{34D61BBF-D269-4543-BA61-D537642E54DF}.Release|x86.Build.0 = Release|x86
-		{1094F5DD-F436-44FB-82A3-DDC4D3FD3B0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1094F5DD-F436-44FB-82A3-DDC4D3FD3B0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1094F5DD-F436-44FB-82A3-DDC4D3FD3B0A}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{1094F5DD-F436-44FB-82A3-DDC4D3FD3B0A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{1094F5DD-F436-44FB-82A3-DDC4D3FD3B0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1094F5DD-F436-44FB-82A3-DDC4D3FD3B0A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1094F5DD-F436-44FB-82A3-DDC4D3FD3B0A}.Release|ARM.ActiveCfg = Release|Any CPU
-		{1094F5DD-F436-44FB-82A3-DDC4D3FD3B0A}.Release|x86.ActiveCfg = Release|Any CPU
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Debug|ARM.ActiveCfg = Debug|ARM
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Debug|ARM.Build.0 = Debug|ARM
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Debug|x86.ActiveCfg = Debug|x86
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Debug|x86.Build.0 = Debug|x86
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Release|ARM.ActiveCfg = Release|ARM
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Release|ARM.Build.0 = Release|ARM
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Release|x86.ActiveCfg = Release|x86
+		{EAEA755B-818F-405E-9297-90F15CC5A825}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = SeriesTracker.vsmdi
 	EndGlobalSection
 EndGlobal
