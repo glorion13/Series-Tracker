@@ -1,49 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reactive.Linq;
-using System.Windows.Threading;
-using System.Reactive.Concurrency;
-using System.Xml;
-using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Collections.ObjectModel;
-using GalaSoft.MvvmLight.Threading;
-using Nito.AsyncEx;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
+using Windows.Foundation.Metadata;
 
-namespace SeriesTracker
+namespace SeriesTracker.Core
 {
     public class TvDbSeriesRepository
     {
         private readonly SeriesStorageManager storageManager;
         private readonly TvDb tvDb;
         private readonly Dictionary<TvDbSeries, Task> updates;
-        private readonly Nito.AsyncEx.AsyncLock subscriptionLock = new Nito.AsyncEx.AsyncLock();
-        private readonly Nito.AsyncEx.AsyncLock seenLock = new Nito.AsyncEx.AsyncLock();
-
+        private readonly SemaphoreSlim subscriptionLock = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim seenLock = new SemaphoreSlim(1);
+        private readonly AsyncLazy<ObservableCollection<TvDbSeries>> subscribed;
         public TvDbSeriesRepository(SeriesStorageManager storageManager, TvDb tvDb)
         {
             this.storageManager = storageManager;
-            updates = new Dictionary<TvDbSeries, Task>();
             this.tvDb = tvDb;
+
+            updates = new Dictionary<TvDbSeries, Task>();
+
+            subscribed = new AsyncLazy<ObservableCollection<TvDbSeries>>(() =>
+            {
+                var subscriptions = storageManager.GetSavedSeries();
+                var collection = new SelfSortingObservableCollection<TvDbSeries, DateTime?>(s => s.NextEpisodeAirDateTime, new SoonestFirstComparer());
+                foreach (var series in subscriptions)
+                {
+                    collection.Add(series);
+                }
+
+                return collection;
+            });
         }
 
         public async Task<IDictionary<TvDbSeries, Task>> FindAsync(string seriesName)
         {
             try
             {
-                var results = from result in await tvDb.FindSeries(seriesName)
-                              join subscribed in await storageManager.GetSavedSeries() on result.Id equals subscribed.Id into matches
+                var results = from online in await tvDb.FindSeries(seriesName)
+                              join local in await subscribed.Value on online.Id equals local.Id into matches
                               from match in matches.DefaultIfEmpty()
-                              select match ?? result;
-                
-                var dict = new Dictionary<TvDbSeries, Task>();
-                foreach (var series in results) {
-                    dict.Add(series, CheckUpdateSeriesAsync(series));
-                }
+                              select match ?? online;
 
-                return dict;
+                return results.ToDictionary(series => series, UpdateSeriesIfNecessaryAsync);
             }
             catch (XmlException e)
             {
@@ -52,33 +56,39 @@ namespace SeriesTracker
             }
         }
 
-        public async Task<ObservableCollection<TvDbSeries>> GetSubscribedAsync()
+        public async Task<ObservableCollection<TvDbSeries>> GetSubscribedAsync(bool updateInBackground = true)
         {
-            var subscriptions = await storageManager.GetSavedSeries();
-            foreach (var series in subscriptions)
+            var subs = await subscribed.Value;
+
+            List<Task> updates = new List<Task>(subs.Count);
+            foreach (var series in subs)
             {
-                CheckUpdateSeriesAsync(series);
+                updates.Add(UpdateSeriesIfNecessaryAsync(series));
             }
 
-            return subscriptions;
+            if (updateInBackground)
+                return subs;
+
+            await Task.WhenAll(updates);
+            return subs;
         }
 
-        private async Task CheckUpdateSeriesAsync(TvDbSeries series)
+        private async Task UpdateSeriesIfNecessaryAsync(TvDbSeries series)
         {
             Task update = null;
-            using (await subscriptionLock.LockAsync())
+            using (await subscriptionLock.DisposableWaitAsync())
             {
                 var needsUpdating = !updates.ContainsKey(series) && (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1));
                 if (needsUpdating)
                 {
-                    update = UpdateDataAsync(series);
+                    update = UpdateSeriesAsync(series);
                     updates.Add(series, update);
                 }
             }
             if (update != null)
             {
                 await update;
-                using (await subscriptionLock.LockAsync())
+                using (await subscriptionLock.DisposableWaitAsync())
                 {
                     updates.Remove(series);
                     if (series.IsSubscribed)
@@ -87,10 +97,10 @@ namespace SeriesTracker
             }
                     
             await Task.Factory.StartNew(() => storageManager.SetSeenEpisodes(series));
-            updateSeriesUnseenEpisodeCount(series);
+            UpdateSeriesUnseenEpisodeCount(series);
         }
 
-        private async Task UpdateDataAsync(TvDbSeries series)
+        private async Task UpdateSeriesAsync(TvDbSeries series)
         {
             try
             {
@@ -99,18 +109,16 @@ namespace SeriesTracker
 
                 await update;
                 await subs;
-                return;
             }
             catch (XmlException e)
             {
                 Debug.WriteLine("Search failed for '{0}', message: '{1}'", series.Title, e.Message);
-                return;
             }
         }
 
         private async Task UpdateSubscirptionStatusAsync(TvDbSeries series)
         {
-            var subs = await storageManager.GetSavedSeries();
+            var subs = await subscribed.Value;
             var isSubscribed = subs.Any(s => series.Id == s.Id);
             series.IsSubscribed = isSubscribed;
         }
@@ -129,59 +137,41 @@ namespace SeriesTracker
             await SaveSeenAsync(series);
         }
 
-        private void updateSeriesUnseenEpisodeCount(TvDbSeries series)
+        private static void UpdateSeriesUnseenEpisodeCount(TvDbSeries series)
         {
-            int episodeCount = series.Episodes.Count<TvDbSeriesEpisode>(e => !e.IsSeen);
+            int episodeCount = series.Episodes.Count(e => !e.IsSeen);
             series.UnseenEpisodeCount = (episodeCount > 0) ? episodeCount.ToString() : "None";
         }
 
         private async Task SaveSeenAsync(TvDbSeries series)
         {
-            using (await seenLock.LockAsync())
+            using (await seenLock.DisposableWaitAsync())
             {
-                updateSeriesUnseenEpisodeCount(series);
+                UpdateSeriesUnseenEpisodeCount(series);
 
                 await Task.Factory.StartNew(() => storageManager.SaveSeen(series));
             }
         }
 
         public async Task SubscribeAsync(TvDbSeries series) {
-            try
+            using (await subscriptionLock.DisposableWaitAsync())
             {
                 series.IsSubscribed = true;
-                var subscriptions = await storageManager.GetSavedSeries();
+                var subscriptions = await subscribed.Value;
                 subscriptions.Add(series);
-
-                using (await subscriptionLock.LockAsync())
-                {
-                    if (!updates.ContainsKey(series))
-                    {
-                        updateSeriesUnseenEpisodeCount(series);
-                        storageManager.Save(series);
-                    }
-                }
-            }
-            catch
-            {
-                Debug.WriteLine("Error unsubscribing");
+                UpdateSeriesUnseenEpisodeCount(series);
+                storageManager.Save(series);
             }
         }
 
         public async Task UnsubscribeAsync(TvDbSeries series)
         {
-            try
+            using (await subscriptionLock.DisposableWaitAsync())
             {
                 series.IsSubscribed = false;
-                var subscriptions = await storageManager.GetSavedSeries();
+                var subscriptions = await subscribed.Value;
                 subscriptions.RemoveAllThatMatch(m => series.Id == m.Id);
-                using (await subscriptionLock.LockAsync())
-                {
-                    storageManager.Remove(series);
-                }
-            }
-            catch
-            {
-                Debug.WriteLine("Error unsubscribing");
+                storageManager.Remove(series);
             }
         }
     }

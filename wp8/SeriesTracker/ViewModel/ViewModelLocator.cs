@@ -16,6 +16,8 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Threading;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
+using SeriesTracker.Agent;
+using SeriesTracker.Core;
 
 namespace SeriesTracker
 {
@@ -32,6 +34,7 @@ namespace SeriesTracker
   
             SimpleIoc.Default.Register<ConnectivityService>();
             SimpleIoc.Default.Register<TvDb>();
+            SimpleIoc.Default.Register<AgentScheduler>(true);
 
             SimpleIoc.Default.Register<TvDbSeriesRepository>();
             SimpleIoc.Default.Register<SeriesStorageManager>(true);
@@ -41,6 +44,8 @@ namespace SeriesTracker
             SimpleIoc.Default.Register<AboutViewModel>(true);
 
             SimpleIoc.Default.Register<SplashViewModel>(true);
+
+            SimpleIoc.Default.Register<SettingsViewModel>(true);
         }
 
         public MainViewModel MainViewModel
@@ -72,6 +77,14 @@ namespace SeriesTracker
             get
             {
                 return ServiceLocator.Current.GetInstance<SplashViewModel>();
+            }
+        }
+
+        public SettingsViewModel Settings
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<SettingsViewModel>();
             }
         }
         

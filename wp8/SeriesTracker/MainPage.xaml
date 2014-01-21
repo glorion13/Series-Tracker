@@ -345,6 +345,7 @@
         <bar:BindableApplicationBar IsVisible="True" Opacity="0.5">
             <bar:BindableApplicationBar.MenuItems>
                 <bar:BindableApplicationBarMenuItem Command="{Binding ViewAboutPage}" Text="About" />
+                <bar:BindableApplicationBarMenuItem Command="{Binding ViewSettingsPage}" Text="Settings" />
             </bar:BindableApplicationBar.MenuItems>
         </bar:BindableApplicationBar>
     </bar:Bindable.ApplicationBar>

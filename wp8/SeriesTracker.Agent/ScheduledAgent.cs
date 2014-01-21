@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 using Microsoft.Phone.Scheduler;
+using Microsoft.Phone.Shell;
 
 namespace SeriesTracker.Agent
 {
@@ -39,9 +40,25 @@ namespace SeriesTracker.Agent
         /// </remarks>
         protected override void OnInvoke(ScheduledTask task)
         {
-            //TODO: Add code to perform your task in background
 
+
+
+            string toastMessage = "";
+
+
+            var toast = new ShellToast();
+            toast.Title = "Background Agent Sample";
+            toast.Content = toastMessage;
+            toast.Show();
+
+            // If debugging is enabled, launch the agent again in one minute.
+            #if DEBUG_AGENT
+              ScheduledActionService.LaunchForTest(task.Name, TimeSpan.FromSeconds(60));
+            #endif
+
+            // Call NotifyComplete to let the system know the agent is done working.
             NotifyComplete();
+
         }
     }
 }

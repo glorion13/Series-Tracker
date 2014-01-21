@@ -24,6 +24,7 @@ using GalaSoft.MvvmLight.Threading;
 using System.Windows.Navigation;
 using System.Threading.Tasks;
 using Microsoft.Phone.Shell;
+using SeriesTracker.Core;
 
 namespace SeriesTracker
 {
@@ -165,8 +166,7 @@ namespace SeriesTracker
 
         private void SetupSearch()
         {
-            var ui = DispatcherSynchronizationContext.Current;
-            this.ObservableForProperty(m => m.Search).ObserveOn(ui).Subscribe(async change =>
+            this.ObservableForProperty(m => m.Search).SubscribeOnDispatcher().Subscribe(async change =>
             {
                 searchResults.Clear();
                 IsSearching = true;
@@ -302,10 +302,16 @@ namespace SeriesTracker
         {
             get
             {
-                return viewAboutPage ?? (viewAboutPage = new RelayCommand<TvDbSeries>(s =>
-                {
-                    MessengerInstance.Send(new Uri("/About.xaml", UriKind.Relative));
-                }));
+                return viewAboutPage ?? (viewAboutPage = new RelayCommand<TvDbSeries>(s => MessengerInstance.Send(new Uri("/About.xaml", UriKind.Relative))));
+            }
+        }
+
+        private ICommand viewSettingsPage;
+        public ICommand ViewSettingsPage
+        {
+            get
+            {
+                return viewSettingsPage ?? (viewSettingsPage = new RelayCommand<TvDbSeries>(s => MessengerInstance.Send(new Uri("/Settings.xaml", UriKind.Relative))));
             }
         }
 

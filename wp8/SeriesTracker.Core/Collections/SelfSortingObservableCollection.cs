@@ -78,7 +78,7 @@ namespace SeriesTracker
                     {
                         if (beingReordered != item)
                         {
-                            var subscription = item.ObservableForProperty(sortingProperty).Subscribe(change =>
+                            var subscription = item.ObservableForProperty(sortingProperty).SubscribeOnDispatcher().Subscribe(change =>
                             {
                                 DispatcherHelper.UIDispatcher.BeginInvoke(() => {
                                     beingReordered = item;

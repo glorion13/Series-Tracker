@@ -81,8 +81,8 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock TextWrapping="Wrap" Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Grid.ColumnSpan="2" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48"/>
-                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Subscribed" VerticalAlignment="Center" Margin="12,12,0,12" Grid.Row="1" Style="{StaticResource PhoneTextNormalStyle}"/>
-                            <toolkitPrimitives:ToggleSwitchButton Content="ToggleSwitchButton" HorizontalAlignment="Left" Grid.Column="1" d:LayoutOverrides="Height" IsChecked="{Binding Series.IsSubscribed, Mode=OneWay}" Grid.Row="1">
+                            <TextBlock HorizontalAlignment="Left" Text="Subscribed" VerticalAlignment="Center" Margin="12,12,0,12" Grid.Row="1" Style="{StaticResource PhoneTextTitle3Style}"/>
+                            <toolkitPrimitives:ToggleSwitchButton Content="ToggleSwitchButton" HorizontalAlignment="Left" Grid.Column="1" IsChecked="{Binding Series.IsSubscribed, Mode=OneWay}" Grid.Row="1">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger EventName="Unchecked">
                                         <GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding Unsunscribe, Mode=OneWay}"/>

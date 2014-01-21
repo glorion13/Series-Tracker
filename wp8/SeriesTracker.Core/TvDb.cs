@@ -5,27 +5,25 @@ using System.Threading;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
-using System.Reactive.Concurrency;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Threading;
 using GalaSoft.MvvmLight.Threading;
-using Nito.AsyncEx;
+using Microsoft.Phone.Reactive;
 
 namespace SeriesTracker
 {
     public class TvDb
     {
         private const string ApiKey = "D8E7E19874B4F438";
+        private const string ApiUrl = "http://www.thetvdb.com/api/" + ApiKey + "/mirrors.xml";
    
         private readonly ConnectivityService connectivityService;
-        private readonly Nito.AsyncEx.AsyncLock key = new Nito.AsyncEx.AsyncLock();
+        private readonly SemaphoreSlim @lock = new SemaphoreSlim(1);
 
-        private string mirror = null;
+        private string mirror;
 
         private bool initialized;        
 
@@ -36,34 +34,40 @@ namespace SeriesTracker
 
         private async Task<bool> EnsureInitialized()
         {
-            using(await key.LockAsync())
+            if (initialized)
+                return true;
+
+            await @lock.WaitAsync();
+            try
             {
-                if (!initialized)
+                if (initialized) 
+                    return true;
+
+                try
                 {
-                    try
-                    {
-                        await DoInitialize();
-                        initialized = true;
-                    }
-                    catch (System.Net.WebException we)
-                    {
-                        connectivityService.ReportHealth(false);
-                        Console.Out.WriteLine("Error initializing: " + we.Message);
-                    }
+                    await DoInitialize();
+                    initialized = true;
+                }
+                catch (WebException we)
+                {
+                    connectivityService.ReportHealth(false);
+                    Console.Out.WriteLine("Error initializing: " + we.Message);
                 }
 
                 return initialized;
+            }
+            finally
+            {
+                @lock.Release();
             }
         }
 
         private async Task DoInitialize()
         {
-            var url = "http://www.thetvdb.com/api/" + ApiKey + "/mirrors.xml";
-            var wc = new WebClient();
-            var result = await wc.DownloadStringTaskAsync(new Uri(url));
+            var result = await new WebClient().DownloadStringTaskAsync(new Uri(ApiUrl));
             connectivityService.ReportHealth(true);
 
-            this.mirror = (from path in XDocument.Parse(result).Descendants("mirrorpath")
+            mirror = (from path in XDocument.Parse(result).Descendants("mirrorpath")
                            select path.Value).First();
         }
 
@@ -92,7 +96,7 @@ namespace SeriesTracker
 
                 return list;
             }
-            catch (System.Net.WebException we)
+            catch (WebException we)
             {
                 connectivityService.ReportHealth(false);
                 Console.Out.WriteLine("Error initializing: " + we.Message);
@@ -100,7 +104,7 @@ namespace SeriesTracker
             }   
         }
 
-        private static List<string> daysOfWeek = CultureInfo.InvariantCulture.DateTimeFormat.DayNames.Select(d => d.ToLowerInvariant()).ToList();
+        private static readonly List<string> DaysOfWeek = CultureInfo.InvariantCulture.DateTimeFormat.DayNames.Select(d => d.ToLowerInvariant()).ToList();
 
         public async Task UpdateData(TvDbSeries series)
         {
@@ -129,7 +133,7 @@ namespace SeriesTracker
 
                 ParseFromDetailsDoc(doc, "Rating", value => series.Rating = float.Parse(value, CultureInfo.InvariantCulture.NumberFormat));
                 ParseFromDetailsDoc(doc, "Airs_Time", value => series.AirsTime = value);
-                ParseFromDetailsDoc(doc, "Airs_DayOfWeek", value => series.AirsDayOfWeek = daysOfWeek.IndexOf(value.Trim().ToLowerInvariant()));
+                ParseFromDetailsDoc(doc, "Airs_DayOfWeek", value => series.AirsDayOfWeek = DaysOfWeek.IndexOf(value.Trim().ToLowerInvariant()));
                 ParseFromDetailsDoc(doc, "Runtime", value => series.Runtime = int.Parse(value));
 
                 var episodeUpdates = from newData in doc.Descendants("Episode")
@@ -173,7 +177,7 @@ namespace SeriesTracker
                     series.Updated = updated;
                 });
             }
-            catch (System.Net.WebException we)
+            catch (WebException we)
             {
                 connectivityService.ReportHealth(false);
                 Console.Out.WriteLine("Error initializing: " + we.Message);
@@ -187,10 +191,7 @@ namespace SeriesTracker
             {
                 if (!string.IsNullOrEmpty(node.Value))
                 {
-                    DispatcherHelper.CheckBeginInvokeOnUI(() =>
-                    {
-                        processValue(node.Value);
-                    });
+                    DispatcherHelper.CheckBeginInvokeOnUI(() => processValue(node.Value));
                 }
             }
         }
