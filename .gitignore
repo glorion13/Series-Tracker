@@ -1,7 +1,8 @@
-*.user
+.*user
 *.suo
 bin/
 obj/
 PerformanceLogs/
 PerfLogs/
 packages/
+testdata/
