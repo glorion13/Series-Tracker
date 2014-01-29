@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -9,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using Nito.AsyncEx;
 using ReactiveUI;
 using SeriesTracker;
 using System.Reactive.Linq;
@@ -163,22 +165,64 @@ namespace SeriesTracker
             SetupSearch();
         }
 
+        private readonly AsyncLock searchLock = new AsyncLock();
+
         private void SetupSearch()
         {
-            var ui = DispatcherSynchronizationContext.Current;
+            var ui = SynchronizationContext.Current;
+
+            CancellationTokenSource cancellationTokenSource = null;
+
             this.ObservableForProperty(m => m.Search).ObserveOn(ui).Subscribe(async change =>
             {
-                searchResults.Clear();
-                IsSearching = true;
+                var myCancelation = new CancellationTokenSource();
+                var theirCancellation = Interlocked.Exchange(ref cancellationTokenSource, myCancelation);
 
-                var results = await repository.FindAsync(change.Value);
+                if (theirCancellation != null)
+                {
+                    theirCancellation.Cancel();
+                }
 
-                await searchResults.AddAll(results.Keys);
-
-                await TaskEx.WhenAll(results.Values);
-
-                IsSearching = false;
+                try
+                {
+                    using (await searchLock.LockAsync(myCancelation.Token))
+                    {
+                        await DoSearch(change.Value, myCancelation.Token);
+                    }
+                
+                }
+                catch (OperationCanceledException)
+                {
+                    
+                }
             });
+        }
+
+        private async Task DoSearch(string searchTerm, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            IsSearching = true;
+
+            token.ThrowIfCancellationRequested();
+
+            searchResults.Clear();
+
+            token.ThrowIfCancellationRequested();
+
+            var results = await repository.FindAsync(searchTerm);
+
+            token.ThrowIfCancellationRequested();
+
+            await searchResults.AddAll(results.Keys);
+
+            token.ThrowIfCancellationRequested();
+
+            await TaskEx.WhenAll(results.Values);
+
+            token.ThrowIfCancellationRequested();
+
+            IsSearching = false;
         }
 
         private async Task LoadSubscriptions()
