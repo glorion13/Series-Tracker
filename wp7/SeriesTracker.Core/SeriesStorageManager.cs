@@ -1,32 +1,19 @@
 ﻿using System;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Collections.Generic;
-using System.Xml;
-using System.Runtime.Serialization;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
-using System.Xml.Serialization;
+using System.Linq;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
-using System.Windows.Threading;
-using GalaSoft.MvvmLight.Threading;
-using System.Xml.Schema;
-using SeriesTracker.Core;
+using System.Xml.Serialization;
 
-namespace SeriesTracker
+namespace SeriesTracker.Core
 {
     public sealed class SeriesStorageManager
     {
+        const string SubscriptionsFolderName = "subscriptions";
+
         private XmlSerializer serializer;
         private XmlSerializer Serializer
         {
@@ -45,17 +32,44 @@ namespace SeriesTracker
             }
         }
 
-        private object ioLock = new object();
+        public SeriesStorageManager()
+        {
+#if DEBUG
+            if (GalaSoft.MvvmLight.ViewModelBase.IsInDesignModeStatic)
+            {
+                return;
+            }
+#endif
+
+            using (var storage = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                using (new MutexLock(SubscriptionsFolderName))
+                {
+                    if (!storage.DirectoryExists(SubscriptionsFolderName))
+                    {
+                        storage.CreateDirectory(SubscriptionsFolderName);
+                    }
+                }
+            }
+        }
+
         public void Save(TvDbSeries series)
         {
-            lock (ioLock)
+            using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
-                {
-                    if (!storage.DirectoryExists(string.Format(@"subscriptions\{0}", series.Id)))
-                        storage.CreateDirectory(string.Format(@"subscriptions\{0}", series.Id));
+                var directory = string.Format(@"{0}\{1}", SubscriptionsFolderName, series.Id);
 
-                    using (IsolatedStorageFileStream file = new IsolatedStorageFileStream(string.Format(@"subscriptions\{0}\data.xml", series.Id), FileMode.Create, storage))
+                using (new MutexLock(directory))
+                {
+                    if (!storage.DirectoryExists(directory))
+                        storage.CreateDirectory(directory);
+                }
+
+                var filename = string.Format(@"{0}\data.xml", directory);
+
+                using (new MutexLock(filename))
+                {
+                    using (var file = new IsolatedStorageFileStream(filename, FileMode.Create, storage))
                     {
                         try
                         {
@@ -72,14 +86,21 @@ namespace SeriesTracker
 
         public void SaveSeen(TvDbSeries series)
         {
-            lock (ioLock)
+            using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
-                {
-                    if (!storage.DirectoryExists(string.Format(@"subscriptions\{0}", series.Id)))
-                        storage.CreateDirectory(string.Format(@"subscriptions\{0}", series.Id));
+                var directory = string.Format(@"{0}\{1}", SubscriptionsFolderName, series.Id);
 
-                    using (IsolatedStorageFileStream file = new IsolatedStorageFileStream(string.Format(@"subscriptions\{0}\seen.xml", series.Id), FileMode.Create, storage))
+                using (new MutexLock(directory))
+                {
+                    if (!storage.DirectoryExists(directory))
+                        storage.CreateDirectory(directory);
+                }
+
+                var filename = string.Format(@"{0}\seen.xml", directory);
+
+                using (new MutexLock(filename))
+                {
+                    using (var file = new IsolatedStorageFileStream(filename, FileMode.Create, storage))
                     {
                         try
                         {
@@ -96,98 +117,73 @@ namespace SeriesTracker
 
         public void Remove(TvDbSeries series)
         {
-            lock (ioLock)
+            using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
+                var filename = string.Format(@"{0}\{1}\data.xml", SubscriptionsFolderName, series.Id);
+
+                using (new MutexLock(filename))
                 {
-                    if (!storage.FileExists(string.Format(@"subscriptions\{0}\data.xml", series.Id)))
+                    if (!storage.FileExists(filename))
                         return;
 
-                    storage.DeleteFile(string.Format(@"subscriptions\{0}\data.xml", series.Id));
+                    storage.DeleteFile(filename);
                 }
             }
         }
 
-        public async Task<ObservableCollection<TvDbSeries>> GetSavedSeries()
+        public IEnumerable<TvDbSeries> GetSavedSeries()
         {
-            return await GetCachedSubscriptions();
-        }
-        
-        private object key = new object();
-        ObservableCollection<TvDbSeries> subscriptions = null;
-        private async Task<ObservableCollection<TvDbSeries>> GetCachedSubscriptions() {
-            return subscriptions ?? await Task.Factory.StartNew(() =>
+            using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                lock (key)
+                var dirs = storage.GetDirectoryNames(string.Format(@"{0}\*", SubscriptionsFolderName));
+                if (dirs.Length > 0)
                 {
-                    return subscriptions ?? (subscriptions = DoGetSavedSeries());
-                }
-            });
-        }
-
-        private ObservableCollection<TvDbSeries> DoGetSavedSeries()
-        {
-            lock (ioLock)
-            {
-                var collection = new SelfSortingObservableCollection<TvDbSeries, DateTime?>(s => s.NextEpisodeAirDateTime, new SoonestFirstComparer());
-
-                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
-                {
-                    if (!storage.DirectoryExists("subscriptions"))
-                        storage.CreateDirectory("subscriptions");
-
-                    var dirs = storage.GetDirectoryNames(@"subscriptions\*");
-                    if (dirs.Length > 0)
+                    foreach (var dir in dirs)
                     {
-                        foreach (var dir in dirs)
+                        var filename = string.Format(@"{0}\{1}\data.xml", SubscriptionsFolderName, dir);
+
+                        TvDbSeries series;
+                        using (new MutexLock(filename))
                         {
-                            if (!storage.FileExists(string.Format(@"subscriptions\{0}\data.xml", dir)))
+                            if (!storage.FileExists(filename))
                                 continue;
 
-                            TvDbSeries series;
-                            using (var stream = new IsolatedStorageFileStream(string.Format(@"subscriptions\{0}\data.xml", dir), FileMode.Open, storage))
+                            using (var stream = new IsolatedStorageFileStream(filename, FileMode.Open, storage))
                             {
                                 if (stream.Length == 0)
                                     continue;
 
                                 series = (TvDbSeries)Serializer.Deserialize(stream);
                             }
-
-                            DispatcherHelper.CheckBeginInvokeOnUI(() =>
-                            {
-                                collection.Add(series);
-                            });
                         }
+
+                        yield return series;
                     }
                 }
-
-                return collection;
             }
         }
 
         public void SetSeenEpisodes(TvDbSeries series)
         {
-            lock (ioLock)
+            using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
-                {
-                    var filename = string.Format(@"subscriptions\{0}\seen.xml", series.Id);
+                var filename = string.Format(@"{0}\{1}\seen.xml", SubscriptionsFolderName, series.Id);
 
+                using (new MutexLock(filename))
+                {
                     if (!storage.FileExists(filename))
                         return;
 
                     using (var stream = new IsolatedStorageFileStream(filename, FileMode.OpenOrCreate, storage))
                     {
-                        List<string> seen = (List<string>)SeenSerializer.Deserialize(stream);
-                        DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                        var seen = (List<string>)SeenSerializer.Deserialize(stream);
+
+                        foreach (var episodeId in seen)
                         {
-                            foreach (var episodeId in seen)
-                            {
-                                var episode = series.Episodes.FirstOrDefault(e => e.Id.Equals(episodeId));
-                                if (episode != null)
-                                    episode.IsSeen = true;                                    
-                            }
-                        });
+                            var episode = series.Episodes.FirstOrDefault(e => e.Id.Equals(episodeId));
+                            if (episode != null)
+                                episode.IsSeen = true;
+                        }
                     }
                 }
             }
