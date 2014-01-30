@@ -218,6 +218,10 @@
     <None Include="packages.config" />
     <None Include="Properties\AppManifest.xml" />
     <None Include="Properties\WMAppManifest.xml" />
+    <None Include="SeriesTracker_2014_01_30_21_59_04.sap" />
+    <None Include="SeriesTracker_2014_01_30_22_00_10.sap" />
+    <None Include="SeriesTracker_2014_01_30_23_22_56.sap" />
+    <None Include="SeriesTracker_2014_01_30_23_26_30.sap" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ApplicationIcon.png">

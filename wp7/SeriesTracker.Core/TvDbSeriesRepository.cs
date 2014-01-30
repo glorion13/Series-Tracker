@@ -111,11 +111,7 @@ namespace SeriesTracker
         {
             try
             {
-                var update = tvDb.UpdateData(series);
-                var subs = UpdateSubscirptionStatusAsync(series);
-
-                await update;
-                await subs;
+                await Task.Factory.ContinueWhenAll(new[] {tvDb.UpdateData(series), UpdateSubscirptionStatusAsync(series)}, _ => {});
             }
             catch (XmlException e)
             {
@@ -164,9 +160,9 @@ namespace SeriesTracker
         {
             using (await subscriptionLock.LockAsync())
             {
-                series.IsSubscribed = true;
                 var subscriptions = await subscribed;
                 subscriptions.Add(series);
+                series.IsSubscribed = true;
                 UpdateSeriesUnseenEpisodeCount(series);
                 storageManager.Save(series);
             }
@@ -176,10 +172,10 @@ namespace SeriesTracker
         {
             using (await subscriptionLock.LockAsync())
             {
-                series.IsSubscribed = false;
                 var subscriptions = await subscribed;
                 subscriptions.RemoveAllThatMatch(m => series.Id == m.Id);
                 storageManager.Remove(series);
+                series.IsSubscribed = false;
             }
         }
     }
