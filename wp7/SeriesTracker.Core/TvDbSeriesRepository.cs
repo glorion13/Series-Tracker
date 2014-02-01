@@ -75,7 +75,7 @@ namespace SeriesTracker
             if (updateInBackground)
                 return subs;
 
-            await Task.Factory.ContinueWhenAll(loading, _ => { });
+            await TaskEx.WhenAll(loading);
 
             return subs;
         }
@@ -85,7 +85,7 @@ namespace SeriesTracker
             Task update = null;
             using (await subscriptionLock.LockAsync())
             {
-                var needsUpdating = !updates.ContainsKey(series) && (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1));
+                var needsUpdating = !updates.ContainsKey(series) && ((series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1)));
                 if (needsUpdating)
                 {
                     update = UpdateSeriesAsync(series);
@@ -102,21 +102,11 @@ namespace SeriesTracker
                         storageManager.Save(series);
                 }
             }
-
-            await Task.Factory.StartNew(() => storageManager.SetSeenEpisodes(series));
-            UpdateSeriesUnseenEpisodeCount(series);
         }
 
-        private async Task UpdateSeriesAsync(TvDbSeries series)
+        private Task UpdateSeriesAsync(TvDbSeries series)
         {
-            try
-            {
-                await Task.Factory.ContinueWhenAll(new[] {tvDb.UpdateData(series), UpdateSubscirptionStatusAsync(series)}, _ => {});
-            }
-            catch (XmlException e)
-            {
-                Debug.WriteLine("Search failed for '{0}', message: '{1}'", series.Title, e.Message);
-            }
+            return TaskEx.WhenAll(new[] { tvDb.UpdateData(series), UpdateSubscirptionStatusAsync(series) });
         }
 
         private async Task UpdateSubscirptionStatusAsync(TvDbSeries series)
@@ -140,18 +130,10 @@ namespace SeriesTracker
             await SaveSeenAsync(series);
         }
 
-        private static void UpdateSeriesUnseenEpisodeCount(TvDbSeries series)
-        {
-            int episodeCount = series.Episodes.Count(e => !e.IsSeen);
-            series.UnseenEpisodeCount = (episodeCount > 0) ? episodeCount.ToString() : "None";
-        }
-
         private async Task SaveSeenAsync(TvDbSeries series)
         {
             using (await seenLock.LockAsync())
             {
-                UpdateSeriesUnseenEpisodeCount(series);
-
                 await Task.Factory.StartNew(() => storageManager.SaveSeen(series));
             }
         }
@@ -163,7 +145,6 @@ namespace SeriesTracker
                 var subscriptions = await subscribed;
                 subscriptions.Add(series);
                 series.IsSubscribed = true;
-                UpdateSeriesUnseenEpisodeCount(series);
                 storageManager.Save(series);
             }
         }

@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ProfilerSession Type="ExecutionPerformanceAnalysis" Name="SeriesTracker3727707227">
+<ProfilerSession Type="ExecutionPerformanceAnalysis" Name="SeriesTracker842015479">
   <TargetApplication Name="SeriesTracker" SourceProject="SeriesTracker.csproj" Type="WindowsPhone71">
-    <ApplicationBinary Path="Bin\Debug\SeriesTracker.xap" Timestamp="29. 1. 2014 23:00:56" />
+    <ApplicationBinary Path="Bin\Release\SeriesTracker.xap" Timestamp="31. 1. 2014 21:16:51" />
     <ApplicationIconPath Path="" />
     <SymbolPaths>
-      <Path Value="Bin\Debug\" />
+      <Path Value="Bin\Release\" />
     </SymbolPaths>
   </TargetApplication>
   <Settings>
@@ -16,7 +16,7 @@
     </Probe>
     <Probe Name="Code">
       <SampleCallStack Enabled="True" Depth="4294967295" Interval="10" />
-      <CollectPerformanceCounters Enabled="True" />
+      <CollectPerformanceCounters Enabled="False" />
     </Probe>
     <Probe Name="Memory">
       <MemoryCallStack Enabled="False" Depth="4294967295" />
@@ -25,8 +25,8 @@
   </Settings>
   <Data>
     <Logs>
-      <File Type="NativeFormat" Path="PerfLogs\SeriesTracker3727707227\tmp10CB.spl" />
+      <File Type="NativeFormat" Path="PerfLogs\SeriesTracker842015479\tmp8433.spl" />
     </Logs>
   </Data>
-  <TargetDeviceSettings OSVersion="7.10.8862" AvailablePhysicalMemoryAtStartup="134074368" ProcessorArchitectureType="Arm" ProcessorInformation="Armv4ifp" IsEmulator="False" />
+  <TargetDeviceSettings OSVersion="7.10.8862" AvailablePhysicalMemoryAtStartup="156160000" ProcessorArchitectureType="Arm" ProcessorInformation="Armv4ifp" IsEmulator="False" />
 </ProfilerSession>

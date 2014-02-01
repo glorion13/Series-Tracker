@@ -52,11 +52,11 @@ namespace SeriesTracker
             {
                 return initialize ?? (initialize = new RelayCommand(async () =>
                 {
-                    await Task.Factory.ContinueWhenAny(new[]
+                    await TaskEx.WhenAll(new[]
                     {
                         main.Initialize(),
                         Task.Factory.StartNew(() => Thread.Sleep(4000))
-                    }, _ => { });
+                    });
                    
                     IsLoaded = true;
                 }));

@@ -6,7 +6,10 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Xml;
 using System.Xml.Serialization;
+using GalaSoft.MvvmLight.Threading;
 
 namespace SeriesTracker.Core
 {
@@ -84,9 +87,12 @@ namespace SeriesTracker.Core
             }
         }
 
+        [Obsolete("Save the whole series")]
         public void SaveSeen(TvDbSeries series)
         {
-            using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
+            Save(series);
+
+            /*using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
             {
                 var directory = string.Format(@"{0}\{1}", SubscriptionsFolderName, series.Id);
 
@@ -112,7 +118,7 @@ namespace SeriesTracker.Core
                         }
                     }
                 }
-            }
+            }*/
         }
 
         public void Remove(TvDbSeries series)
@@ -148,42 +154,54 @@ namespace SeriesTracker.Core
                             if (!storage.FileExists(filename))
                                 continue;
 
-                            using (var stream = new IsolatedStorageFileStream(filename, FileMode.Open, storage))
-                            {
-                                if (stream.Length == 0)
-                                    continue;
+                            try {
+                                using (var stream = new IsolatedStorageFileStream(filename, FileMode.Open, storage))
+                                {
+                                    if (stream.Length == 0)
+                                        continue;
 
-                                series = (TvDbSeries)Serializer.Deserialize(stream);
+                                    series = (TvDbSeries) Serializer.Deserialize(stream);
+
+                                    var seenFilename = string.Format(@"{0}\{1}\seen.xml", SubscriptionsFolderName, series.Id);
+
+                                    using (new MutexLock(seenFilename))
+                                    {
+                                        if (storage.FileExists(seenFilename))
+                                        {
+                                            using (var seenStream = new IsolatedStorageFileStream(seenFilename, FileMode.Open, storage))
+                                            {
+                                                var seen = (List<string>)SeenSerializer.Deserialize(seenStream);
+
+                                                foreach (var episodeId in seen)
+                                                {
+                                                    var episode = series.Episodes.FirstOrDefault(e => e.Id.Equals(episodeId));
+                                                    if (episode != null)
+                                                        episode.IsSeen = true;
+                                                }
+                                            }
+
+                                            storage.DeleteFile(seenFilename);
+                                        }
+                                    }
+                                }
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                DispatcherHelper.CheckBeginInvokeOnUI(() =>  MessageBox.Show(
+                                    "Error loading series from phone storage. Part of your data will be lost. Very sorry :("));
+                                try
+                                {
+                                    storage.DeleteFile(filename);
+                                }
+                                catch
+                                {
+
+                                }
+                                continue;
                             }
                         }
 
                         yield return series;
-                    }
-                }
-            }
-        }
-
-        public void SetSeenEpisodes(TvDbSeries series)
-        {
-            using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
-            {
-                var filename = string.Format(@"{0}\{1}\seen.xml", SubscriptionsFolderName, series.Id);
-
-                using (new MutexLock(filename))
-                {
-                    if (!storage.FileExists(filename))
-                        return;
-
-                    using (var stream = new IsolatedStorageFileStream(filename, FileMode.OpenOrCreate, storage))
-                    {
-                        var seen = (List<string>)SeenSerializer.Deserialize(stream);
-
-                        foreach (var episodeId in seen)
-                        {
-                            var episode = series.Episodes.FirstOrDefault(e => e.Id.Equals(episodeId));
-                            if (episode != null)
-                                episode.IsSeen = true;
-                        }
                     }
                 }
             }

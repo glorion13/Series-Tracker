@@ -25,9 +25,19 @@ namespace SeriesTracker
             if (items == null)
                 return;
 
+            if (DispatcherHelper.UIDispatcher.CheckAccess())
+            {
+                foreach (var item in items)
+                {
+                    collection.Add(item);
+                }
+                return;
+            }
+
             foreach (var item in items)
             {
-                await DispatcherHelper.UIDispatcher.InvokeAsync(() => collection.Add(item));                
+                var i = item;
+                await DispatcherHelper.UIDispatcher.InvokeAsync(() => collection.Add(i));                
             }
         }
     }

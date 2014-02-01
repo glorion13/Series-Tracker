@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Windows;
@@ -27,7 +28,7 @@ namespace SeriesTracker.ManualTest
             {
                 AirsDayOfWeek = 0,
                 AirsTime = "9 PM",
-                Episodes = new List<TvDbSeriesEpisode>()
+                Episodes = new ObservableCollection<TvDbSeriesEpisode>()
                 {
                      new TvDbSeriesEpisode() {
                         FirstAired = DateTime.Today.AddDays(1)

@@ -14,6 +14,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using GalaSoft.MvvmLight.Threading;
 using System.Windows.Media.Imaging;
+using ReactiveUI;
 
 namespace SeriesTracker
 {
@@ -132,6 +133,8 @@ namespace SeriesTracker
             {
                 RootFrame.Navigate(m);
             });
+
+            RxApp.InUnitTestRunner();
 
             App.Current.Resources.Remove("CreateOption");
             App.Current.Resources.Add("CreateOption", BitmapCreateOptions.BackgroundCreation | BitmapCreateOptions.DelayCreation);

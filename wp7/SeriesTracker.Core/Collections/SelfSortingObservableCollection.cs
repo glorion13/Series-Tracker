@@ -17,6 +17,7 @@ using System.Reactive.Linq;
 using System.Collections.Generic;
 using System.Reactive.Subjects;
 using System.Reactive;
+using System.Windows.Threading;
 using GalaSoft.MvvmLight.Threading;
 using ReactiveUI;
 

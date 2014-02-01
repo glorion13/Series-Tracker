@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using GalaSoft.MvvmLight;
 using System.Xml.Serialization;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using GalaSoft.MvvmLight.Threading;
+using ReactiveUI;
 
 namespace SeriesTracker
 {
@@ -122,8 +125,9 @@ namespace SeriesTracker
             }
         }
 
-        private List<TvDbSeriesEpisode> episodes;
-        public List<TvDbSeriesEpisode> Episodes
+        private readonly Dictionary<TvDbSeriesEpisode, IDisposable> isSeenListeners = new Dictionary<TvDbSeriesEpisode, IDisposable>();
+        private ObservableCollection<TvDbSeriesEpisode> episodes;
+        public ObservableCollection<TvDbSeriesEpisode> Episodes
         {
             get
             {
@@ -132,18 +136,122 @@ namespace SeriesTracker
 
             set
             {
+                if (episodes != null)
+                    episodes.CollectionChanged -= OnEpisodesCollectionChanged;
+
+                foreach (var isSeenListener in isSeenListeners)
+                {
+                    isSeenListener.Value.Dispose();
+                }
+                isSeenListeners.Clear();
+
                 Set(() => Episodes, ref episodes, value);
-                RaisePropertyChanged(() => NextEpisodeAirDateTime);
-                RaisePropertyChanged(() => NextEpisodeETA);
-                RaisePropertyChanged(() => NextEpisodeAirs);
+                
+                episodes.CollectionChanged += OnEpisodesCollectionChanged;
+                foreach (var episode in episodes)
+                {
+                    isSeenListeners.Add(episode, episode.ObservableForProperty(e => e.IsSeen).Subscribe(e => DispatcherHelper.CheckBeginInvokeOnUI(() => RaisePropertyChanged(() => UnseenEpisodeCount))));
+                }
+                CalculateMetrics();
             }
         }
 
-        public TvDbSeries() {
-            episodes = new List<TvDbSeriesEpisode>();
+        private void OnEpisodesCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.NewItems != null)
+            {
+                foreach (TvDbSeriesEpisode added in args.NewItems)
+                {
+                    isSeenListeners.Add(added, added.ObservableForProperty(e => e.IsSeen).Subscribe(e => DispatcherHelper.CheckBeginInvokeOnUI(() => RaisePropertyChanged(() => UnseenEpisodeCount))));
+                }
+            }
+
+            if (args.OldItems != null)
+            {
+                foreach (TvDbSeriesEpisode removed in args.OldItems)
+                {
+                    IDisposable subscription;
+                    if (isSeenListeners.TryGetValue(removed, out subscription))
+                    {
+                        subscription.Dispose();
+                        isSeenListeners.Remove(removed);
+                    }
+                }
+            }
+
+
+            CalculateMetrics();
         }
 
-        private DateTime? updated = null;
+        private void CalculateMetrics()
+        {
+            switch (airsDayOfWeek)
+            {
+                case null:
+                    Airs = string.Empty;
+                    break;
+                case -1:
+                    Airs = "irregularly";
+                    break;
+                default:
+                    Airs = CultureInfo.InvariantCulture.DateTimeFormat.DayNames[airsDayOfWeek.Value] + " " + AirsTime;
+                    break;
+            }
+
+            if (Episodes == null)
+                return;
+
+            var nextEpisodeAirDateTime = Episodes.Where(e => e.FirstAired != null && e.FirstAired >= DateTime.Today).Select(e => e.FirstAired).OrderBy(x => x).FirstOrDefault();
+            if (nextEpisodeAirDateTime == null)
+            {
+                NextEpisodeAirDateTime = null;
+                NextEpisodeETA = null;
+                NextEpisodeAirs = "N/A";
+            }
+            else
+            {
+                var nextAirDateTime = nextEpisodeAirDateTime.Value.Date;
+
+                DateTime time;
+                if (!string.IsNullOrEmpty(AirsTime) && DateTime.TryParse(AirsTime, out time))
+                {
+                    ///TODO: take daylight saving time into account
+                    nextAirDateTime = nextAirDateTime.AddHours(5); // EST to UTC
+                    nextAirDateTime = nextAirDateTime.Add(time.TimeOfDay);
+                }
+
+                var localOffset = TimeZoneInfo.Local.BaseUtcOffset;
+                nextAirDateTime = nextAirDateTime.Add(localOffset);
+
+                NextEpisodeAirDateTime = nextAirDateTime;
+                NextEpisodeAirs = nextAirDateTime.ToShortDateString();
+
+                var durationMinutes = Runtime ?? 30;
+
+                var delta = nextAirDateTime - DateTime.Now;
+                if (delta.TotalDays > 30)
+                {
+                    NextEpisodeETA = NextEpisodeAirs;
+                }
+                else
+                {
+                    NextEpisodeETA = delta.Days > 0 ? string.Format("{0}d {1}h", delta.Days, delta.Hours) :
+                        delta.Hours > 0 ? string.Format("{0}h {1}m", delta.Hours, delta.Minutes) :
+                        delta.Minutes > 2 ? string.Format("{0}m {1}s", delta.Minutes, delta.Seconds) :
+                        delta.Ticks > 0 ? "due" :
+                        delta.TotalMinutes >= durationMinutes ? "LIVE" :
+                            "ended";
+                }
+            }
+
+            RaisePropertyChanged(() => UnseenEpisodeCount);
+        }
+
+        public TvDbSeries() {
+            Episodes = new SelfSortingObservableCollection<TvDbSeriesEpisode, string>(e => e.Id);
+        }
+
+        private DateTime? updated;
         public DateTime? Updated
         {
             get
@@ -166,9 +274,7 @@ namespace SeriesTracker
             set
             {
                 Set(() => AirsTime, ref airsTime, value);
-                RaisePropertyChanged(() => Airs);
-                RaisePropertyChanged(() => NextEpisodeAirDateTime);
-                RaisePropertyChanged(() => NextEpisodeETA);
+                CalculateMetrics();
             }
         }
 
@@ -182,26 +288,16 @@ namespace SeriesTracker
             set
             {
                 Set(() => AirsDayOfWeek, ref airsDayOfWeek, value);
-                RaisePropertyChanged(() => Airs);
-                RaisePropertyChanged(() => NextEpisodeAirDateTime);
-                RaisePropertyChanged(() => NextEpisodeETA);
+                CalculateMetrics();
             }
         }
 
+        private string airs;
+        [XmlIgnore]
         public string Airs
         {
-            get
-            {
-                switch (airsDayOfWeek)
-                {
-                    case null:
-                        return string.Empty;
-                    case -1:
-                        return "irregularly";
-                    default:
-                        return CultureInfo.InvariantCulture.DateTimeFormat.DayNames[airsDayOfWeek.Value] + " " + AirsTime;
-                }
-            }
+            get { return airs; }
+            protected set { Set(() => Airs, ref airs, value); }
         }
 
         private int? runtime;
@@ -217,89 +313,38 @@ namespace SeriesTracker
             }
         }
 
+        private DateTime? nextEpisodeAirDateTime;
+        [XmlIgnore]
         public DateTime? NextEpisodeAirDateTime
         {
-            get
-            {
-                var date = episodes.Where(e => e.FirstAired != null && e.FirstAired >= DateTime.Today).Select(e => e.FirstAired).OrderBy(x => x).FirstOrDefault();
-                if (date == null)
-                {
-                    return null;
-                }
-                else
-                {
-                    date = date.Value.Date;
-                }
-                
-                var localOffset = TimeZoneInfo.Local.BaseUtcOffset;
-
-                DateTime time; 
-                if (!string.IsNullOrEmpty(AirsTime) && DateTime.TryParse(AirsTime, out time))
-                {
-                    ///TODO: take daylight saving time into account
-                    date = date.Value.AddHours(5); // EST to UTC
-                    date = date.Value.Add(time.TimeOfDay);
-                }
-
-                date = date.Value.Add(localOffset);
-
-                return date;
-            }
+            get { return nextEpisodeAirDateTime; }
+            protected set { Set(() => NextEpisodeAirDateTime, ref nextEpisodeAirDateTime, value); }
         }
 
-        private string unseenEpisodeCount;
+        [XmlIgnore]
         public string UnseenEpisodeCount
         {
             get
             {
-                return unseenEpisodeCount;
-            }
-            set
-            {
-                Set(() => UnseenEpisodeCount, ref unseenEpisodeCount, value);
+                var episodeCount = Episodes.Count(e => !e.IsSeen);
+                return  (episodeCount > 0) ? episodeCount.ToString() : "None";
             }
         }
 
+        private string nextEpisodeEta;
+        [XmlIgnore]
         public string NextEpisodeETA
         {
-            get
-            {
-                DateTime? date = NextEpisodeAirDateTime as DateTime?;
-                if (date == null)
-                    return null;
-
-                var durationMinutes = Runtime ?? 30;
-
-                var delta = date.Value - DateTime.Now;
-                if (delta.TotalDays > 30)
-                    return date.Value.ToShortDateString();
-
-                return delta.Days > 0 ? string.Format("{0}d {1}h", delta.Days, delta.Hours) :
-                    delta.Hours > 0 ? string.Format("{0}h {1}m", delta.Hours, delta.Minutes) :
-                    delta.Minutes > 2 ? string.Format("{0}m {1}s", delta.Minutes, delta.Seconds) :
-                    delta.Ticks > 0 ? "due" :
-                    delta.TotalMinutes >= durationMinutes ? "LIVE" :
-                        "ended";
-            }
+            get { return nextEpisodeEta; }
+            protected set { Set(() => NextEpisodeETA, ref nextEpisodeEta, value); }
         }
 
+        private string nextEpisodeAirs;
+        [XmlIgnore]
         public string NextEpisodeAirs
         {
-            get
-            {
-                var date = NextEpisodeAirDateTime;
-                if (date == null) {
-                    return "N/A";
-                }
-
-                string airs = AirsTime.Trim();
-                if (!string.IsNullOrEmpty(airs))
-                {
-                    airs += " EST";
-                }
-
-                return date.Value.ToShortDateString() + " " + airs;
-            }
+            get { return nextEpisodeAirs; }
+            protected set { Set(() => NextEpisodeAirs, ref nextEpisodeAirs, value); }
         }
     }
 }

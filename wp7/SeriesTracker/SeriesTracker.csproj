@@ -218,10 +218,7 @@
     <None Include="packages.config" />
     <None Include="Properties\AppManifest.xml" />
     <None Include="Properties\WMAppManifest.xml" />
-    <None Include="SeriesTracker_2014_01_30_21_59_04.sap" />
-    <None Include="SeriesTracker_2014_01_30_22_00_10.sap" />
-    <None Include="SeriesTracker_2014_01_30_23_22_56.sap" />
-    <None Include="SeriesTracker_2014_01_30_23_26_30.sap" />
+    <None Include="SeriesTracker_2014_01_31_21_19_15.sap" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ApplicationIcon.png">
@@ -253,6 +250,7 @@
     <EmbeddedResource Include="Resources\AppResources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />

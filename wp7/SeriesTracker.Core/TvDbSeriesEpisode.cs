@@ -45,6 +45,7 @@ namespace SeriesTracker
             set
             {
                 Set(() => SeriesNumber, ref seriesNumber, value);
+                RaisePropertyChanged(() => Id);
             }
         }
 
@@ -58,6 +59,7 @@ namespace SeriesTracker
             set
             {
                 Set(() => EpisodeNumber, ref episodeNumber, value);
+                RaisePropertyChanged(() => Id);
             }
         }
 
@@ -88,7 +90,6 @@ namespace SeriesTracker
         }
 
         private bool isSeen;
-        [XmlIgnore]
         public bool IsSeen
         {
             get
