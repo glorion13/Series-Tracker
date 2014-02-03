@@ -119,10 +119,33 @@ namespace SeriesTracker
         {
             if (other == null) return 1;
 
-            if (this.SeriesNumber == null)
+            if (SeriesNumber == null)
+            {
+                if (other.SeriesNumber == null)
+                    return 0;
                 return -1;
+            }
 
-            return -1 * this.SeriesNumber.CompareTo(other.SeriesNumber);
+            if (other.SeriesNumber == null)
+                return 1;
+                
+
+            var seriesOrder = -1*String.Compare(SeriesNumber, other.SeriesNumber, StringComparison.Ordinal);
+
+            if (seriesOrder != 0)
+                return seriesOrder;
+
+            if (EpisodeNumber == null)
+            {
+                if (other.EpisodeNumber == null)
+                    return 0;
+                return -1;
+            }
+
+            if (other.EpisodeNumber == null)
+                return 1;
+
+            return -1*String.Compare(EpisodeNumber, other.EpisodeNumber, StringComparison.Ordinal);
         }
     }
 }

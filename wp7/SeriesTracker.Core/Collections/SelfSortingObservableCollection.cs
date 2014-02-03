@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using System.Reactive.Concurrency;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -69,7 +71,23 @@ namespace SeriesTracker
             return i;
         }
 
-        private T beingReordered;
+        private int FindNewIndex(T item)
+        {
+            var newValue = accessor(item);
+            bool pastSelf = false;
+            int i = 0;
+            for (; i < Count; i++)
+            {
+                pastSelf |= this[i] == item;
+
+                var currentValue = accessor(this[i]);
+                if (comparer.Compare(newValue, currentValue) * sortModifier < 0)
+                    break;
+            }
+            return pastSelf ? i-1 : i;
+        }
+
+        private volatile bool reordering;
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -77,20 +95,26 @@ namespace SeriesTracker
                 case NotifyCollectionChangedAction.Add:
                     foreach (var item in e.NewItems.Cast<T>())
                     {
-                        if (beingReordered != item)
+                        if (!reordering)
                         {
-                            var subscription = item.ObservableForProperty(sortingProperty).Subscribe(change =>
+                            var subscription = item.ObservableForProperty(sortingProperty).Subscribe(change => DispatcherHelper.CheckBeginInvokeOnUI(() =>
                             {
-                                DispatcherHelper.UIDispatcher.BeginInvoke(() => {
-                                    beingReordered = item;
+                                try
+                                {
+                                    reordering = true;
+                                    var index = IndexOf(item);
+                                    if (index > 0)
+                                    {
+                                        RemoveItem(index);
+                                        Add(item);
+                                    }
 
-                                    // force reording
-                                    Remove(item);
-                                    Add(item);
-
-                                    beingReordered = null;
-                                });
-                            });
+                                }
+                                finally
+                                {
+                                    reordering = false;
+                                }
+                            }));
 
                             subscriptions.Add(item, subscription);
                         }
@@ -100,7 +124,7 @@ namespace SeriesTracker
                 case NotifyCollectionChangedAction.Remove:
                     foreach (var item in e.OldItems.Cast<T>())
                     {
-                        if (beingReordered != item)
+                        if (!reordering)
                         {
                             var subscription = subscriptions[item];
                             if (subscription != null)
@@ -111,6 +135,15 @@ namespace SeriesTracker
                         }
                     }
                     break;
+
+               case NotifyCollectionChangedAction.Reset:
+                    foreach (var subscription in subscriptions)
+                    {
+                        subscription.Value.Dispose();
+                    }
+                    subscriptions.Clear();
+                    break;
+
             }
             base.OnCollectionChanged(e);
         }

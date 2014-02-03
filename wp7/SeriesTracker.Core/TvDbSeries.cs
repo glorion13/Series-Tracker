@@ -247,8 +247,9 @@ namespace SeriesTracker
             RaisePropertyChanged(() => UnseenEpisodeCount);
         }
 
-        public TvDbSeries() {
-            Episodes = new SelfSortingObservableCollection<TvDbSeriesEpisode, string>(e => e.Id);
+        public TvDbSeries()
+        {
+            Episodes = new ObservableCollection<TvDbSeriesEpisode>();
         }
 
         private DateTime? updated;
