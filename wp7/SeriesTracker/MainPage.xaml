@@ -282,8 +282,34 @@
 			<controls:PanoramaItem Header="followed" toolkit:TiltEffect.IsTiltEnabled="True">
 				<Grid Width="420">
 					<toolkit:PerformanceProgressBar x:Name="subsProgressBar" Height="10" IsIndeterminate="True" VerticalAlignment="Top" Visibility="Collapsed" Margin="0,-10,0,0" />
-					<ListBox ItemsSource="{Binding Series}" ItemTemplate="{StaticResource SeriesTemplate}" />
-				</Grid>
+
+                    <toolkit:LongListSelector ItemsSource="{Binding Series}" IsFlatList="True" x:Name="SeriesSortedList" ShowListFooter="False" ShowListHeader="False" ItemTemplate="{StaticResource SeriesTemplate}">
+                        <toolkit:LongListSelector.GroupItemsPanel>
+                            <ItemsPanelTemplate>
+                                <toolkit:WrapPanel />
+                            </ItemsPanelTemplate>
+                        </toolkit:LongListSelector.GroupItemsPanel>
+                        <toolkit:LongListSelector.GroupHeaderTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneMargin}" MinHeight="72" MinWidth="72">
+                                        <Border.Background>
+                                            <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
+                                        </Border.Background>
+                                        <TextBlock Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource PhoneTextLargeStyle}" FontSize="37.333" Margin="12,13,12,11" />
+                                    </Border>
+                                </Grid>
+                            </DataTemplate>
+                        </toolkit:LongListSelector.GroupHeaderTemplate>
+                        <toolkit:LongListSelector.GroupItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="{StaticResource PhoneTouchTargetOverhang}"  Padding="{StaticResource PhoneTouchTargetOverhang}" MinWidth="92" MinHeight="92" Background="{Binding GroupBackgroundBrush}">
+                                    <TextBlock Text="{Binding Key}" Style="{StaticResource PhoneTextLargeStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </DataTemplate>
+                        </toolkit:LongListSelector.GroupItemTemplate>
+                    </toolkit:LongListSelector>
+                </Grid>
 			</controls:PanoramaItem>
  
 			<!--Use 'Orientation="Horizontal"' to enable a panel that lays out horizontally-->
@@ -297,7 +323,7 @@
 						<toolkit:LongListSelector.ListHeaderTemplate>
 							<DataTemplate>
 								<Grid>
-                                    <TextBox Text="{Binding Search, Mode=TwoWay}" IsEnabled="{Binding IsSearchBoxEnabled}" Margin="0,-12,0,0">
+                                    <TextBox Text="{Binding Search, Mode=TwoWay}" IsEnabled="{Binding IsSearchBoxEnabled}" Margin="0,-12,0,0" InputScope="Search">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="KeyDown">
                                                 <GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding CloseSoftKeyboard}" PassEventArgsToCommand="True" />

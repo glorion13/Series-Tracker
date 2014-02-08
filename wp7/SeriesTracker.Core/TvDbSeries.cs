@@ -12,7 +12,7 @@ using ReactiveUI;
 
 namespace SeriesTracker
 {
-    public class TvDbSeries : ViewModelBase
+    public class TvDbSeries : ViewModelBase, IComparable<TvDbSeries>
     {
         private string id;
         public string Id
@@ -123,6 +123,38 @@ namespace SeriesTracker
             {
                 Set(() => IsSubscribed, ref isSubscribed, value);
             }
+        }
+
+        public int CompareTo(TvDbSeries other)
+        {
+            if (other == null) return 1;
+
+            if (Title == null)
+            {
+                if (other.Title == null)
+                    return 0;
+                return -1;
+            }
+
+            if (other.Title == null)
+                return 1;
+
+            var seriesOrder = -1 * String.Compare(Title, other.Title, StringComparison.Ordinal);
+
+            if (seriesOrder != 0)
+                return seriesOrder;
+
+            if (Title == null)
+            {
+                if (other.Title == null)
+                    return 0;
+                return -1;
+            }
+
+            if (other.Title == null)
+                return 1;
+
+            return -1 * String.Compare(Title, other.Title, StringComparison.Ordinal);
         }
 
         private readonly Dictionary<TvDbSeriesEpisode, IDisposable> isSeenListeners = new Dictionary<TvDbSeriesEpisode, IDisposable>();

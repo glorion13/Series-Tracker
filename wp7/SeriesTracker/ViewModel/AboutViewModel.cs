@@ -44,6 +44,19 @@ namespace SeriesTracker
                 }));
             }
         }
+        private ICommand openTwitterLink;
+        public ICommand OpenTwitterLink
+        {
+            get
+            {
+                return openTwitterLink ?? (openTwitterLink = new RelayCommand(() =>
+                {
+                    var task = new Microsoft.Phone.Tasks.WebBrowserTask();
+                    task.Uri = new Uri("https://twitter.com/@alexgouv");
+                    task.Show();
+                }));
+            }
+        }
     }
 
 }

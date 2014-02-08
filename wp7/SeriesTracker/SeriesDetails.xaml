@@ -124,7 +124,6 @@
                 		<toolkit:LongListSelector.GroupHeaderTemplate>
                 			<DataTemplate>
                                 <Grid>
-
                                     <toolkit:ContextMenuService.ContextMenu>
                                         <toolkit:ContextMenu>
                                             <toolkit:MenuItem CommandParameter="{Binding Key}" Command="{Binding SeriesDetails.MarkSeenSeason, Source={StaticResource Locator}}">
@@ -218,8 +217,15 @@
                 						<Rectangle Fill="{StaticResource PhoneAccentBrush}" />
                 						<TextBlock Text="{Binding Episode.Name, Converter={StaticResource ToUpper}}" Foreground="{StaticResource PhoneForegroundBrush}" Style="{StaticResource PhoneTextBlockBase}" Margin="12,10,8,7" TextWrapping="Wrap" TextOptions.TextHintingMode="Animated" FontSize="18.667" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue"/>
                 					</Grid>
-                					<TextBlock TextWrapping="Wrap" Text="{Binding Episode.Description}" Grid.Column="1" Grid.RowSpan="2" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" VerticalAlignment="Top"/>
-                				</Grid>
+                                    <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock TextWrapping="NoWrap" Text="{Binding Episode.FirstAired}" Grid.Row="0" Style="{StaticResource PhoneTextLargeStyle}" FontSize="16" VerticalAlignment="Top" />
+                                        <TextBlock TextWrapping="Wrap" Text="{Binding Episode.Description}" Grid.Row="1" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" VerticalAlignment="Top" />
+                                    </Grid>
+                                </Grid>
                 			</DataTemplate>
                 		</toolkit:LongListSelector.ItemTemplate>
                 	</toolkit:LongListSelector>

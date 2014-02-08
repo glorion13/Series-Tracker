@@ -26,6 +26,7 @@ using GalaSoft.MvvmLight.Threading;
 using System.Windows.Navigation;
 using System.Threading.Tasks;
 using Microsoft.Phone.Shell;
+using SeriesTracker.Collections;
 
 namespace SeriesTracker
 {
@@ -73,6 +74,18 @@ namespace SeriesTracker
                 Set(() => Series, ref series, value);
             }
         }
+
+        // Started working on creating an easier to navigate 'followed' Series list
+        /*public LongListCollection<TvDbSeries, string> SeriesSortedList
+        {
+            get
+            {
+                return new LongListCollection<TvDbSeries, string>(
+                    Series.OrderBy(l => l.Title[0]).Select(x => x),
+                    s => s.AirsDayOfWeek.ToString(),
+                    Series.Select(s => s.Title[0].ToString()).ToList());
+            }
+        }*/
 
         ObservableCollection<TvDbSeries> searchResults;
         public ObservableCollection<TvDbSeries> SearchResults

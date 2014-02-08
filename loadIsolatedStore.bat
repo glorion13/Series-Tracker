@@ -6,7 +6,7 @@ set wp8AppId=3715797b-f831-4e64-98a4-39446456c0b5
 
 echo Running script to insert Isolated Store data from testdata to the target emulator or device.
 
-Make sure that the target emulator or device is running and has the application installed. It's not necessary that it's attached to Visual Studio.
+echo Make sure that the target emulator or device is running and has the application installed. It's not necessary that it's attached to Visual Studio.
 
 "C:\Program Files (x86)\Microsoft SDKs\Windows Phone\v8.0\Tools\IsolatedStorageExplorerTool\"ISETool.exe EnumerateDevices
 
