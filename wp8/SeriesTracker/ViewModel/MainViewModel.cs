@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -45,6 +46,7 @@ namespace SeriesTracker
 
         private readonly TvDbSeriesRepository repository;
         private readonly ConnectivityService connectivityService;
+        private readonly ReminderService reminderService;
         private LiveTileUpdater ltUpdater;
 
         private bool connectionDown;
@@ -82,9 +84,10 @@ namespace SeriesTracker
             }
         }
 
-        public MainViewModel(TvDbSeriesRepository repository, ConnectivityService connectivityService)
+        public MainViewModel(TvDbSeriesRepository repository, ConnectivityService connectivityService, ReminderService reminderService)
         {
             this.connectivityService = connectivityService;
+            this.reminderService = reminderService;
             connectivityService.InternetDown += connectivityService_InternetDown;
             connectivityService.InternetUp += connectivityService_InternetUp;
 
@@ -108,7 +111,7 @@ namespace SeriesTracker
                     Image = "http://thetvdb.com/banners/posters/73871-2.jpg",
                     Rating = 5,
                     AirsTime = "11 PM",
-                    Episodes = new List<TvDbSeriesEpisode>()
+                    Episodes = new ObservableCollection<TvDbSeriesEpisode>()
                     {
                         new TvDbSeriesEpisode() {
                             Name = "Episode 1",
@@ -160,25 +163,68 @@ namespace SeriesTracker
 
         public async Task Initialize()
         {
-            await LoadSubscriptions();
             SetupSearch();
+            await LoadSubscriptions();
+
+            //background initialization, do not await
+            Task.Factory.StartNew(() => reminderService.CreateOrUpdateRemindersAsync());
         }
+
+        private readonly SemaphoreSlim searchLock = new SemaphoreSlim(1);
 
         private void SetupSearch()
         {
-            this.ObservableForProperty(m => m.Search).SubscribeOnDispatcher().Subscribe(async change =>
+            var ui = SynchronizationContext.Current;
+
+            CancellationTokenSource cancellationTokenSource = null;
+
+            this.ObservableForProperty(m => m.Search).ObserveOn(ui).Subscribe(async change =>
             {
-                searchResults.Clear();
-                IsSearching = true;
+                var myCancelation = new CancellationTokenSource();
+                var theirCancellation = Interlocked.Exchange(ref cancellationTokenSource, myCancelation);
 
-                var results = await repository.FindAsync(change.Value);
+                if (theirCancellation != null)
+                {
+                    theirCancellation.Cancel();
+                }
 
-                await searchResults.AddAll(results.Keys);
+                try
+                {
+                    await searchLock.WaitAsync(myCancelation.Token);
+                    await DoSearch(change.Value, myCancelation.Token);
+                }
+                catch (OperationCanceledException)
+                {
 
-                await TaskEx.WhenAll(results.Values);
-
-                IsSearching = false;
+                }
             });
+        }
+
+        private async Task DoSearch(string searchTerm, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+
+            IsSearching = true;
+
+            token.ThrowIfCancellationRequested();
+
+            searchResults.Clear();
+
+            token.ThrowIfCancellationRequested();
+
+            var results = await repository.FindAsync(searchTerm);
+
+            token.ThrowIfCancellationRequested();
+
+            await searchResults.AddAll(results.Keys);
+
+            token.ThrowIfCancellationRequested();
+
+            await TaskEx.WhenAll(results.Values);
+
+            token.ThrowIfCancellationRequested();
+
+            IsSearching = false;
         }
 
         private async Task LoadSubscriptions()

@@ -39,26 +39,24 @@ namespace SeriesTracker
             }
         }
 
-        private ICommand subscribe;
-        public ICommand Subscribe
-        {
-            get
-            {
-                return subscribe ?? (subscribe = new RelayCommand(async () =>
-                {
-                    await repository.SubscribeAsync(series);
-                }));
-            }
-        }
 
-        private ICommand unsubscribe;
-        public ICommand Unsunscribe
+        private ICommand toggleSubscribed;
+        public ICommand ToggleSubscribed
         {
             get
             {
-                return unsubscribe ?? (unsubscribe = new RelayCommand(async () =>
+                return toggleSubscribed ?? (toggleSubscribed = new RelayCommand(async () =>
                 {
-                    await repository.UnsubscribeAsync(series);
+                    if (Series.IsSubscribed)
+                    {
+                        await repository.UnsubscribeAsync(series);
+                    }
+                    else
+                    {
+                        await repository.SubscribeAsync(series);
+                    }
+                    RaisePropertyChanged(() => ToggleSubscribeIcon);
+                    RaisePropertyChanged(() => ToggleSubscribeText);
                 }));
             }
         }
@@ -171,7 +169,7 @@ namespace SeriesTracker
                     Rating = 5,
                     AirsTime = "9 PM",
                     AirsDayOfWeek = 6,
-                    Episodes = new List<TvDbSeriesEpisode>() {
+                    Episodes = new ObservableCollection<TvDbSeriesEpisode>() {
                         new TvDbSeriesEpisode() {
                             Name = "Episode 1",
                             SeriesNumber = "1",
@@ -252,5 +250,34 @@ namespace SeriesTracker
             }
         }
 
+        public Uri ToggleSubscribeIcon
+        {
+            get
+            {
+                if (series.IsSubscribed)
+                {
+                    return new Uri("Toolkit.Content\\appbar.star.remove.png", UriKind.Relative);
+                }
+                else
+                {
+                    return new Uri("Toolkit.Content\\appbar.star.png", UriKind.Relative);
+                }
+            }
+        }
+
+        public string ToggleSubscribeText
+        {
+            get
+            {
+                if (series.IsSubscribed)
+                {
+                    return "unsubscribe";
+                }
+                else
+                {
+                    return "subscribe";
+                }
+            }
+        }
     }
 }

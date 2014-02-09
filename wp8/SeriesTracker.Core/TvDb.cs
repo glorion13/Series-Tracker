@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Windows.Threading;
 using GalaSoft.MvvmLight.Threading;
 using Microsoft.Phone.Reactive;
+using SeriesTracker.Core;
 
 namespace SeriesTracker
 {
@@ -34,31 +35,22 @@ namespace SeriesTracker
 
         private async Task<bool> EnsureInitialized()
         {
-            if (initialized)
-                return true;
-
-            await @lock.WaitAsync();
-            try
+            using (await @lock.DisposableWaitAsync())
             {
-                if (initialized) 
-                    return true;
-
-                try
+                if (!initialized)
                 {
-                    await DoInitialize();
-                    initialized = true;
+                    try
+                    {
+                        await DoInitialize();
+                        initialized = true;
+                    }
+                    catch (WebException)
+                    {
+                        connectivityService.ReportHealth(false);
+                    }
                 }
-                catch (WebException we)
-                {
-                    connectivityService.ReportHealth(false);
-                    Console.Out.WriteLine("Error initializing: " + we.Message);
-                }
-
+                
                 return initialized;
-            }
-            finally
-            {
-                @lock.Release();
             }
         }
 
@@ -67,8 +59,8 @@ namespace SeriesTracker
             var result = await new WebClient().DownloadStringTaskAsync(new Uri(ApiUrl));
             connectivityService.ReportHealth(true);
 
-            mirror = (from path in XDocument.Parse(result).Descendants("mirrorpath")
-                           select path.Value).First();
+            mirror = await Task.Factory.StartNew(() => (from path in XDocument.Parse(result).Descendants("mirrorpath")
+                           select path.Value).First());
         }
 
         public async Task<IEnumerable<TvDbSeries>> FindSeries(string name)
@@ -83,23 +75,23 @@ namespace SeriesTracker
                 string s = await wc.DownloadStringTaskAsync(url);
                 connectivityService.ReportHealth(true);
 
-                var list = from series in XDocument.Parse(s).Descendants("Series")
-                           where string.Equals(series.Descendants("language").Select(n => n.Value).FirstOrDefault(), "en")
-                           select new TvDbSeries()
-                           {
-                               Title = series.Descendants("SeriesName").Select(n => n.Value).FirstOrDefault(),
-                               Id = series.Descendants("seriesid").Select(n => n.Value).FirstOrDefault(),
-                               Banner = series.Descendants("banner").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault(),
-                               Overview = series.Descendants("Overview").Select(n => n.Value).FirstOrDefault(),
-                               ImdbId = series.Descendants("IMDB_ID").Select(n => n.Value).FirstOrDefault()
-                           };
+                var list = await Task.Factory.StartNew(() => 
+                    from series in XDocument.Parse(s).Descendants("Series")
+                    where string.Equals(series.Descendants("language").Select(n => n.Value).FirstOrDefault(), "en")
+                    select new TvDbSeries()
+                    {
+                        Title = series.Descendants("SeriesName").Select(n => n.Value).FirstOrDefault(),
+                        Id = series.Descendants("seriesid").Select(n => n.Value).FirstOrDefault(),
+                        Banner = series.Descendants("banner").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault(),
+                        Overview = series.Descendants("Overview").Select(n => n.Value).FirstOrDefault(),
+                        ImdbId = series.Descendants("IMDB_ID").Select(n => n.Value).FirstOrDefault()
+                    });
 
                 return list;
             }
-            catch (WebException we)
+            catch (WebException)
             {
                 connectivityService.ReportHealth(false);
-                Console.Out.WriteLine("Error initializing: " + we.Message);
                 return new List<TvDbSeries>();
             }   
         }
@@ -110,90 +102,164 @@ namespace SeriesTracker
         {
             if (!await EnsureInitialized())
                 return;
-            
-            try {
+
+            try
+            {
                 var url = string.Format("{0}/api/{1}/series/{2}/all/en.xml", mirror, ApiKey, series.Id);
                 var wc = new WebClient();
-                var updated = DateTime.Now;
-
-                string s = await wc.DownloadStringTaskAsync(url);
+                string response = await wc.DownloadStringTaskAsync(url);
                 connectivityService.ReportHealth(true);
-
-                var doc = XDocument.Parse(s);
-                var poster = doc.Descendants("poster").FirstOrDefault();
-                if (poster != null ) {
-                    if (!string.IsNullOrEmpty(poster.Value))
+                try
+                {
+                    var updates = await Task.Factory.StartNew(() => GetSeriesUpdates(response).ToList());
+                    foreach (var update in updates)
                     {
-                        DispatcherHelper.CheckBeginInvokeOnUI(() =>
-                        {
-                            series.Image = string.Format("{0}/banners/{1}", mirror, poster.Value);
-                        });
+                        if (update != null)
+                            update(series);
                     }
                 }
-
-                ParseFromDetailsDoc(doc, "Rating", value => series.Rating = float.Parse(value, CultureInfo.InvariantCulture.NumberFormat));
-                ParseFromDetailsDoc(doc, "Airs_Time", value => series.AirsTime = value);
-                ParseFromDetailsDoc(doc, "Airs_DayOfWeek", value => series.AirsDayOfWeek = DaysOfWeek.IndexOf(value.Trim().ToLowerInvariant()));
-                ParseFromDetailsDoc(doc, "Runtime", value => series.Runtime = int.Parse(value));
-
-                var episodeUpdates = from newData in doc.Descendants("Episode")
-                                     join episode in series.Episodes on TvDbSeriesEpisode.GetEpisodeId(
-                                         newData.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
-                                         newData.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault())
-                                         equals episode.Id into matches
-                                     from update in matches.DefaultIfEmpty(new TvDbSeriesEpisode())
-                                     select new { Episode = update, Data = newData };
-
-
-                    DispatcherHelper.CheckBeginInvokeOnUI(() =>
-                    {
-                        var list = new List<TvDbSeriesEpisode>();
-
-                        foreach (var update in episodeUpdates)
-                        {
-
-                            update.Episode.Name = update.Data.Descendants("EpisodeName").Select(n => n.Value).FirstOrDefault();
-                            update.Episode.SeriesNumber = update.Data.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault();
-                            update.Episode.EpisodeNumber = update.Data.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault();
-                            update.Episode.Description = update.Data.Descendants("Overview").Select(n => n.Value).FirstOrDefault();
-                            update.Episode.FirstAired = update.Data.Descendants("FirstAired").Select(n =>
-                            {
-                                DateTime date;
-                                if (DateTime.TryParse(n.Value, out date))
-                                    return (DateTime?)date;
-
-                                return null;
-                            }).FirstOrDefault();
-                            update.Episode.Image = update.Data.Descendants("filename").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault();
-
-                            list.Add(update.Episode);
-                        }
-                        series.Episodes = list.OrderByDescending(e => e.SeriesNumber).ThenByDescending(e => e.EpisodeNumber).ToList();
-                    });               
-
-
-                DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                catch (XmlException)
                 {
-                    series.Updated = updated;
-                });
+
+                }
             }
             catch (WebException we)
             {
                 connectivityService.ReportHealth(false);
                 Console.Out.WriteLine("Error initializing: " + we.Message);
-            }  
+            }
         }
 
-        private static void ParseFromDetailsDoc(XDocument doc, string nodeName, Action<string> processValue)
+        private IEnumerable<Action<TvDbSeries>> GetSeriesUpdates(string response)
+        {
+            var doc = XDocument.Parse(response);
+            var poster = doc.Descendants("poster").FirstOrDefault();
+            if (poster != null)
+            {
+                if (!string.IsNullOrEmpty(poster.Value))
+                {
+                    var image = string.Format("{0}/banners/{1}", mirror, poster.Value);
+                    yield return s => s.Image = image;
+                }
+            }
+
+            yield return
+                doc.ParseAndGetUpdateAction("Rating",
+                    value => float.Parse(value, CultureInfo.InvariantCulture.NumberFormat), (s, r) => s.Rating = r);
+
+            yield return doc.ParseAndGetUpdateAction("Airs_Time", (s, v) => s.AirsTime = v);
+
+            yield return
+                doc.ParseAndGetUpdateAction("Airs_DayOfWeek",
+                    value => DaysOfWeek.IndexOf(value.Trim().ToLowerInvariant()), (s, v) => s.AirsDayOfWeek = v);
+
+            yield return
+                doc.ParseAndGetUpdateAction("Runtime", int.Parse, (s, i) => s.Runtime = i);
+
+            var episodeUpdates = from newData in doc.Descendants("Episode")
+                                 select new
+                                 {
+                                     Id = TvDbSeriesEpisode.GetEpisodeId(
+                                         newData.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
+                                         newData.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault()),
+                                     Data = newData
+                                 };
+
+            var newEpisodes = (from update in episodeUpdates
+                               let name = update.Data.Descendants("EpisodeName").Select(e => e.Value).FirstOrDefault()
+                               let seasonNumber = update.Data.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault()
+                               let episodeNumber = update.Data.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault()
+                               let overview = update.Data.Descendants("Overview").Select(n => n.Value).FirstOrDefault()
+                               let firstAired = update.Data.Descendants("FirstAired").Select(n =>
+                               {
+                                   DateTime date;
+                                   if (DateTime.TryParse(n.Value, out date))
+                                       return (DateTime?)date;
+
+                                   return null;
+                               }).FirstOrDefault()
+                               let image = update.Data.Descendants("filename").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault()
+                               select (Func<IList<TvDbSeriesEpisode>, TvDbSeriesEpisode>)(episodes =>
+                               {
+                                   var episode = episodes.FirstOrDefault(e => e.Id == update.Id);
+                                   if (episode == null)
+                                   {
+                                       episode = new TvDbSeriesEpisode();
+                                   }
+                                   else
+                                   {
+                                       episodes.Remove(episode);
+                                   }
+
+                                   episode.Name = name;
+                                   episode.SeriesNumber = seasonNumber;
+                                   episode.EpisodeNumber = episodeNumber;
+                                   episode.Description = overview;
+                                   episode.FirstAired = firstAired;
+                                   episode.Image = image;
+
+                                   return episode;
+                               })).ToList();
+
+            yield return s =>
+            {
+                var episodes = new SelfSortingObservableCollection<TvDbSeriesEpisode, string>(e => e.Id);
+                var current = s.Episodes.ToList();
+                foreach (var episode in newEpisodes.Select(e => e(current)))
+                {
+                    episodes.Add(episode);
+                }
+                s.Episodes = episodes;
+            };
+
+            yield return s => s.Updated = DateTime.Now;
+        }
+    }
+
+    public static class XDocumentExtensions
+    {
+        public static T ParseDescendantNode<T>(this XDocument doc, string nodeName, Func<string, T> processValue)
         {
             var node = doc.Descendants(nodeName).FirstOrDefault();
             if (node != null)
             {
                 if (!string.IsNullOrEmpty(node.Value))
                 {
-                    DispatcherHelper.CheckBeginInvokeOnUI(() => processValue(node.Value));
+                    return processValue(node.Value);
                 }
             }
+
+            return default(T);
+        }
+
+        public static Action<TvDbSeries> ParseAndGetUpdateAction<T>(this XDocument doc, string nodeName, Func<string, T> processValue, Action<TvDbSeries, T> apply)
+        {
+            var node = doc.Descendants(nodeName).FirstOrDefault();
+            if (node != null)
+            {
+                if (!string.IsNullOrEmpty(node.Value))
+                {
+                    var value = processValue(node.Value);
+                    return s => apply(s, value);
+                }
+            }
+
+            return null;
+        }
+
+        public static Action<TvDbSeries> ParseAndGetUpdateAction(this XDocument doc, string nodeName, Action<TvDbSeries, string> apply)
+        {
+            var node = doc.Descendants(nodeName).FirstOrDefault();
+            if (node != null)
+            {
+                if (!string.IsNullOrEmpty(node.Value))
+                {
+                    var value = node.Value;
+                    return s => apply(s, value);
+                }
+            }
+
+            return null;
         }
     }
 }

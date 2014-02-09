@@ -5,21 +5,23 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-	xmlns:scm="clr-namespace:System.ComponentModel;assembly=System.Windows"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     xmlns:ec="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions" 
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
-    xmlns:bar="clr-namespace:BindableApplicationBar;assembly=BindableApplicationBar"
-    xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP8"
-    xmlns:SeriesTracker_Converters="clr-namespace:SeriesTracker.Converters"
+    xmlns:commands="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP8"
     xmlns:ctrl="clr-namespace:SeriesTracker.Controls"
-    xmlns:eim="clr-namespace:Microsoft.Expression.Interactivity.Media;assembly=Microsoft.Expression.Interactions"    
+    xmlns:eim="clr-namespace:Microsoft.Expression.Interactivity.Media;assembly=Microsoft.Expression.Interactions"
+    xmlns:appBarUtils="clr-namespace:AppBarUtils;assembly=AppBarUtils"
     x:Class="SeriesTracker.MainPage"
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
     SupportedOrientations="Portrait"
 	Orientation="Portrait"
-    shell:SystemTray.IsVisible="False">
+    shell:SystemTray.IsVisible="False"
+    DataContext="{Binding Path=MainViewModel, Source={StaticResource Locator}}"
+    Foreground="{StaticResource PhoneForegroundBrush}" 
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}">
     
 	<phone:PhoneApplicationPage.Resources>
         <DataTemplate x:Key="SeriesTemplate">
@@ -38,7 +40,7 @@
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Tap">
-                            <GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding}" Command="{Binding MainViewModel.ViewDetails, Source={StaticResource Locator}}"/>
+                            <commands:EventToCommand CommandParameter="{Binding}" Command="{Binding MainViewModel.ViewDetails, Source={StaticResource Locator}}"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <Grid.RowDefinitions>
@@ -117,7 +119,7 @@
         		<Canvas Margin="12,0,0,0" Background="#00000000" Width="100" Height="100">
         			<i:Interaction.Triggers>
         				<i:EventTrigger EventName="Tap">
-        					<GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding Mode=OneWay}" Command="{Binding MainViewModel.ToggleSubscribed, Mode=OneWay, Source={StaticResource Locator}}"/>
+                            <commands:EventToCommand CommandParameter="{Binding Mode=OneWay}" Command="{Binding MainViewModel.ToggleSubscribed, Mode=OneWay, Source={StaticResource Locator}}"/>
         				</i:EventTrigger>
         			</i:Interaction.Triggers>
         			<Image Height="100" Width="100" Stretch="UniformToFill" x:Name="image">
@@ -136,7 +138,7 @@
         			</Grid.RowDefinitions>
         			<i:Interaction.Triggers>
         				<i:EventTrigger EventName="Tap">
-        					<GalaSoft_MvvmLight_Command:EventToCommand CommandParameter="{Binding}" Command="{Binding MainViewModel.ViewDetails, Source={StaticResource Locator}}"/>
+                            <commands:EventToCommand CommandParameter="{Binding}" Command="{Binding MainViewModel.ViewDetails, Source={StaticResource Locator}}"/>
         				</i:EventTrigger>
         			</i:Interaction.Triggers>
         			<TextBlock Text="{Binding Title, Converter={StaticResource ToUpper}}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48" Margin="0,0,0,-3" TextWrapping="Wrap" LineStackingStrategy="BlockLineHeight" LineHeight="45.333" />
@@ -192,19 +194,7 @@
         	</DoubleAnimationUsingKeyFrames>
         </Storyboard>
     </phone:PhoneApplicationPage.Resources>
-	<phone:PhoneApplicationPage.FontFamily>
-		<StaticResource ResourceKey="PhoneFontFamilyNormal"/>
-	</phone:PhoneApplicationPage.FontFamily>
-	<phone:PhoneApplicationPage.FontSize>
-		<StaticResource ResourceKey="PhoneFontSizeNormal"/>
-	</phone:PhoneApplicationPage.FontSize>
-	<phone:PhoneApplicationPage.Foreground>
-		<StaticResource ResourceKey="PhoneForegroundBrush"/>
-	</phone:PhoneApplicationPage.Foreground>
-	<phone:PhoneApplicationPage.DataContext>
-		<Binding Mode="OneWay" Path="MainViewModel" Source="{StaticResource Locator}"/>
-	</phone:PhoneApplicationPage.DataContext>
-	<toolkit:TransitionService.NavigationInTransition>
+    <toolkit:TransitionService.NavigationInTransition>
 	    <toolkit:NavigationInTransition>
 	    	<toolkit:NavigationInTransition.Forward>
 	            <toolkit:TurnstileTransition Mode="ForwardIn"/>
@@ -225,7 +215,7 @@
 	    </toolkit:NavigationOutTransition>
 	</toolkit:TransitionService.NavigationOutTransition>
 
-	<Grid x:Name="LayoutRoot">
+    <Grid x:Name="LayoutRoot">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -233,121 +223,125 @@
         </Grid.RowDefinitions>
 
         <i:Interaction.Behaviors>
-	        <ec:DataStateBehavior Binding="{Binding IsLoadingSubscriptions}" TrueState="Loading" FalseState="NotLoading" Value="True"/>
-	    </i:Interaction.Behaviors>	
-		<VisualStateManager.VisualStateGroups>
-			<VisualStateGroup x:Name="LoadingSubs">
-				<VisualState x:Name="Loading">
-					<Storyboard>
-						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="subsProgressBar">
-							<DiscreteObjectKeyFrame KeyTime="0">
-								<DiscreteObjectKeyFrame.Value>
-									<Visibility>Visible</Visibility>
-								</DiscreteObjectKeyFrame.Value>
-							</DiscreteObjectKeyFrame>
-						</ObjectAnimationUsingKeyFrames>
-					</Storyboard>
-				</VisualState>
-				<VisualState x:Name="NotLoading"/>
-			</VisualStateGroup>
-			<VisualStateGroup x:Name="Search">
-				<VisualState x:Name="Searching">
-					<Storyboard>
-						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="searchProgressBar">
-							<DiscreteObjectKeyFrame KeyTime="0">
-								<DiscreteObjectKeyFrame.Value>
-									<Visibility>Visible</Visibility>
-								</DiscreteObjectKeyFrame.Value>
-							</DiscreteObjectKeyFrame>
-						</ObjectAnimationUsingKeyFrames>
-						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="searchProgressBar">
-							<DiscreteObjectKeyFrame KeyTime="0">
-								<DiscreteObjectKeyFrame.Value>
-									<Thickness>0,-10,0,0</Thickness>
-								</DiscreteObjectKeyFrame.Value>
-							</DiscreteObjectKeyFrame>
-						</ObjectAnimationUsingKeyFrames>
-					</Storyboard>
-				</VisualState>
-				<VisualState x:Name="NotSearching"/>
-			</VisualStateGroup>
-		</VisualStateManager.VisualStateGroups>
-	 
-		<VisualStateManager.CustomVisualStateManager>
-			<ec:ExtendedVisualStateManager/>
-		</VisualStateManager.CustomVisualStateManager>
-		
-		<controls:Panorama TitleTemplate="{StaticResource PanoramaTitle}">
- 
-			<controls:PanoramaItem Header="followed" toolkit:TiltEffect.IsTiltEnabled="True">
-				<Grid Width="420">
-					<toolkit:PerformanceProgressBar x:Name="subsProgressBar" Height="10" IsIndeterminate="True" VerticalAlignment="Top" Visibility="Collapsed" Margin="0,-10,0,0" />
-					<ListBox ItemsSource="{Binding Series}" ItemTemplate="{StaticResource SeriesTemplate}" />
-				</Grid>
-			</controls:PanoramaItem>
- 
-			<!--Use 'Orientation="Horizontal"' to enable a panel that lays out horizontally-->
-			<controls:PanoramaItem Header="search">
-				<Grid>
-				    <i:Interaction.Behaviors>
-				        <ec:DataStateBehavior Binding="{Binding IsSearching}" TrueState="Searching" FalseState="NotSearching" Value="True"/>
-				    </i:Interaction.Behaviors>
+            <ec:DataStateBehavior Binding="{Binding IsLoadingSubscriptions}" TrueState="Loading" FalseState="NotLoading" Value="True"/>
+        </i:Interaction.Behaviors>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="LoadingSubs">
+                <VisualState x:Name="Loading">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="subsProgressBar">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Visible</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="NotLoading"/>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="Search">
+                <VisualState x:Name="Searching">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="searchProgressBar">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Visible</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="searchProgressBar">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>0,-10,0,0</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="NotSearching"/>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <VisualStateManager.CustomVisualStateManager>
+            <ec:ExtendedVisualStateManager/>
+        </VisualStateManager.CustomVisualStateManager>
+
+        <controls:Panorama TitleTemplate="{StaticResource PanoramaTitle}">
+
+            <controls:PanoramaItem Header="followed" toolkit:TiltEffect.IsTiltEnabled="True">
+                <Grid Width="420">
+                    <toolkit:PerformanceProgressBar x:Name="subsProgressBar" Height="10" IsIndeterminate="True" VerticalAlignment="Top" Visibility="Collapsed" Margin="0,-10,0,0" />
+                    <ListBox ItemsSource="{Binding Series}" ItemTemplate="{StaticResource SeriesTemplate}" />
+                </Grid>
+            </controls:PanoramaItem>
+
+            <!--Use 'Orientation="Horizontal"' to enable a panel that lays out horizontally-->
+            <controls:PanoramaItem Header="search">
+                <Grid>
+                    <i:Interaction.Behaviors>
+                        <ec:DataStateBehavior Binding="{Binding IsSearching}" TrueState="Searching" FalseState="NotSearching" Value="True"/>
+                    </i:Interaction.Behaviors>
                     <ProgressBar x:Name="searchProgressBar" Height="10" VerticalAlignment="Top" IsIndeterminate="True" Visibility="Collapsed" Margin="0,-10,0,0" />
                     <phone:LongListSelector ItemsSource="{Binding SearchResults}" ItemTemplate="{StaticResource SearchResultTemplate}" ListHeader="{Binding}" LayoutMode="List">
                         <phone:LongListSelector.ListHeaderTemplate>
-							<DataTemplate>
-								<Grid>
+                            <DataTemplate>
+                                <Grid>
                                     <TextBox Text="{Binding Search, Mode=TwoWay}" IsEnabled="{Binding IsSearchBoxEnabled}" Margin="0,-12,0,0">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="KeyDown">
-                                                <GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding CloseSoftKeyboard}" PassEventArgsToCommand="True" />
+                                                <commands:EventToCommand Command="{Binding CloseSoftKeyboard}" PassEventArgsToCommand="True" />
                                             </i:EventTrigger>
                                         </i:Interaction.Triggers>
                                     </TextBox>
-                                </Grid>						
-							</DataTemplate>
+                                </Grid>
+                            </DataTemplate>
                         </phone:LongListSelector.ListHeaderTemplate>
                     </phone:LongListSelector>
-				</Grid>
-			</controls:PanoramaItem>
-		</controls:Panorama>
-		<Popup x:Name="popup" IsOpen="{Binding ConnectionDown}" RenderTransformOrigin="0.5,0.5">
-			<i:Interaction.Triggers>
-				<i:EventTrigger EventName="Opened">
-					<eim:ControlStoryboardAction Storyboard="{StaticResource AnimatePopup}"/>
-				</i:EventTrigger>
-			</i:Interaction.Triggers>
-			<Popup.RenderTransform>
-				<CompositeTransform/>
-			</Popup.RenderTransform>
-			<Grid x:Name="grid" Background="{StaticResource PhoneAccentBrush}" HorizontalAlignment="Center" Height="120" Width="480" UseLayoutRounding="True">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="120" />
-					<ColumnDefinition />
-				</Grid.ColumnDefinitions>
-				<TextBlock Margin="{StaticResource PhoneTouchTargetLargeOverhang}" TextWrapping="Wrap" Text="Oh no! Looks like we are offline. Connect to the internet and try again! Until then we'll just show you local data." d:LayoutOverrides="Width, Height" Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Center" Grid.Column="1" VerticalAlignment="Center" TextOptions.TextHintingMode="Animated"/>
-				<Canvas x:Name="Vrstva_1" Width="16" Height="16" RenderTransformOrigin="0.5,0.5" Margin="12,0,-12,0">
-					<Canvas.RenderTransform>
-						<CompositeTransform ScaleY="5" ScaleX="5"/>
-					</Canvas.RenderTransform>
-					<Path Data="F1M298,66.1104C294.141,66.1104,291,62.9704,291,59.1104C291,55.2504,294.141,52.1104,298,52.1104C301.859,52.1104,305,55.2504,305,59.1104C305,62.9704,301.859,66.1104,298,66.1104 M298,51.1104C293.582,51.1104,290,54.6924,290,59.1104C290,63.5284,293.582,67.1104,298,67.1104C302.418,67.1104,306,63.5284,306,59.1104C306,54.6924,302.418,51.1104,298,51.1104" Fill="{StaticResource PhoneDisabledBrush}" Height="16" Canvas.Left="0" Stretch="Fill" Canvas.Top="0" Width="16"/>
-					<Path Data="F1M297,56.6104C297,55.7814,296.553,55.1104,296,55.1104C295.447,55.1104,295,55.7814,295,56.6104C295,57.4394,295.447,58.1104,296,58.1104C296.553,58.1104,297,57.4394,297,56.6104" Fill="{StaticResource PhoneDisabledBrush}" Height="3" Canvas.Left="5" Stretch="Fill" Canvas.Top="4" Width="2"/>
-					<Path Data="F1M300,55.1104C299.447,55.1104,299,55.7814,299,56.6104C299,57.4394,299.447,58.1104,300,58.1104C300.553,58.1104,301,57.4394,301,56.6104C301,55.7814,300.553,55.1104,300,55.1104" Fill="{StaticResource PhoneDisabledBrush}" Height="3" Canvas.Left="9" Stretch="Fill" Canvas.Top="4" Width="2"/>
-					<Path Data="F1M298,60.1104C296.896,60.1104,296,61.0064,296,62.1104C296,63.2144,296.896,64.1104,298,64.1104C299.105,64.1104,300,63.2144,300,62.1104C300,61.0064,299.105,60.1104,298,60.1104" Fill="{StaticResource PhoneDisabledBrush}" Height="4" Canvas.Left="6" Stretch="Fill" Canvas.Top="9" Width="4"/>
-				</Canvas>
-			</Grid>
-		</Popup>
+                </Grid>
+            </controls:PanoramaItem>
+        </controls:Panorama>
+        <Popup x:Name="popup" IsOpen="{Binding ConnectionDown}" RenderTransformOrigin="0.5,0.5">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Opened">
+                    <eim:ControlStoryboardAction Storyboard="{StaticResource AnimatePopup}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <Popup.RenderTransform>
+                <CompositeTransform/>
+            </Popup.RenderTransform>
+            <Grid x:Name="grid" Background="{StaticResource PhoneAccentBrush}" HorizontalAlignment="Center" Height="120" Width="480" UseLayoutRounding="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="{StaticResource PhoneTouchTargetLargeOverhang}" TextWrapping="Wrap" Text="Oh no! Looks like we are offline. Connect to the internet and try again! Until then we'll just show you local data." d:LayoutOverrides="Width, Height" Style="{StaticResource PhoneTextSmallStyle}" HorizontalAlignment="Center" Grid.Column="1" VerticalAlignment="Center" TextOptions.TextHintingMode="Animated"/>
+                <Canvas x:Name="Vrstva_1" Width="16" Height="16" RenderTransformOrigin="0.5,0.5" Margin="12,0,-12,0">
+                    <Canvas.RenderTransform>
+                        <CompositeTransform ScaleY="5" ScaleX="5"/>
+                    </Canvas.RenderTransform>
+                    <Path Data="F1M298,66.1104C294.141,66.1104,291,62.9704,291,59.1104C291,55.2504,294.141,52.1104,298,52.1104C301.859,52.1104,305,55.2504,305,59.1104C305,62.9704,301.859,66.1104,298,66.1104 M298,51.1104C293.582,51.1104,290,54.6924,290,59.1104C290,63.5284,293.582,67.1104,298,67.1104C302.418,67.1104,306,63.5284,306,59.1104C306,54.6924,302.418,51.1104,298,51.1104" Fill="{StaticResource PhoneDisabledBrush}" Height="16" Canvas.Left="0" Stretch="Fill" Canvas.Top="0" Width="16"/>
+                    <Path Data="F1M297,56.6104C297,55.7814,296.553,55.1104,296,55.1104C295.447,55.1104,295,55.7814,295,56.6104C295,57.4394,295.447,58.1104,296,58.1104C296.553,58.1104,297,57.4394,297,56.6104" Fill="{StaticResource PhoneDisabledBrush}" Height="3" Canvas.Left="5" Stretch="Fill" Canvas.Top="4" Width="2"/>
+                    <Path Data="F1M300,55.1104C299.447,55.1104,299,55.7814,299,56.6104C299,57.4394,299.447,58.1104,300,58.1104C300.553,58.1104,301,57.4394,301,56.6104C301,55.7814,300.553,55.1104,300,55.1104" Fill="{StaticResource PhoneDisabledBrush}" Height="3" Canvas.Left="9" Stretch="Fill" Canvas.Top="4" Width="2"/>
+                    <Path Data="F1M298,60.1104C296.896,60.1104,296,61.0064,296,62.1104C296,63.2144,296.896,64.1104,298,64.1104C299.105,64.1104,300,63.2144,300,62.1104C300,61.0064,299.105,60.1104,298,60.1104" Fill="{StaticResource PhoneDisabledBrush}" Height="4" Canvas.Left="6" Stretch="Fill" Canvas.Top="9" Width="4"/>
+                </Canvas>
+            </Grid>
+        </Popup>
 
         <ctrl:FeedbackOverlay Grid.RowSpan="2" EnableAnimation="True" />
     </Grid>
 
-    <bar:Bindable.ApplicationBar>
-        <bar:BindableApplicationBar IsVisible="True" Opacity="0.5">
-            <bar:BindableApplicationBar.MenuItems>
-                <bar:BindableApplicationBarMenuItem Command="{Binding ViewAboutPage}" Text="About" />
-                <bar:BindableApplicationBarMenuItem Command="{Binding ViewSettingsPage}" Text="Settings" />
-            </bar:BindableApplicationBar.MenuItems>
-        </bar:BindableApplicationBar>
-    </bar:Bindable.ApplicationBar>
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar Mode="Minimized">
+            <shell:ApplicationBar.MenuItems>
+                <shell:ApplicationBarMenuItem Text="about"/>
+                <shell:ApplicationBarMenuItem Text="settings"/>
+            </shell:ApplicationBar.MenuItems>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
 
+    <i:Interaction.Behaviors>
+        <appBarUtils:AppBarItemCommand Id="about" Text="About" Type="MenuItem" Command="{Binding ViewAboutPage}"/>
+        <appBarUtils:AppBarItemCommand Id="settings" Text="Settings" Type="MenuItem" Command="{Binding ViewSettingsPage}"/>
+    </i:Interaction.Behaviors>
 </phone:PhoneApplicationPage>

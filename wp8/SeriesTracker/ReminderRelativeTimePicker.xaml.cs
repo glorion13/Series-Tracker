@@ -10,9 +10,9 @@ using Microsoft.Phone.Shell;
 
 namespace SeriesTracker
 {
-    public partial class ReminderTimePicker : PhoneApplicationPage
+    public partial class ReminderRelativeTimePicker : PhoneApplicationPage
     {
-        public ReminderTimePicker()
+        public ReminderRelativeTimePicker()
         {
             InitializeComponent();
         }

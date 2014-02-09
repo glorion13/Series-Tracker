@@ -2,6 +2,7 @@
 using System.Windows;
 using Microsoft.Phone.Scheduler;
 using Microsoft.Phone.Shell;
+using SeriesTracker.Core;
 
 namespace SeriesTracker.Agent
 {
@@ -41,15 +42,10 @@ namespace SeriesTracker.Agent
         protected override void OnInvoke(ScheduledTask task)
         {
 
+            var repository = new TvDbSeriesRepository(new SeriesStorageManager(), new TvDb(new ConnectivityService()));
+            var reminderService = new ReminderService(repository, new AgentScheduler());
 
-
-            string toastMessage = "";
-
-
-            var toast = new ShellToast();
-            toast.Title = "Background Agent Sample";
-            toast.Content = toastMessage;
-            toast.Show();
+            reminderService.CreateOrUpdateRemindersAsync().Wait();
 
             // If debugging is enabled, launch the agent again in one minute.
             #if DEBUG_AGENT

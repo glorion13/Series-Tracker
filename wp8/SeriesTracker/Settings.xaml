@@ -8,6 +8,7 @@
     xmlns:toolkitPrimitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit"
     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity" xmlns:ec="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
     xmlns:converters="clr-namespace:SeriesTracker.Converters"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     x:Class="SeriesTracker.Settings"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
@@ -16,9 +17,28 @@
     SupportedOrientations="Portrait"  Orientation="Portrait"
     shell:SystemTray.IsVisible="True"
     DataContext="{Binding Settings, Source={StaticResource Locator}}">
-    <phone:PhoneApplicationPage.Resources>
-        <converters:TimeSpanToAirTimeDeltaConverter x:Key="TimeSpanToAirTimeDeltaConverter"></converters:TimeSpanToAirTimeDeltaConverter>
-    </phone:PhoneApplicationPage.Resources>
+
+
+    <toolkit:TransitionService.NavigationInTransition>
+        <toolkit:NavigationInTransition>
+            <toolkit:NavigationInTransition.Forward>
+                <toolkit:TurnstileTransition Mode="ForwardIn"/>
+            </toolkit:NavigationInTransition.Forward>
+            <toolkit:NavigationInTransition.Backward>
+                <toolkit:TurnstileTransition Mode="BackwardIn"/>
+            </toolkit:NavigationInTransition.Backward>
+        </toolkit:NavigationInTransition>
+    </toolkit:TransitionService.NavigationInTransition>
+    <toolkit:TransitionService.NavigationOutTransition>
+        <toolkit:NavigationOutTransition>
+            <toolkit:NavigationOutTransition.Backward>
+                <toolkit:TurnstileTransition Mode="BackwardOut"/>
+            </toolkit:NavigationOutTransition.Backward>
+            <toolkit:NavigationOutTransition.Forward>
+                <toolkit:TurnstileTransition Mode="ForwardOut"/>
+            </toolkit:NavigationOutTransition.Forward>
+        </toolkit:NavigationOutTransition>
+    </toolkit:TransitionService.NavigationOutTransition>
 
     <!--LayoutRoot is the root grid where all page content is placed-->
 	<Grid x:Name="LayoutRoot" Background="Transparent">
@@ -39,21 +59,10 @@
 							<RowDefinition Height="Auto" />
 						</Grid.RowDefinitions>
 
-						<TextBlock Text="New episode reminders" VerticalAlignment="Bottom" Margin="{StaticResource LabelMargin}" Style="{StaticResource PhoneTextTitle3Style}"/>
+						<TextBlock Text="Enable notifications" VerticalAlignment="Bottom" Margin="{StaticResource LabelMargin}" Style="{StaticResource PhoneTextTitle3Style}"/>
 						<TextBlock Text="Enables reminders for upcoming episodes" TextWrapping="Wrap" Grid.Row="1" VerticalAlignment="Top" Margin="{StaticResource PhoneHorizontalMargin}" Style="{StaticResource PhoneTextSmallStyle}"/>
-						<toolkitPrimitives:ToggleSwitchButton Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Center" IsChecked="{Binding NotificationsEnabled}" />
-
-						<TextBlock Text="Reminder timing" Grid.Row="2" VerticalAlignment="Bottom" Margin="{StaticResource LabelMargin}" Style="{StaticResource PhoneTextTitle3Style}"/>
-						<TextBlock Text="Enter time relative to the episode air time" TextWrapping="Wrap" Grid.Row="3" VerticalAlignment="Bottom" Margin="{StaticResource PhoneHorizontalMargin}" Style="{StaticResource PhoneTextSmallStyle}"/>
-                        <TextBlock Text="{Binding NotificationDelta, Converter={StaticResource TimeSpanToAirTimeDeltaConverter}}" Style="{StaticResource PhoneTextAccentStyle}" Grid.Row="2" Grid.RowSpan="2" VerticalAlignment="Center" Grid.Column="1" HorizontalAlignment="Center">
-							<i:Interaction.Triggers>
-								<i:EventTrigger EventName="Tap">
-									<ec:NavigateToPageAction TargetPage="/ReminderTimePicker.xaml"/>
-								</i:EventTrigger>
-							</i:Interaction.Triggers>
-						</TextBlock>
-                        
-					</Grid>
+                        <toolkitPrimitives:ToggleSwitchButton Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Center" IsChecked="{Binding NotificationsEnabled, Mode=TwoWay}" />
+                    </Grid>
 				</ScrollViewer>
 			</phone:PivotItem>
 		</phone:Pivot>

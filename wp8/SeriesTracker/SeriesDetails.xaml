@@ -10,8 +10,9 @@
     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
 	xmlns:ec="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions" 
     xmlns:toolkitPrimitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit"
-	xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP8" 
-    x:Class="SeriesTracker.SeriesDetails" 
+	xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP8"
+	xmlns:appBarUtils="clr-namespace:AppBarUtils;assembly=AppBarUtils"
+	x:Class="SeriesTracker.SeriesDetails" 
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
     SupportedOrientations="Portrait"  Orientation="Portrait"
     shell:SystemTray.IsVisible="False"
@@ -69,39 +70,27 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="0.133*"/>
-                                <RowDefinition Height="0.867*"/>
+                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="0.757*"/>
-                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock TextWrapping="Wrap" Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Grid.ColumnSpan="2" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48"/>
-                            <TextBlock HorizontalAlignment="Left" Text="Subscribed" VerticalAlignment="Center" Margin="12,12,0,12" Grid.Row="1" Style="{StaticResource PhoneTextTitle3Style}"/>
-                            <toolkitPrimitives:ToggleSwitchButton Content="ToggleSwitchButton" HorizontalAlignment="Left" Grid.Column="1" IsChecked="{Binding Series.IsSubscribed, Mode=OneWay}" Grid.Row="1">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Unchecked">
-                                        <GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding Unsunscribe, Mode=OneWay}"/>
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="Checked">
-                                        <GalaSoft_MvvmLight_Command:EventToCommand Command="{Binding Subscribe, Mode=OneWay}"/>
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </toolkitPrimitives:ToggleSwitchButton>
-                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next episode" d:LayoutOverrides="Height" Grid.Row="2" Style="{StaticResource PhoneTextNormalStyle}" Margin="12,18,0,6"/>
-                            <TextBlock Margin="{StaticResource PhoneHorizontalMargin}" TextWrapping="Wrap" Text="{Binding Series.NextEpisodeAirs, Mode=OneWay}" d:LayoutOverrides="Height" Grid.Row="3" Grid.ColumnSpan="2" Style="{StaticResource PhoneTextAccentStyle}"/>
-                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="IMDb" Grid.Row="4" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}" d:LayoutOverrides="Height"/>
-                            <HyperlinkButton Content="Read more at IMDb" Command="{Binding OpenImdbLink, Mode=OneWay}" Grid.Row="5" FontSize="20" HorizontalAlignment="Left" >
+                            <TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48"/>
+                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next episode" Grid.Row="1" Style="{StaticResource PhoneTextNormalStyle}" Margin="12,18,0,6"/>
+                            <TextBlock Margin="{StaticResource PhoneHorizontalMargin}" Text="{Binding Series.NextEpisodeAirs, Mode=OneWay}" Grid.Row="2" Style="{StaticResource PhoneTextAccentStyle}"/>
+                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="IMDb" Grid.Row="3" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}" d:LayoutOverrides="Height"/>
+                            <HyperlinkButton Content="Read more at IMDb" Command="{Binding OpenImdbLink, Mode=OneWay}" Grid.Row="4" FontSize="20" HorizontalAlignment="Left" >
                             	<HyperlinkButton.Foreground>
                             		<SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                             	</HyperlinkButton.Foreground>
                             </HyperlinkButton>
-                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Series overview" Grid.Row="6" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}" d:LayoutOverrides="Height"/>
-                            <TextBlock TextWrapping="Wrap" Text="{Binding Series.Overview, Mode=OneWay}" Style="{StaticResource PhoneTextSubtleStyle}" Grid.Row="7" Grid.ColumnSpan="2"/>
+                            <TextBlock HorizontalAlignment="Left" Text="Series overview" Grid.Row="5" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}" />
+                            <TextBlock TextWrapping="Wrap" Text="{Binding Series.Overview, Mode=OneWay}" Style="{StaticResource PhoneTextSubtleStyle}" Grid.Row="6" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>
@@ -228,7 +217,21 @@
                     </phone:LongListSelector>
                 </Grid>
             </controls:PanoramaItem>
+            <!--Behaviors for dynamic app bar-->
+            <i:Interaction.Triggers>
+                <appBarUtils:SelectedPanoItemChangedTrigger>
+                    <appBarUtils:SwitchAppBarAction>
+                        <appBarUtils:AppBar Id="0">
+                            <appBarUtils:AppBarButton IconUri="{Binding ToggleSubscribeIcon}" Text="{Binding ToggleSubscribeText}" Command="{Binding ToggleSubscribed}" />
+                            <appBarUtils:AppBarButton IconUri="Toolkit.Content/feature.alarm.png" Text="notification">
+                                <ec:NavigateToPageAction TargetPage="/SeriesNotification.xaml"/>
+                            </appBarUtils:AppBarButton>
+                        </appBarUtils:AppBar>
+                        <!--<appBarUtils:AppBar Id="1" Mode="Minimized">
+                </appBarUtils:AppBar>-->
+                    </appBarUtils:SwitchAppBarAction>
+                </appBarUtils:SelectedPanoItemChangedTrigger>
+            </i:Interaction.Triggers>
         </controls:Panorama>
     </Grid>
-
 </phone:PhoneApplicationPage>

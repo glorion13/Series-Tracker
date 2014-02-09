@@ -12,6 +12,7 @@ namespace SeriesTracker.Agent
 {
     public class AgentScheduler
     {
+        public const string NotificationsEnabledKey = "notificationsEnabled";
         private const string PeriodicTaskName = "PeriodicAgent";
 
         public AgentScheduler()
@@ -21,12 +22,11 @@ namespace SeriesTracker.Agent
             {
 #endif
                 bool agentEnabled;
-                if (IsolatedStorageSettings.ApplicationSettings.TryGetValue(SettingsViewModel.NotificationsEnabledKey,
-                    out agentEnabled))
+                if (IsolatedStorageSettings.ApplicationSettings.TryGetValue(NotificationsEnabledKey, out agentEnabled))
                 {
                     if (agentEnabled)
                     {
-                        ScheduleAgent();
+                        ScheduleAgent(false);
                     }
                 }
 #if DEBUG
@@ -39,14 +39,14 @@ namespace SeriesTracker.Agent
             get { return ScheduledActionService.Find(PeriodicTaskName) != null; }
         }
 
-        public bool ScheduleAgent()
+        public bool ScheduleAgent(bool permanently = true)
         {
             // If the task already exists and background agents are enabled for the
             // application, you must remove the task and then add it again to update 
             // the schedule
             if (IsAgentActive)
             {
-                RemoveAgent();
+                RemoveAgent(false);
             }
 
             var periodicTask = new PeriodicTask(PeriodicTaskName)
@@ -63,6 +63,11 @@ namespace SeriesTracker.Agent
 #if(DEBUG_AGENT)
                 ScheduledActionService.LaunchForTest(periodicTaskName, TimeSpan.FromSeconds(60));
 #endif
+                if (permanently)
+                {
+                    IsolatedStorageSettings.ApplicationSettings[NotificationsEnabledKey] = true;
+                }
+                
                 return true;
             }
             catch (InvalidOperationException exception)
@@ -84,13 +89,17 @@ namespace SeriesTracker.Agent
 
             return false;
         }
-        public void RemoveAgent()
+        public void RemoveAgent(bool permanently = true)
         {
             try
             {
                 if (IsAgentActive)
                 {
                     ScheduledActionService.Remove(PeriodicTaskName);
+                    if (permanently)
+                    {
+                        IsolatedStorageSettings.ApplicationSettings[NotificationsEnabledKey] = false;
+                    }
                 }
             }
             catch
