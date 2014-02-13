@@ -51,9 +51,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BindableApplicationBar, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\BindableApplicationBar.1.0.0\lib\sl4-windowsphone71\BindableApplicationBar.dll</HintPath>
+    <Reference Include="AppBarUtils">
+      <HintPath>..\packages\AppBarUtils.2.4\lib\wp71\AppBarUtils.dll</HintPath>
     </Reference>
     <Reference Include="GalaSoft.MvvmLight.Extras.WP71, Version=4.0.23.35541, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -229,10 +228,16 @@
     </Content>
     <Content Include="imdb.ico" />
     <Content Include="README_FIRST.txt" />
+    <Content Include="Toolkit.Content\appbar.star.png" />
+    <Content Include="Toolkit.Content\appbar.star.remove.png" />
+    <Content Include="Toolkit.Content\ApplicationBar.Add.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Cancel.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Check.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Delete.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Select.png" />
+    <Content Include="Toolkit.Content\bookmark.png" />
+    <Content Include="Toolkit.Content\bookmarked.png" />
+    <Content Include="Toolkit.Content\feature.alarm.png" />
     <Content Include="tv_white_noise.gif" />
     <Resource Include="PanoramaBackground.png" />
     <Content Include="SplashScreenImage.jpg" />

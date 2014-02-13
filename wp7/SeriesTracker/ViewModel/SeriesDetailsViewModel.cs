@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 using System.Windows.Input;
+using SeriesTracker.Core;
 
 namespace SeriesTracker
 {
@@ -38,26 +39,24 @@ namespace SeriesTracker
             }
         }
 
-        private ICommand subscribe;
-        public ICommand Subscribe
-        {
-            get
-            {
-                return subscribe ?? (subscribe = new RelayCommand(async () =>
-                {
-                    await repository.SubscribeAsync(series);
-                }));
-            }
-        }
 
-        private ICommand unsubscribe;
-        public ICommand Unsunscribe
+        private ICommand toggleSubscribed;
+        public ICommand ToggleSubscribed
         {
             get
             {
-                return unsubscribe ?? (unsubscribe = new RelayCommand(async () =>
+                return toggleSubscribed ?? (toggleSubscribed = new RelayCommand(async () =>
                 {
-                    await repository.UnsubscribeAsync(series);
+                    if (Series.IsSubscribed)
+                    {
+                        await repository.UnsubscribeAsync(series);
+                    }
+                    else
+                    {
+                        await repository.SubscribeAsync(series);
+                    }
+                    RaisePropertyChanged(() => ToggleSubscribeIcon);
+                    RaisePropertyChanged(() => ToggleSubscribeText);
                 }));
             }
         }
@@ -193,7 +192,7 @@ namespace SeriesTracker
                             Description = "bla bla bla bla bla lba",
                             Image = "http://thetvdb.com/banners/episodes/121361/3254641.jpg"
                         }
-                    }   ,
+                    },
                     Overview = @"Chocolate bar macaroon halvah candy cheesecake pie macaroon gummies lemon drops. Soufflé marzipan cake. Wypas tootsie roll candy sweet roll candy soufflé. Sesame snaps topping candy caramels lollipop cheesecake marshmallow.
                                  Cake toffee dessert powder cupcake macaroon dragée faworki cookie. Chupa chups halvah applicake liquorice marzipan carrot cake gummi bears chocolate cake. Sugar plum marshmallow halvah cookie caramels dragée wafer sugar plum sugar plum. Cheesecake macaroon carrot cake topping wafer carrot cake lemon drops."
                 };
@@ -228,7 +227,8 @@ namespace SeriesTracker
                 }
             }
 
-            public EpisodeViewModel(TvDbSeriesEpisode episode) {
+            public EpisodeViewModel(TvDbSeriesEpisode episode)
+            {
                 this.episode = episode;
             }
 
@@ -251,5 +251,34 @@ namespace SeriesTracker
             }
         }
 
+        public Uri ToggleSubscribeIcon
+        {
+            get
+            {
+                if (series.IsSubscribed)
+                {
+                    return new Uri("Toolkit.Content\\appbar.star.remove.png", UriKind.Relative);
+                }
+                else
+                {
+                    return new Uri("Toolkit.Content\\appbar.star.png", UriKind.Relative);
+                }
+            }
+        }
+
+        public string ToggleSubscribeText
+        {
+            get
+            {
+                if (series.IsSubscribed)
+                {
+                    return "unsubscribe";
+                }
+                else
+                {
+                    return "subscribe";
+                }
+            }
+        }
     }
 }

@@ -359,10 +359,16 @@ namespace SeriesTracker
         {
             get
             {
-                return viewAboutPage ?? (viewAboutPage = new RelayCommand<TvDbSeries>(s =>
-                {
-                    MessengerInstance.Send(new Uri("/About.xaml", UriKind.Relative));
-                }));
+                return viewAboutPage ?? (viewAboutPage = new RelayCommand<TvDbSeries>(s => MessengerInstance.Send(new Uri("/About.xaml", UriKind.Relative))));
+            }
+        }
+
+        private ICommand viewSettingsPage;
+        public ICommand ViewSettingsPage
+        {
+            get
+            {
+                return viewSettingsPage ?? (viewSettingsPage = new RelayCommand<TvDbSeries>(s => MessengerInstance.Send(new Uri("/Settings.xaml", UriKind.Relative))));
             }
         }
 

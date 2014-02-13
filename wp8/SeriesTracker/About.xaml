@@ -47,11 +47,18 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" Grid.Row="2">
                 <TextBlock Text="Social networks:" />
-                <HyperlinkButton Content="Follow us on Facebook" Command="{Binding OpenFacebookLink, Mode=OneWay}" FontSize="20" HorizontalAlignment="Left" >
-                    <HyperlinkButton.Foreground>
-                        <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
-                    </HyperlinkButton.Foreground>
-                </HyperlinkButton>
+                <StackPanel Orientation="Vertical">
+                    <HyperlinkButton Content="like series tracker on facebook" Command="{Binding OpenFacebookLink, Mode=OneWay}" FontSize="20" HorizontalAlignment="Left" >
+                        <HyperlinkButton.Foreground>
+                            <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
+                        </HyperlinkButton.Foreground>
+                    </HyperlinkButton>
+                    <HyperlinkButton Content="follow @alexgouv on twitter" Command="{Binding OpenTwitterLink, Mode=OneWay}" FontSize="20" HorizontalAlignment="Left" >
+                        <HyperlinkButton.Foreground>
+                            <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
+                        </HyperlinkButton.Foreground>
+                    </HyperlinkButton>
+                </StackPanel>
             </StackPanel>
             <TextBlock Margin="0,20" Grid.Row="3" Text="We hope you enjoy this app and that you find it useful; remember if you have ideas about features you'd like to see just let us know and we'll do our best to add them! You can either contact us by e-mail or through our facebook page. In fact, make sure you have a look on our facebook page for the latest updates and discussions on Series Tracker."
                       TextWrapping="Wrap" />
