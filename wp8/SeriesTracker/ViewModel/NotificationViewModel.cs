@@ -31,6 +31,8 @@ namespace SeriesTracker
                 series.RemindersEnabled = remindersEnabled;
                 await repository.SaveAsync(series);
                 await reminderService.CreateOrUpdateRemindersAsync();
+                //MessengerInstance.Send(Series);
+                //MessengerInstance.Send(new Uri("/SeriesDetails.xaml", UriKind.Relative));
             });
         }
 

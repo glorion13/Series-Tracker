@@ -77,7 +77,7 @@
 
                     <TextBlock Text="Reminder timing" Grid.Row="2" VerticalAlignment="Bottom" Margin="{StaticResource LabelMargin}" Style="{StaticResource PhoneTextTitle3Style}"/>
                     <TextBlock Text="Select the time of day you want to receive the notication. Notification will be shown on the day the episode airs." TextWrapping="Wrap" Grid.Row="3" VerticalAlignment="Top" Margin="{StaticResource PhoneHorizontalMargin}" Style="{StaticResource PhoneTextSmallStyle}"/>
-                    <toolkit:TimePicker Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" VerticalAlignment="Center" Value="{Binding NotificationTime}" />
+                    <toolkit:TimePicker Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" VerticalAlignment="Center" Value="{Binding NotificationTime, Mode=TwoWay}" />
                 </Grid>
             </ScrollViewer>
         </Grid>

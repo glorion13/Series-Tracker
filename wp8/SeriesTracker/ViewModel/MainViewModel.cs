@@ -26,6 +26,7 @@ using System.Windows.Navigation;
 using System.Threading.Tasks;
 using Microsoft.Phone.Shell;
 using SeriesTracker.Core;
+using SeriesTracker.Collections;
 
 namespace SeriesTracker
 {
@@ -72,6 +73,23 @@ namespace SeriesTracker
             set
             {
                 Set(() => Series, ref series, value);
+                SeriesSortedList = new LongListCollection<TvDbSeries, char>(
+                    Series.OrderBy(l => l.Title[0]).Select(x => x),
+                    s => s.Title.ToLower()[0],
+                    "abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList());
+            }
+        }
+
+        private LongListCollection<TvDbSeries, char> seriesSortedList;
+        public LongListCollection<TvDbSeries, char> SeriesSortedList
+        {
+            get
+            {
+                return seriesSortedList;
+            }
+            set
+            {
+                Set(() => SeriesSortedList, ref seriesSortedList, value);
             }
         }
 
