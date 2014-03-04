@@ -191,7 +191,14 @@ namespace SeriesTracker
                 try
                 {
                     await searchLock.WaitAsync(myCancelation.Token);
-                    await DoSearch(change.Value, myCancelation.Token);
+                    try
+                    {
+                        await DoSearch(change.Value, myCancelation.Token);
+                    }
+                    finally
+                    {
+                        searchLock.Release();
+                    }
                 }
                 catch (OperationCanceledException)
                 {
