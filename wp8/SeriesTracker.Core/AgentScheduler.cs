@@ -61,7 +61,7 @@ namespace SeriesTracker.Agent
 
                 // If debugging is enabled, use LaunchForTest to launch the agent in one minute.
 #if(DEBUG_AGENT)
-                ScheduledActionService.LaunchForTest(periodicTaskName, TimeSpan.FromSeconds(60));
+                ScheduledActionService.LaunchForTest(periodicTask.Name, TimeSpan.FromSeconds(60));
 #endif
                 if (permanently)
                 {

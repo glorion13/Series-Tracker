@@ -30,7 +30,7 @@ namespace SeriesTracker
                 series.NotificationTime = NotificationTime;
                 series.RemindersEnabled = remindersEnabled;
                 await repository.SaveAsync(series);
-                await reminderService.CreateOrUpdateRemindersAsync();
+                reminderService.CreateOrUpdateRemindersAsync();
             });
         }
 

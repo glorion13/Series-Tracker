@@ -14,43 +14,15 @@ namespace SeriesTracker.Core
     public class ReminderService
     {
         private readonly TvDbSeriesRepository repository;
-        private readonly AgentScheduler agentScheduler;
 
-        public ReminderService(TvDbSeriesRepository repository, AgentScheduler agentScheduler)
+        public ReminderService(TvDbSeriesRepository repository)
         {
             this.repository = repository;
-            this.agentScheduler = agentScheduler;
-        }
-
-
-        public bool NotificationsEnabled
-        {
-            get { return agentScheduler.IsAgentActive; }
-        }
-
-        public Task EnableNotifications()
-        {
-            var result = agentScheduler.ScheduleAgent();
-            if (!result)
-            {
-                MessageBox.Show(
-                    "There was a problem enabling notifications. Please ensure background agents are not disabled for Series Tracker in your phone settings, or that your device did not reach the maximum amount of agents available.");
-            }
-            return CreateOrUpdateRemindersAsync();
-        }
-
-        public void DisableNotifications()
-        {
-            agentScheduler.RemoveAgent();
-            RemoveAllReminders();
         }
 
         public async Task CreateOrUpdateRemindersAsync()
         {
             RemoveAllReminders();
-            if (!NotificationsEnabled)
-                return;
-
             var subscribedSeries = await repository.GetSubscribedAsync(false);
 
             foreach (var series in subscribedSeries)
@@ -58,7 +30,7 @@ namespace SeriesTracker.Core
                 if (!series.RemindersEnabled)
                     continue;
 
-                var nextEpisode = series.Episodes.Where(e => e.FirstAired > DateTime.Today).OrderBy(e => e.FirstAired).FirstOrDefault(e => e.FirstAired > DateTime.Today);
+                var nextEpisode = series.Episodes.Where(e => e.FirstAired >= DateTime.Today).OrderBy(e => e.FirstAired).FirstOrDefault();
                 if (nextEpisode == null || nextEpisode.FirstAired == null)
                     continue;
 

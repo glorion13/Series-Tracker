@@ -69,10 +69,12 @@ namespace SeriesTracker
         //}
 
         private readonly ReminderService reminderService;
+        private readonly AgentScheduler agentScheduler;
 
-        public SettingsViewModel(ReminderService reminderService)
+        public SettingsViewModel(ReminderService reminderService, AgentScheduler agentScheduler)
         {
             this.reminderService = reminderService;
+            this.agentScheduler = agentScheduler;
             /*var savedNotificationDelta = SharedSettings.Get(SharedSettings.NotificationDeltaKey);
             this.NotificationDelta = savedNotificationDelta == null ? TimeSpan.FromHours(-2) : (TimeSpan)savedNotificationDelta;*/
 
@@ -155,17 +157,26 @@ namespace SeriesTracker
         {
             get
             {
-                return reminderService.NotificationsEnabled;
+                return agentScheduler.IsAgentActive;
             }
             set
             {
                 if (value)
                 {
-                    reminderService.EnableNotifications();
+                    if (agentScheduler.ScheduleAgent())
+                    {
+                        reminderService.CreateOrUpdateRemindersAsync();
+                    }
+                    else
+                    {
+                        MessageBox.Show(
+                            "There was a problem enabling notifications. Please ensure background agents are not disabled for Series Tracker in your phone settings, or that your device did not reach the maximum amount of agents available.");
+                    }
                 }
                 else
                 {
-                    reminderService.DisableNotifications();
+                    agentScheduler.RemoveAgent();
+                    reminderService.RemoveAllReminders();
                 }
                 RaisePropertyChanged(() => NotificationsEnabled);
             }
