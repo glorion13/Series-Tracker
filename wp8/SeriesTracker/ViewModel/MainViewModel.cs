@@ -174,7 +174,7 @@ namespace SeriesTracker
 
             await LoadSubscriptions();
 
-            if (agentScheduler.IsAgentActive)
+            if (Settings.Instance.NotificationsEnabled)
                 //background initialization, do not await
                 Task.Factory.StartNew(() => reminderService.CreateOrUpdateRemindersAsync());
         }
@@ -374,7 +374,7 @@ namespace SeriesTracker
         {
             get
             {
-                return viewSettingsPage ?? (viewSettingsPage = new RelayCommand<TvDbSeries>(s => MessengerInstance.Send(new Uri("/Settings.xaml", UriKind.Relative))));
+                return viewSettingsPage ?? (viewSettingsPage = new RelayCommand<TvDbSeries>(s => MessengerInstance.Send(new Uri("/SettingsPage.xaml", UriKind.Relative))));
             }
         }
 

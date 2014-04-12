@@ -79,24 +79,32 @@ namespace SeriesTracker.Core
 
         private async Task UpdateSeriesIfNecessaryAsync(TvDbSeries series)
         {
+            bool ownsTask = false;
             Task update = null;
             using (await ioLock.DisposableWaitAsync())
             {
-                var needsUpdating = !updates.ContainsKey(series) && ((series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1)));
+                if (updates.ContainsKey(series))
+                    update = updates[series];
+
+                var needsUpdating = (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1));
                 if (needsUpdating)
                 {
                     update = UpdateSeriesAsync(series);
                     updates.Add(series, update);
+                    ownsTask = true;
                 }
             }
             if (update != null)
             {
                 await update;
-                using (await ioLock.DisposableWaitAsync())
+                if (ownsTask)
                 {
-                    updates.Remove(series);
-                    if (series.IsSubscribed)
-                        storageManager.Save(series);
+                    using (await ioLock.DisposableWaitAsync())
+                    {
+                        updates.Remove(series);
+                        if (series.IsSubscribed)
+                            storageManager.Save(series);
+                    }
                 }
             }
         }

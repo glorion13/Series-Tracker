@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using GalaSoft.MvvmLight.Threading;
@@ -128,11 +129,9 @@ namespace SeriesTracker
             // Handle navigation failures
             RootFrame.NavigationFailed += RootFrame_NavigationFailed;
 
-            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Uri>(this, m =>
-            {
-                RootFrame.Navigate(m);
-            });
-
+            Messenger.Default.Register<Uri>(this, m => RootFrame.Navigate(m));
+            Messenger.Default.Register<Action<Frame>>(this, action => action(RootFrame));
+            
             App.Current.Resources.Remove("CreateOption");
             App.Current.Resources.Add("CreateOption", BitmapCreateOptions.BackgroundCreation | BitmapCreateOptions.DelayCreation);
 

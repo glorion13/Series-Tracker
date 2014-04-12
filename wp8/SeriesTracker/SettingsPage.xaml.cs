@@ -10,9 +10,9 @@ using Microsoft.Phone.Shell;
 
 namespace SeriesTracker
 {
-    public partial class Settings : PhoneApplicationPage
+    public partial class SettingsPage : PhoneApplicationPage
     {
-        public Settings()
+        public SettingsPage()
         {
             InitializeComponent();
         }
