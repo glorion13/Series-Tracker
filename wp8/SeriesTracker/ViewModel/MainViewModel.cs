@@ -73,10 +73,19 @@ namespace SeriesTracker
             set
             {
                 Set(() => Series, ref series, value);
-                SeriesSortedList = new LongListCollection<TvDbSeries, char>(
-                    Series.OrderBy(l => l.Title[0]).Select(x => x),
-                    s => s.Title.ToLower()[0],
-                    "abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList());
+            }
+        }
+
+        private bool sortedSeriesListEnabled;
+        public bool SortedSeriesListEnabled
+        {
+            get
+            {
+                return sortedSeriesListEnabled;
+            }
+            set
+            {
+                Set(() => SortedSeriesListEnabled, ref sortedSeriesListEnabled, value);
             }
         }
 
@@ -85,7 +94,10 @@ namespace SeriesTracker
         {
             get
             {
-                return seriesSortedList;
+                return new LongListCollection<TvDbSeries, char>(
+                    Series.OrderBy(l => l.Title[0]).Select(x => x),
+                    s => s.Title.ToLower()[0],
+                    "abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList()); ;
             }
             set
             {
@@ -342,7 +354,7 @@ namespace SeriesTracker
                     else
                     {
                         //series.Remove(series.FirstOrDefault(old => old.Series.Id == s.Id));
-                        repository.UnsubscribeAsync(s); 
+                        repository.UnsubscribeAsync(s);
                     }
                 }));
             }
