@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using SeriesTracker.Core;
@@ -30,9 +33,16 @@ namespace SeriesTracker
                 series.NotificationTime = NotificationTime;
                 series.RemindersEnabled = remindersEnabled;
                 await repository.SaveAsync(series);
-                await reminderService.CreateOrUpdateRemindersAsync();
-                //MessengerInstance.Send(Series);
-                //MessengerInstance.Send(new Uri("/SeriesDetails.xaml", UriKind.Relative));
+                if (Settings.Instance.NotificationsEnabled)
+                {
+                    reminderService.CreateOrUpdateRemindersAsync();
+                }
+                else
+                {
+                    MessageBox.Show(string.Format(
+                        "Notification for {0} was set up succesfully. Notifications are however currently globally disabled in application settings. Please enable notifications for this setting to take effect.", series.Title));
+                }
+                MessengerInstance.Send(new Action<Frame>(a => a.GoBack()));
             });
         }
 

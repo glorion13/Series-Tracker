@@ -6,3 +6,4 @@ PerformanceLogs/
 PerfLogs/
 packages/
 testdata/
+*.user

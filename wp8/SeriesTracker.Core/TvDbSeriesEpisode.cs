@@ -103,6 +103,9 @@ namespace SeriesTracker
         }
 
         private DateTime? firstAired = null;
+        /// <summary>
+        /// The day this episode was aired. The time part of this DateTime instance is 0.
+        /// </summary>
         public DateTime? FirstAired
         {
             get

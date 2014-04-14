@@ -1,20 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Reactive;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO.IsolatedStorage;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using SeriesTracker.Agent;
-using Microsoft.Phone.Controls.Primitives;
 using SeriesTracker.Core;
 
 namespace SeriesTracker
 {
+    public class Settings
+    {
+        private const string NavigationEnabledKey = "NavigationEnabled";
+
+        private static Settings instance;
+        private readonly IsolatedStorageSettings settings;
+
+        public static Settings Instance
+        {
+            get { return instance ?? (instance = new Settings()); }
+        }
+
+        public Settings()
+        {
+            settings = IsolatedStorageSettings.ApplicationSettings;
+        }
+
+        public bool NotificationsEnabled
+        {
+            get
+            {
+                bool enabled;
+                return settings.TryGetValue(NavigationEnabledKey, out enabled) && enabled;
+            }
+            set { settings[NavigationEnabledKey] = value; }
+        }
+    }
+
     public class SettingsViewModel : ViewModelBase
     {
         //public class IntDataSource : ILoopingSelectorDataSource
@@ -69,10 +88,12 @@ namespace SeriesTracker
         //}
 
         private readonly ReminderService reminderService;
+        private readonly AgentScheduler agentScheduler;
 
-        public SettingsViewModel(ReminderService reminderService)
+        public SettingsViewModel(ReminderService reminderService, AgentScheduler agentScheduler)
         {
             this.reminderService = reminderService;
+            this.agentScheduler = agentScheduler;
             /*var savedNotificationDelta = SharedSettings.Get(SharedSettings.NotificationDeltaKey);
             this.NotificationDelta = savedNotificationDelta == null ? TimeSpan.FromHours(-2) : (TimeSpan)savedNotificationDelta;*/
 
@@ -155,17 +176,24 @@ namespace SeriesTracker
         {
             get
             {
-                return reminderService.NotificationsEnabled;
+                return Settings.Instance.NotificationsEnabled && agentScheduler.IsAgentActive;
             }
             set
             {
+                Settings.Instance.NotificationsEnabled = value;
                 if (value)
                 {
-                    reminderService.EnableNotifications();
+                    reminderService.CreateOrUpdateRemindersAsync();
+                    if (!agentScheduler.ScheduleAgent())
+                    {
+                        MessageBox.Show(
+                            "There was a problem enabling notifications. Please ensure background agents are not disabled for Series Tracker in your phone settings, or that your device did not reach the maximum amount of agents available.");
+                    }
                 }
                 else
                 {
-                    reminderService.DisableNotifications();
+                    agentScheduler.RemoveAgent();
+                    reminderService.RemoveAllReminders();
                 }
                 RaisePropertyChanged(() => NotificationsEnabled);
             }

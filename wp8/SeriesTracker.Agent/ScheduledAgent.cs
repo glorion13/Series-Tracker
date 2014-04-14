@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Windows;
+using GalaSoft.MvvmLight.Threading;
 using Microsoft.Phone.Scheduler;
 using Microsoft.Phone.Shell;
 using SeriesTracker.Core;
@@ -39,13 +41,16 @@ namespace SeriesTracker.Agent
         /// <remarks>
         /// This method is called when a periodic or resource intensive task is invoked
         /// </remarks>
-        protected override void OnInvoke(ScheduledTask task)
+        protected async override void OnInvoke(ScheduledTask task)
         {
+            //nasty hack... let's pretend this thread is the Dispatcher, haha :-P
+            DispatcherHelper.Initialize();
 
             var repository = new TvDbSeriesRepository(new SeriesStorageManager(), new TvDb(new ConnectivityService()));
-            var reminderService = new ReminderService(repository, new AgentScheduler());
+            var reminderService = new ReminderService(repository);
 
-            reminderService.CreateOrUpdateRemindersAsync().Wait();
+            //enabling reminders and simply assuming they are enabled.. otherwise this agent wouldn't run, right?
+            await reminderService.CreateOrUpdateRemindersAsync();
 
             // If debugging is enabled, launch the agent again in one minute.
             #if DEBUG_AGENT
@@ -54,7 +59,6 @@ namespace SeriesTracker.Agent
 
             // Call NotifyComplete to let the system know the agent is done working.
             NotifyComplete();
-
         }
     }
 }

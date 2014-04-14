@@ -432,6 +432,9 @@ namespace SeriesTracker
         }
 
         private DateTime? notificationTime;
+        /// <summary>
+        /// Of interest is only the *time* component of this DateTime property.
+        /// </summary>
         public DateTime? NotificationTime
         {
             get

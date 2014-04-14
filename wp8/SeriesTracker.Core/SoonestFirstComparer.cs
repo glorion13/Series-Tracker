@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SeriesTracker.Core
 {
-    class SoonestFirstComparer : IComparer<DateTime?>
+    public class SoonestFirstComparer : IComparer<DateTime?>
     {
         public int Compare(DateTime? x, DateTime? y)
         {

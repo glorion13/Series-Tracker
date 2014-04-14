@@ -25,6 +25,7 @@ using GalaSoft.MvvmLight.Threading;
 using System.Windows.Navigation;
 using System.Threading.Tasks;
 using Microsoft.Phone.Shell;
+using SeriesTracker.Agent;
 using SeriesTracker.Core;
 using SeriesTracker.Collections;
 
@@ -48,6 +49,7 @@ namespace SeriesTracker
         private readonly TvDbSeriesRepository repository;
         private readonly ConnectivityService connectivityService;
         private readonly ReminderService reminderService;
+        private readonly AgentScheduler agentScheduler;
         private LiveTileUpdater ltUpdater;
 
         private bool connectionDown;
@@ -102,12 +104,17 @@ namespace SeriesTracker
             }
         }
 
-        public MainViewModel(TvDbSeriesRepository repository, ConnectivityService connectivityService, ReminderService reminderService)
+        public MainViewModel(TvDbSeriesRepository repository, ConnectivityService connectivityService, ReminderService reminderService, AgentScheduler agentScheduler)
         {
             this.connectivityService = connectivityService;
             this.reminderService = reminderService;
+            this.agentScheduler = agentScheduler;
             connectivityService.InternetDown += connectivityService_InternetDown;
             connectivityService.InternetUp += connectivityService_InternetUp;
+
+            Series = new SelfSortingObservableCollection<TvDbSeries, DateTime?>(s => s.NextEpisodeAirDateTime, new SoonestFirstComparer());
+            repository.Subscribed += (sender, args) => DispatcherHelper.UIDispatcher.BeginInvoke(() => Series.Add(args.Series));
+            repository.Unsubscribed += (sender, args) => DispatcherHelper.UIDispatcher.BeginInvoke(() => Series.Remove(args.Series));
 
             if (!IsInDesignMode)
             {
@@ -182,10 +189,12 @@ namespace SeriesTracker
         public async Task Initialize()
         {
             SetupSearch();
+
             await LoadSubscriptions();
 
-            //background initialization, do not await
-            Task.Factory.StartNew(() => reminderService.CreateOrUpdateRemindersAsync());
+            if (Settings.Instance.NotificationsEnabled)
+                //background initialization, do not await
+                Task.Factory.StartNew(() => reminderService.CreateOrUpdateRemindersAsync());
         }
 
         private readonly SemaphoreSlim searchLock = new SemaphoreSlim(1);
@@ -209,7 +218,14 @@ namespace SeriesTracker
                 try
                 {
                     await searchLock.WaitAsync(myCancelation.Token);
-                    await DoSearch(change.Value, myCancelation.Token);
+                    try
+                    {
+                        await DoSearch(change.Value, myCancelation.Token);
+                    }
+                    finally
+                    {
+                        searchLock.Release();
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -234,7 +250,7 @@ namespace SeriesTracker
 
             token.ThrowIfCancellationRequested();
 
-            await searchResults.AddAll(results.Keys);
+            await searchResults.AddAllAsync(results.Keys);
 
             token.ThrowIfCancellationRequested();
 
@@ -251,7 +267,8 @@ namespace SeriesTracker
 
             try
             {
-                Series = await repository.GetSubscribedAsync();
+                var subscribed = await repository.GetSubscribedAsync();
+                await Series.AddAllAsync(subscribed);
             }
             finally
             {
@@ -375,7 +392,7 @@ namespace SeriesTracker
         {
             get
             {
-                return viewSettingsPage ?? (viewSettingsPage = new RelayCommand<TvDbSeries>(s => MessengerInstance.Send(new Uri("/Settings.xaml", UriKind.Relative))));
+                return viewSettingsPage ?? (viewSettingsPage = new RelayCommand<TvDbSeries>(s => MessengerInstance.Send(new Uri("/SettingsPage.xaml", UriKind.Relative))));
             }
         }
 

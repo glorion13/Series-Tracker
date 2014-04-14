@@ -11,13 +11,26 @@ using GalaSoft.MvvmLight.Threading;
 
 namespace SeriesTracker.Core
 {
+    public sealed class SubscriptionChangedEventArgs : EventArgs
+    {
+        public SubscriptionChangedEventArgs(TvDbSeries series)
+        {
+            Series = series;
+        }
+
+        public TvDbSeries Series { get; private set; }
+   }
     public class TvDbSeriesRepository
     {
         private readonly SeriesStorageManager storageManager;
         private readonly TvDb tvDb;
         private readonly Dictionary<TvDbSeries, Task> updates;
         private readonly SemaphoreSlim ioLock = new SemaphoreSlim(1);
-        private readonly AsyncLazy<ObservableCollection<TvDbSeries>> subscribed;
+        private readonly AsyncLazy<List<TvDbSeries>> subscribed;
+
+        public event EventHandler<SubscriptionChangedEventArgs> Subscribed;
+        public event EventHandler<SubscriptionChangedEventArgs> Unsubscribed;
+
         public TvDbSeriesRepository(SeriesStorageManager storageManager, TvDb tvDb)
         {
             this.storageManager = storageManager;
@@ -25,15 +38,10 @@ namespace SeriesTracker.Core
 
             updates = new Dictionary<TvDbSeries, Task>();
 
-            subscribed = new AsyncLazy<ObservableCollection<TvDbSeries>>(async () =>
+            subscribed = new AsyncLazy<List<TvDbSeries>>(async () =>
             {
-                var subscriptions = storageManager.GetSavedSeries();
-                var collection = new SelfSortingObservableCollection<TvDbSeries, DateTime?>(s => s.NextEpisodeAirDateTime, new SoonestFirstComparer());
-                foreach (var series in subscriptions)
-                {
-                    await DispatcherHelper.UIDispatcher.InvokeAsync(() => collection.Add(series));
-                }
-
+                var subscriptions = await Task.Run(() => storageManager.GetSavedSeries());
+                var collection = new List<TvDbSeries>(subscriptions);
                 return collection;
             });
         }
@@ -56,7 +64,7 @@ namespace SeriesTracker.Core
             }
         }
 
-        public async Task<ObservableCollection<TvDbSeries>> GetSubscribedAsync(bool updateInBackground = true)
+        public async Task<IEnumerable<TvDbSeries>> GetSubscribedAsync(bool updateInBackground = true)
         {
             var subs = await subscribed.Value;
 
@@ -71,24 +79,32 @@ namespace SeriesTracker.Core
 
         private async Task UpdateSeriesIfNecessaryAsync(TvDbSeries series)
         {
+            bool ownsTask = false;
             Task update = null;
             using (await ioLock.DisposableWaitAsync())
             {
-                var needsUpdating = !updates.ContainsKey(series) && ((series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1)));
+                if (updates.ContainsKey(series))
+                    update = updates[series];
+
+                var needsUpdating = (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1));
                 if (needsUpdating)
                 {
                     update = UpdateSeriesAsync(series);
                     updates.Add(series, update);
+                    ownsTask = true;
                 }
             }
             if (update != null)
             {
                 await update;
-                using (await ioLock.DisposableWaitAsync())
+                if (ownsTask)
                 {
-                    updates.Remove(series);
-                    if (series.IsSubscribed)
-                        storageManager.Save(series);
+                    using (await ioLock.DisposableWaitAsync())
+                    {
+                        updates.Remove(series);
+                        if (series.IsSubscribed)
+                            storageManager.Save(series);
+                    }
                 }
             }
         }
@@ -133,6 +149,7 @@ namespace SeriesTracker.Core
                 var subscriptions = await subscribed.Value;
                 subscriptions.Add(series);
                 series.IsSubscribed = true;
+                OnSubscribed(new SubscriptionChangedEventArgs(series));
                 await Task.Factory.StartNew(() => storageManager.Save(series));
             }
         }
@@ -143,8 +160,27 @@ namespace SeriesTracker.Core
             {
                 var subscriptions = await subscribed.Value;
                 subscriptions.RemoveAllThatMatch(m => series.Id == m.Id);
-                await Task.Factory.StartNew(() => storageManager.Remove(series));
                 series.IsSubscribed = false;
+                OnUnsubscribed(new SubscriptionChangedEventArgs(series));
+                await Task.Factory.StartNew(() => storageManager.Remove(series));
+            }
+        }
+
+        public void OnSubscribed(SubscriptionChangedEventArgs eventArgs)
+        {
+            var handler = Subscribed;
+            if (handler != null)
+            {
+                handler(this, eventArgs);
+            }
+        }
+
+        public void OnUnsubscribed(SubscriptionChangedEventArgs eventArgs)
+        {
+            var handler = Unsubscribed;
+            if (handler != null)
+            {
+                handler(this, eventArgs);
             }
         }
     }
