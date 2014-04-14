@@ -103,7 +103,7 @@
                                 <ColumnDefinition Width="0.6*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48" Grid.ColumnSpan="2"/>
-                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next episode" Grid.Row="1" Style="{StaticResource PhoneTextNormalStyle}" Margin="12,18,0,6"/>
+                            <TextBlock HorizontalAlignment="Left" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Next episode" Grid.Row="1" Style="{StaticResource PhoneTextNormalStyle}" Margin="12,18,0,6"/>
                             <TextBlock Margin="{StaticResource PhoneHorizontalMargin}" Text="{Binding Series.NextEpisodeAirs, Mode=OneWay}" Grid.Row="2" Style="{StaticResource PhoneTextAccentStyle}" />
 
                             <TextBlock TextWrapping="NoWrap" Margin="{StaticResource PhoneHorizontalMargin}" Grid.Row="2" Grid.Column="1" Style="{StaticResource PhoneTextAccentStyle}" Visibility="{Binding Series.RemindersEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" TextAlignment="Right">
@@ -118,7 +118,7 @@
                                     <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                                 </HyperlinkButton.Foreground>
                             </HyperlinkButton>
-                            <TextBlock HorizontalAlignment="Left" Text="Series overview" Grid.Row="5" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}" />
+                            <TextBlock HorizontalAlignment="Left" Grid.ColumnSpan="2" Text="Series overview" Grid.Row="5" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}" />
                             <TextBlock TextWrapping="Wrap" Text="{Binding Series.Overview, Mode=OneWay}" Style="{StaticResource PhoneTextSubtleStyle}" Grid.Row="6" Grid.ColumnSpan="2" Margin="12,0,12,425" />
                         </Grid>
                     </StackPanel>
