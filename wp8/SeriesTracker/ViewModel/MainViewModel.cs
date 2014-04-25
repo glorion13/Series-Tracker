@@ -32,6 +32,7 @@ namespace SeriesTracker
 {
     public class MainViewModel : ViewModelBase
     {
+        // Live Tile stuff
         public class LiveTileUpdater
         {
             private MainViewModel mvm;
@@ -42,6 +43,19 @@ namespace SeriesTracker
             public void updateLiveTile()
             {
 
+            }
+        }
+        private void initialiseLiveTile()
+        {
+            ShellTile PrimaryTile = ShellTile.ActiveTiles.First();
+
+            if (PrimaryTile != null)
+            {
+                StandardTileData tile = new StandardTileData();
+
+                tile.Count = 4;
+                tile.Title = "Series Tracker";
+                PrimaryTile.Update(tile);
             }
         }
 
@@ -73,21 +87,10 @@ namespace SeriesTracker
             set
             {
                 Set(() => Series, ref series, value);
+                Series.CollectionChanged += (e, v) => RaisePropertyChanged(() => SeriesSortedList);
             }
         }
 
-        private bool sortedSeriesListEnabled;
-        public bool SortedSeriesListEnabled
-        {
-            get
-            {
-                return sortedSeriesListEnabled;
-            }
-            set
-            {
-                Set(() => SortedSeriesListEnabled, ref sortedSeriesListEnabled, value);
-            }
-        }
 
         private LongListCollection<TvDbSeries, char> seriesSortedList;
         public LongListCollection<TvDbSeries, char> SeriesSortedList
@@ -95,9 +98,9 @@ namespace SeriesTracker
             get
             {
                 return new LongListCollection<TvDbSeries, char>(
-                    Series.OrderBy(l => l.Title[0]).Select(x => x),
+                    series.OrderBy(l => l.Title[0]).Select(x => x),
                     s => s.Title.ToLower()[0],
-                    "abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList()); ;
+                    "#abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList());
             }
             set
             {
@@ -127,7 +130,8 @@ namespace SeriesTracker
                 IsSearchBoxEnabled = true;
                 searchResults = new SelfSortingObservableCollection<TvDbSeries, float>(s => s.Rating, order: SortOrder.Desc);
                 ltUpdater = new LiveTileUpdater(this);
-                //series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
+                initialiseLiveTile();
+                //series = new SelfSortingObservableCollection<TvDbSeries, string>(s => s.Title);
             }
             else if (IsInDesignMode)
             {
@@ -178,6 +182,10 @@ namespace SeriesTracker
                 });
 
                 searchResults = series;
+                SeriesSortedList = new LongListCollection<TvDbSeries, char>(
+                    Series.OrderBy(l => l.Title[0]).Select(x => x),
+                    s => s.Title.ToLower()[0],
+                    "#abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList());
             }
         }
 
@@ -388,33 +396,6 @@ namespace SeriesTracker
             get
             {
                 return viewSettingsPage ?? (viewSettingsPage = new RelayCommand<TvDbSeries>(s => MessengerInstance.Send(new Uri("/Settings.xaml", UriKind.Relative))));
-            }
-        }
-
-        // Live Tile stuff
-        private void initialiseLiveTile()
-        {
-            ShellTile PrimaryTile = ShellTile.ActiveTiles.First();
-
-            if (PrimaryTile != null)
-            {
-                StandardTileData tile = new StandardTileData();
-
-                tile.Count = 0;
-                tile.Title = "Series Tracker";
-                PrimaryTile.Update(tile);
-            }
-        }
-        private int allUnseenEpisodes;
-        public int AllUnseenEpisodes
-        {
-            get
-            {
-                return allUnseenEpisodes;
-            }
-            set
-            {
-                allUnseenEpisodes = value;
             }
         }
     }

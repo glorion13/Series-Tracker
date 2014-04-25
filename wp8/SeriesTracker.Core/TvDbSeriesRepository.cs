@@ -95,10 +95,10 @@ namespace SeriesTracker.Core
 
         private Task UpdateSeriesAsync(TvDbSeries series)
         {
-            return Task.WhenAll(new[] { tvDb.UpdateData(series), UpdateSubscirptionStatusAsync(series) });
+            return Task.WhenAll(new[] { tvDb.UpdateData(series), UpdateSubscriptionStatusAsync(series) });
         }
 
-        private async Task UpdateSubscirptionStatusAsync(TvDbSeries series)
+        private async Task UpdateSubscriptionStatusAsync(TvDbSeries series)
         {
             var subs = await subscribed.Value;
             var isSubscribed = subs.Any(s => series.Id == s.Id);

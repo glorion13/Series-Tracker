@@ -377,7 +377,7 @@ namespace SeriesTracker
         {
             get
             {
-                var episodeCount = Episodes.Count(e => !e.IsSeen);
+                var episodeCount = Episodes.Count(e => !e.IsSeen && (e.FirstAired < DateTime.Today));
                 return (episodeCount > 0) ? episodeCount.ToString() : "None";
             }
         }
