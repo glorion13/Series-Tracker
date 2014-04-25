@@ -1,22 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using System.Reactive.Linq;
 using System.Collections.Generic;
-using System.Reactive.Subjects;
-using System.Reactive;
 using GalaSoft.MvvmLight.Threading;
 using ReactiveUI;
 
@@ -78,7 +66,7 @@ namespace SeriesTracker
                     {
                         if (beingReordered != item)
                         {
-                            var subscription = item.ObservableForProperty(sortingProperty).SubscribeOnDispatcher().Subscribe(change =>
+                            var subscription = item.ObservableForProperty(sortingProperty).Subscribe(change =>
                             {
                                 DispatcherHelper.UIDispatcher.BeginInvoke(() => {
                                     beingReordered = item;

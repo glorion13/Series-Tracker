@@ -168,6 +168,8 @@ namespace SeriesTracker
                     Banner = "http://thetvdb.com/banners/graphical/121361-g19.jpg",
                     Rating = 5,
                     AirsTime = "9 PM",
+                    RemindersEnabled = true,
+                    NotificationTime = DateTime.Now,
                     AirsDayOfWeek = 6,
                     Episodes = new ObservableCollection<TvDbSeriesEpisode>() {
                         new TvDbSeriesEpisode() {
