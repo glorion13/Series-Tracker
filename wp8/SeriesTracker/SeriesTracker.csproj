@@ -327,6 +327,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="SampleData\" />
+    <Folder Include="View\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\AppResources.en-GB.resx" />

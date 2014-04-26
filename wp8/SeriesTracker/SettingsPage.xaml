@@ -57,11 +57,18 @@
 							<RowDefinition Height="Auto" />
 							<RowDefinition Height="Auto" />
 							<RowDefinition Height="Auto" />
-						</Grid.RowDefinitions>
+
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
 						<TextBlock Text="Enable notifications" VerticalAlignment="Bottom" Margin="{StaticResource LabelMargin}" Style="{StaticResource PhoneTextTitle3Style}"/>
 						<TextBlock Text="Enables reminders for upcoming episodes" TextWrapping="Wrap" Grid.Row="1" VerticalAlignment="Top" Margin="{StaticResource PhoneHorizontalMargin}" Style="{StaticResource PhoneTextSmallStyle}"/>
                         <toolkitPrimitives:ToggleSwitchButton Grid.Column="1" Grid.RowSpan="2" VerticalAlignment="Center" IsChecked="{Binding NotificationsEnabled, Mode=TwoWay}" />
+
+                        <TextBlock Text="Enable alphabetical sorting" VerticalAlignment="Bottom" Grid.Row="2" Margin="{StaticResource LabelMargin}" Style="{StaticResource PhoneTextTitle3Style}"/>
+                        <TextBlock Text="Sorts the series you follow alphabetically" TextWrapping="Wrap" Grid.Row="3" VerticalAlignment="Top" Margin="{StaticResource PhoneHorizontalMargin}" Style="{StaticResource PhoneTextSmallStyle}"/>
+                        <toolkitPrimitives:ToggleSwitchButton Grid.Column="1" Grid.Row="2" Grid.RowSpan="2" VerticalAlignment="Center" IsChecked="{Binding AlphabeticalSortingEnabled, Mode=TwoWay}" />
                     </Grid>
 				</ScrollViewer>
 			</phone:PivotItem>

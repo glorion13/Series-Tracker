@@ -3,12 +3,14 @@ using System.Windows;
 using GalaSoft.MvvmLight;
 using SeriesTracker.Agent;
 using SeriesTracker.Core;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace SeriesTracker
 {
     public class Settings
     {
-        private const string NavigationEnabledKey = "NavigationEnabled";
+        private const string NotificationsEnabledKey = "NotificationsEnabled";
+        private const string AlphabeticalSortingEnabledKey = "AlphabeticalSortingEnabled";
 
         private static Settings instance;
         private readonly IsolatedStorageSettings settings;
@@ -28,9 +30,19 @@ namespace SeriesTracker
             get
             {
                 bool enabled;
-                return settings.TryGetValue(NavigationEnabledKey, out enabled) && enabled;
+                return settings.TryGetValue(NotificationsEnabledKey, out enabled) && enabled;
             }
-            set { settings[NavigationEnabledKey] = value; }
+            set { settings[NotificationsEnabledKey] = value; }
+        }
+
+        public bool AlphabeticalSortingEnabled
+        {
+            get
+            {
+                bool enabled;
+                return settings.TryGetValue(AlphabeticalSortingEnabledKey, out enabled) && enabled;
+            }
+            set { settings[AlphabeticalSortingEnabledKey] = value; }
         }
     }
 
@@ -196,6 +208,20 @@ namespace SeriesTracker
                     reminderService.RemoveAllReminders();
                 }
                 RaisePropertyChanged(() => NotificationsEnabled);
+            }
+        }
+
+        public bool AlphabeticalSortingEnabled
+        {
+            get
+            {
+                return Settings.Instance.AlphabeticalSortingEnabled;
+            }
+            set
+            {
+                Settings.Instance.AlphabeticalSortingEnabled = value;
+                RaisePropertyChanged(() => AlphabeticalSortingEnabled);
+                MessengerInstance.Send<Settings>(Settings.Instance);
             }
         }
 

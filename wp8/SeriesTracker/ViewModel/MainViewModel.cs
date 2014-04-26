@@ -93,6 +93,39 @@ namespace SeriesTracker
             }
         }
 
+        private bool alphabeticalSortingEnabled;
+        public bool AlphabeticalSortingEnabled
+        {
+            get
+            {
+                return alphabeticalSortingEnabled;
+            }
+            set
+            {
+                Set(() => AlphabeticalSortingEnabled, ref alphabeticalSortingEnabled, value);
+                RegularSortingEnabled = !AlphabeticalSortingEnabled;
+            }
+        }
+        private bool regularSortingEnabled;
+        public bool RegularSortingEnabled
+        {
+            get
+            {
+                return alphabeticalSortingEnabled;
+            }
+            set
+            {
+                Set(() => RegularSortingEnabled, ref regularSortingEnabled, value);
+            }
+        }
+
+        public string RegularListingVisibility
+        {
+            get
+            {
+                return Settings.Instance.AlphabeticalSortingEnabled ? "Collapsed" : "Visible";
+            }
+        }
 
         private LongListCollection<TvDbSeries, char> seriesSortedList;
         public LongListCollection<TvDbSeries, char> SeriesSortedList
@@ -101,7 +134,7 @@ namespace SeriesTracker
             {
                 return new LongListCollection<TvDbSeries, char>(
                     series.OrderBy(l => l.Title[0]).Select(x => x),
-                    s => s.Title.ToLower()[0],
+                    s => Char.IsDigit(s.Title.ToLower()[0]) ? '#' : s.Title.ToLower()[0],
                     "#abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList());
             }
             set
@@ -138,6 +171,7 @@ namespace SeriesTracker
                 searchResults = new SelfSortingObservableCollection<TvDbSeries, float>(s => s.Rating, order: SortOrder.Desc);
                 ltUpdater = new LiveTileUpdater(this);
                 initialiseLiveTile();
+                MessengerInstance.Register<Settings>(this, s => AlphabeticalSortingEnabled = s.AlphabeticalSortingEnabled);
                 //series = new SelfSortingObservableCollection<TvDbSeries, string>(s => s.Title);
             }
             else if (IsInDesignMode)
