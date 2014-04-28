@@ -103,27 +103,33 @@ namespace SeriesTracker
             set
             {
                 Set(() => AlphabeticalSortingEnabled, ref alphabeticalSortingEnabled, value);
-                RegularSortingEnabled = !AlphabeticalSortingEnabled;
-            }
-        }
-        private bool regularSortingEnabled;
-        public bool RegularSortingEnabled
-        {
-            get
-            {
-                return alphabeticalSortingEnabled;
-            }
-            set
-            {
-                Set(() => RegularSortingEnabled, ref regularSortingEnabled, value);
+                RaisePropertyChanged(() => AlphabeticalSortingVisibility);
+                RaisePropertyChanged(() => RegularSortingVisibility);
             }
         }
 
-        public string RegularListingVisibility
+        private string alphabeticalSortingVisibility;
+        public string AlphabeticalSortingVisibility
         {
             get
             {
-                return Settings.Instance.AlphabeticalSortingEnabled ? "Collapsed" : "Visible";
+                return AlphabeticalSortingEnabled ? "Visible" : "Collapsed";
+            }
+            set
+            {
+                Set(() => AlphabeticalSortingVisibility, ref alphabeticalSortingVisibility, value);
+            }
+        }
+        private string regularSortingVisibility;
+        public string RegularSortingVisibility
+        {
+            get
+            {
+                return AlphabeticalSortingEnabled ? "Collapsed" : "Visible";
+            }
+            set
+            {
+                Set(() => RegularSortingVisibility, ref regularSortingVisibility, value);
             }
         }
 
@@ -163,6 +169,8 @@ namespace SeriesTracker
             Series = new SelfSortingObservableCollection<TvDbSeries, DateTime?>(s => s.NextEpisodeAirDateTime, new SoonestFirstComparer());
             repository.Subscribed += (sender, args) => DispatcherHelper.UIDispatcher.BeginInvoke(() => Series.Add(args.Series));
             repository.Unsubscribed += (sender, args) => DispatcherHelper.UIDispatcher.BeginInvoke(() => Series.Remove(args.Series));
+
+            AlphabeticalSortingEnabled = Settings.Instance.AlphabeticalSortingEnabled;
 
             if (!IsInDesignMode)
             {
