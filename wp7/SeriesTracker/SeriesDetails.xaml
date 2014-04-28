@@ -221,18 +221,18 @@
                 </Grid>
             </controls:PanoramaItem>
 
-            <i:Interaction.Triggers>
+            <!--<i:Interaction.Triggers>
                 <appBarUtils:SelectedPanoItemChangedTrigger>
                     <appBarUtils:SwitchAppBarAction>
                         <appBarUtils:AppBar Id="0">
                             <appBarUtils:AppBarButton IconUri="{Binding ToggleSubscribeIcon}" Text="{Binding ToggleSubscribeText}" Command="{Binding ToggleSubscribed}" />
                         </appBarUtils:AppBar>
-                        <!--<appBarUtils:AppBar Id="1" Mode="Minimized">
-                </appBarUtils:AppBar>-->
+                        <appBarUtils:AppBar Id="1" Mode="Minimized">
+                </appBarUtils:AppBar>
                     </appBarUtils:SwitchAppBarAction>
                 </appBarUtils:SelectedPanoItemChangedTrigger>
-            </i:Interaction.Triggers>
-            
+            </i:Interaction.Triggers>-->
+
         </controls:Panorama>
     </Grid>
 

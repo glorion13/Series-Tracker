@@ -43,9 +43,9 @@
     <!--LayoutRoot is the root grid where all page content is placed-->
 	<Grid x:Name="LayoutRoot" Background="Transparent">
 		<!--Pivot Control-->
-		<phone:Pivot Title="SERIES TRACKER SETTINGS">
+		<phone:Pivot Title="SERIES TRACKER">
 			<!--Pivot item one-->
-			<phone:PivotItem Header="notifications">
+			<phone:PivotItem Header="SETTINGS">
 				<ScrollViewer>
 					<Grid VerticalAlignment="Top">
 						<Grid.ColumnDefinitions>

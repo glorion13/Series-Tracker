@@ -72,20 +72,65 @@ namespace SeriesTracker
             set
             {
                 Set(() => Series, ref series, value);
+                Series.CollectionChanged += (e, v) => RaisePropertyChanged(() => SeriesSortedList);
             }
         }
 
-        // Started working on creating an easier to navigate 'followed' Series list
-        /*public LongListCollection<TvDbSeries, string> SeriesSortedList
+        private bool alphabeticalSortingEnabled;
+        public bool AlphabeticalSortingEnabled
         {
             get
             {
-                return new LongListCollection<TvDbSeries, string>(
-                    Series.OrderBy(l => l.Title[0]).Select(x => x),
-                    s => s.AirsDayOfWeek.ToString(),
-                    Series.Select(s => s.Title[0].ToString()).ToList());
+                return alphabeticalSortingEnabled;
             }
-        }*/
+            set
+            {
+                Set(() => AlphabeticalSortingEnabled, ref alphabeticalSortingEnabled, value);
+                RaisePropertyChanged(() => AlphabeticalSortingVisibility);
+                RaisePropertyChanged(() => RegularSortingVisibility);
+            }
+        }
+
+        private string alphabeticalSortingVisibility;
+        public string AlphabeticalSortingVisibility
+        {
+            get
+            {
+                return AlphabeticalSortingEnabled ? "Visible" : "Collapsed";
+            }
+            set
+            {
+                Set(() => AlphabeticalSortingVisibility, ref alphabeticalSortingVisibility, value);
+            }
+        }
+        private string regularSortingVisibility;
+        public string RegularSortingVisibility
+        {
+            get
+            {
+                return AlphabeticalSortingEnabled ? "Collapsed" : "Visible";
+            }
+            set
+            {
+                Set(() => RegularSortingVisibility, ref regularSortingVisibility, value);
+            }
+        }
+
+        private LongListCollection<TvDbSeries, char> seriesSortedList;
+        public LongListCollection<TvDbSeries, char> SeriesSortedList
+        {
+            get
+            {
+                return new LongListCollection<TvDbSeries, char>(
+                    series.OrderBy(l => l.Title[0]).Select(x => x),
+                    s => Char.IsDigit(s.Title.ToLower()[0]) ? '#' : s.Title.ToLower()[0],
+                    "#abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList());
+            }
+            set
+            {
+                Set(() => SeriesSortedList, ref seriesSortedList, value);
+            }
+        }
 
         ObservableCollection<TvDbSeries> searchResults;
         public ObservableCollection<TvDbSeries> SearchResults
@@ -102,18 +147,24 @@ namespace SeriesTracker
             connectivityService.InternetDown += connectivityService_InternetDown;
             connectivityService.InternetUp += connectivityService_InternetUp;
 
+            AlphabeticalSortingEnabled = Settings.Instance.AlphabeticalSortingEnabled;
+
             if (!IsInDesignMode)
             {
                 this.repository = repository;
                 IsSearchBoxEnabled = true;
                 searchResults = new SelfSortingObservableCollection<TvDbSeries, float>(s => s.Rating, order: SortOrder.Desc);
                 ltUpdater = new LiveTileUpdater(this);
+
+                MessengerInstance.Register<Settings>(this, s => AlphabeticalSortingEnabled = s.AlphabeticalSortingEnabled);
                 //series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
             }
             else if (IsInDesignMode)
             {
                 searchResults = new ObservableCollection<TvDbSeries>();
                 series = new ObservableCollection<TvDbSeries>();
+
+                AlphabeticalSortingEnabled = false;
 
                 Search = "Simpsons";
                 series.Add(new TvDbSeries()
@@ -363,15 +414,6 @@ namespace SeriesTracker
             }
         }
 
-        private ICommand viewSettingsPage;
-        public ICommand ViewSettingsPage
-        {
-            get
-            {
-                return viewSettingsPage ?? (viewSettingsPage = new RelayCommand<TvDbSeries>(s => MessengerInstance.Send(new Uri("/Settings.xaml", UriKind.Relative))));
-            }
-        }
-
         // Live Tile stuff
         private void initialiseLiveTile()
         {
@@ -386,16 +428,13 @@ namespace SeriesTracker
                 PrimaryTile.Update(tile);
             }
         }
-        private int allUnseenEpisodes;
-        public int AllUnseenEpisodes
+
+        private ICommand viewSettingsPage;
+        public ICommand ViewSettingsPage
         {
             get
             {
-                return allUnseenEpisodes;
-            }
-            set
-            {
-                allUnseenEpisodes = value;
+                return viewSettingsPage ?? (viewSettingsPage = new RelayCommand<TvDbSeries>(s => MessengerInstance.Send(new Uri("/SettingsPage.xaml", UriKind.Relative))));
             }
         }
     }
