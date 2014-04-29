@@ -134,15 +134,20 @@ namespace SeriesTracker
             }
         }
 
-        private bool IsFirstWordThe(string seriesTitle)
+        private bool IsTheFirstWordRedundant(string seriesTitle)
         {
-            return seriesTitle.Split(' ').First().Equals("the", StringComparison.OrdinalIgnoreCase) ? true : false;
+            string firstWord = seriesTitle.Split(' ').First();
+            if (firstWord.Equals("the", StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (firstWord.Equals("a", StringComparison.OrdinalIgnoreCase))
+                return true;
+            return false;
         }
 
         private char GroupByFirstWordOrSecondWord(string seriesTitle)
         {
             string[] words = seriesTitle.Split(' ');
-            return IsFirstWordThe(seriesTitle) ? words[1].ToLower()[0] : words[0].ToLower()[0];
+            return IsTheFirstWordRedundant(seriesTitle) ? words[1].ToLower()[0] : words[0].ToLower()[0];
         }
 
         private char GroupByNumberOrLetter(string seriesTitle)
