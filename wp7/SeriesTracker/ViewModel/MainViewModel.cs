@@ -121,15 +121,34 @@ namespace SeriesTracker
         {
             get
             {
+                // We group the series by first letter. If it's not a letter, add it under '#'.
+                // If the first word is 'the', then use the first letter of the second word.
                 return new LongListCollection<TvDbSeries, char>(
                     series.OrderBy(l => l.Title[0]).Select(x => x),
-                    s => Char.IsDigit(s.Title.ToLower()[0]) ? '#' : s.Title.ToLower()[0],
+                    s => GroupByNumberOrLetter(s.Title),
                     "#abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList());
             }
             set
             {
                 Set(() => SeriesSortedList, ref seriesSortedList, value);
             }
+        }
+
+        private bool IsFirstWordThe(string seriesTitle)
+        {
+            return seriesTitle.Split(' ').First().Equals("the", StringComparison.OrdinalIgnoreCase) ? true : false;
+        }
+
+        private char GroupByFirstWordOrSecondWord(string seriesTitle)
+        {
+            string[] words = seriesTitle.Split(' ');
+            return IsFirstWordThe(seriesTitle) ? words[1].ToLower()[0] : words[0].ToLower()[0];
+        }
+
+        private char GroupByNumberOrLetter(string seriesTitle)
+        {
+            char characterUsedForGrouping = GroupByFirstWordOrSecondWord(seriesTitle);
+            return Char.IsLetter(characterUsedForGrouping) ? characterUsedForGrouping : '#';
         }
 
         ObservableCollection<TvDbSeries> searchResults;
