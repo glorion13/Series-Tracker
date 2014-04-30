@@ -274,6 +274,11 @@ namespace SeriesTracker
 
         public async Task Initialize()
         {
+            if (initialized)
+                return;
+
+            initialized = true;
+
             SetupSearch();
 
             await LoadSubscriptions();
@@ -474,6 +479,8 @@ namespace SeriesTracker
         }
 
         private ICommand viewSettingsPage;
+        private bool initialized;
+
         public ICommand ViewSettingsPage
         {
             get

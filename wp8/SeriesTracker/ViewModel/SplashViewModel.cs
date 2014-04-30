@@ -54,6 +54,9 @@ namespace SeriesTracker
                 {
                     if (!IsInDesignMode)
                     {
+                        if (IsLoaded)
+                            return;
+
                         //kicks of initialization and waits for max 4s, then hides the spalsh screen
                         await Task.WhenAny(main.Initialize(), Task.Delay(4000));
                         IsLoaded = true;
