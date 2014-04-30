@@ -179,6 +179,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AppSettings.cs" />
     <Compile Include="Collections\LongListCollection.cs" />
     <Compile Include="Controls\FeedbackOverlay.xaml.cs">
       <DependentUpon>FeedbackOverlay.xaml</DependentUpon>

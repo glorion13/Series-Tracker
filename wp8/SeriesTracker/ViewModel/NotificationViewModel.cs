@@ -32,16 +32,9 @@ namespace SeriesTracker
             {
                 series.NotificationTime = NotificationTime;
                 series.RemindersEnabled = remindersEnabled;
-                await repository.SaveAsync(series);
-                if (Settings.Instance.NotificationsEnabled)
-                {
-                    reminderService.CreateOrUpdateRemindersAsync();
-                }
-                else
-                {
-                    MessageBox.Show(string.Format(
-                        "Notification for {0} was set up succesfully. Notifications are however currently globally disabled in application settings. Please enable notifications for this setting to take effect.", series.Title));
-                }
+                var saveTask = repository.SaveAsync(series);
+                reminderService.CreateOrUpdateRemindersAsync(); //do not await, does not affect UI, can happen in the background
+                await saveTask;
                 MessengerInstance.Send(new Action<Frame>(a => a.GoBack()));
             });
         }

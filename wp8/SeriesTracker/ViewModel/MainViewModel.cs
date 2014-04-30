@@ -133,7 +133,6 @@ namespace SeriesTracker
             }
         }
 
-        private LongListCollection<TvDbSeries, char> seriesSortedList;
         public LongListCollection<TvDbSeries, char> SeriesSortedList
         {
             get
@@ -144,10 +143,6 @@ namespace SeriesTracker
                     series.OrderBy(l => l.Title[0]).Select(x => x),
                     s => GroupByNumberOrLetter(s.Title),
                     "#abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList());
-            }
-            set
-            {
-                Set(() => SeriesSortedList, ref seriesSortedList, value);
             }
         }
 
@@ -194,7 +189,7 @@ namespace SeriesTracker
             repository.Subscribed += (sender, args) => DispatcherHelper.UIDispatcher.BeginInvoke(() => Series.Add(args.Series));
             repository.Unsubscribed += (sender, args) => DispatcherHelper.UIDispatcher.BeginInvoke(() => Series.Remove(args.Series));
 
-            AlphabeticalSortingEnabled = Settings.Instance.AlphabeticalSortingEnabled;
+            AlphabeticalSortingEnabled = AppSettings.Instance.AlphabeticalSortingEnabled;
 
             if (!IsInDesignMode)
             {
@@ -203,16 +198,15 @@ namespace SeriesTracker
                 searchResults = new SelfSortingObservableCollection<TvDbSeries, float>(s => s.Rating, order: SortOrder.Desc);
                 ltUpdater = new LiveTileUpdater(this);
                 initialiseLiveTile();
-                MessengerInstance.Register<Settings>(this, s => AlphabeticalSortingEnabled = s.AlphabeticalSortingEnabled);
+                MessengerInstance.Register<AppSettings>(this, s => AlphabeticalSortingEnabled = s.AlphabeticalSortingEnabled);
                 //series = new SelfSortingObservableCollection<TvDbSeries, string>(s => s.Title);
             }
             else if (IsInDesignMode)
             {
                 searchResults = new ObservableCollection<TvDbSeries>();
-                series = new ObservableCollection<TvDbSeries>();
 
                 Search = "Simpsons";
-                series.Add(new TvDbSeries()
+                Series.Add(new TvDbSeries()
                 {
                     Title = "Futurama",
                     Image = "http://thetvdb.com/banners/posters/73871-2.jpg",
@@ -247,7 +241,7 @@ namespace SeriesTracker
                     }
                 });
 
-                series.Add(new TvDbSeries()
+                Series.Add(new TvDbSeries()
                 {
                     Title = "Simpsons",
                     Image = "http://thetvdb.com/banners/posters/71663-10.jpg",
@@ -255,10 +249,8 @@ namespace SeriesTracker
                 });
 
                 searchResults = series;
-                SeriesSortedList = new LongListCollection<TvDbSeries, char>(
-                    Series.OrderBy(l => l.Title[0]).Select(x => x),
-                    s => s.Title.ToLower()[0],
-                    "#abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList());
+
+                AlphabeticalSortingEnabled = true;
             }
         }
 
@@ -274,7 +266,7 @@ namespace SeriesTracker
 
         public async Task Initialize()
         {
-            if (initialized)
+            if (initialized || IsInDesignMode)
                 return;
 
             initialized = true;
@@ -283,9 +275,7 @@ namespace SeriesTracker
 
             await LoadSubscriptions();
 
-            if (Settings.Instance.NotificationsEnabled)
-                //background initialization, do not await
-                Task.Factory.StartNew(() => reminderService.CreateOrUpdateRemindersAsync());
+            reminderService.CreateOrUpdateRemindersAsync();
         }
 
         private readonly SemaphoreSlim searchLock = new SemaphoreSlim(1);

@@ -277,7 +277,7 @@
                         <phone:LongListSelector.GroupHeaderTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneMargin}" MinHeight="72" MinWidth="72">
+                                    <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneVerticalMargin}" MinHeight="72" MinWidth="72">
                                         <Border.Background>
                                             <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                                         </Border.Background>

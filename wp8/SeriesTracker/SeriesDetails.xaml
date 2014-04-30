@@ -157,7 +157,7 @@
                                         </toolkit:ContextMenu>
                                     </toolkit:ContextMenuService.ContextMenu>
 
-                                    <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneMargin}" MinHeight="72" MinWidth="72">
+                                    <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneVerticalMargin}" MinHeight="72" MinWidth="72">
                                         <Border.Background>
                                             <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                                         </Border.Background>
@@ -168,7 +168,7 @@
                         </phone:LongListSelector.GroupHeaderTemplate>
                         <phone:LongListSelector.ItemTemplate>
                             <DataTemplate>
-                                <Grid Margin="0,0,-28,12" Width="425">
+                                <Grid Margin="0,0,0,12" Width="435">
                                     <toolkit:ContextMenuService.ContextMenu>
                                         <toolkit:ContextMenu>
                                             <toolkit:MenuItem CommandParameter="{Binding}" Command="{Binding SeriesDetails.ToggleEpisodeSeen, Source={StaticResource Locator}}">
