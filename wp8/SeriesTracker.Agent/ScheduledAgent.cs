@@ -47,10 +47,8 @@ namespace SeriesTracker.Agent
             DispatcherHelper.Initialize();
 
             var repository = new TvDbSeriesRepository(new SeriesStorageManager(), new TvDb(new ConnectivityService()));
-            var reminderService = new ReminderService(repository);
+            await repository.GetSubscribedAsync(false);
 
-            //enabling reminders and simply assuming they are enabled.. otherwise this agent wouldn't run, right?
-            await reminderService.CreateOrUpdateRemindersAsync();
 
             // If debugging is enabled, launch the agent again in one minute.
             #if DEBUG_AGENT

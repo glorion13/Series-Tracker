@@ -86,7 +86,7 @@ namespace SeriesTracker.Core
                 if (updates.ContainsKey(series))
                     update = updates[series];
 
-                var needsUpdating = (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(1));
+                var needsUpdating = (series.Updated == null) || (DateTime.Now - series.Updated > TimeSpan.FromHours(3));
                 if (needsUpdating)
                 {
                     update = UpdateSeriesAsync(series);
