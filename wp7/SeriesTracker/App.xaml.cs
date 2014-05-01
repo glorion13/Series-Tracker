@@ -129,11 +129,8 @@ namespace SeriesTracker
             // Handle navigation failures
             RootFrame.NavigationFailed += RootFrame_NavigationFailed;
 
-            GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<Uri>(this, m =>
-            {
-                RootFrame.Navigate(m);
-            });
-
+            Messenger.Default.Register<Uri>(this, m => RootFrame.Navigate(m));
+            Messenger.Default.Register<Action<Frame>>(this, action => action(RootFrame));
             RxApp.InUnitTestRunner();
 
             App.Current.Resources.Remove("CreateOption");

@@ -91,34 +91,6 @@ namespace SeriesTracker.Core
         public void SaveSeen(TvDbSeries series)
         {
             Save(series);
-
-            /*using (IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForApplication())
-            {
-                var directory = string.Format(@"{0}\{1}", SubscriptionsFolderName, series.Id);
-
-                using (new MutexLock(directory))
-                {
-                    if (!storage.DirectoryExists(directory))
-                        storage.CreateDirectory(directory);
-                }
-
-                var filename = string.Format(@"{0}\seen.xml", directory);
-
-                using (new MutexLock(filename))
-                {
-                    using (var file = new IsolatedStorageFileStream(filename, FileMode.Create, storage))
-                    {
-                        try
-                        {
-                            SeenSerializer.Serialize(file, series.Episodes.Where(e => e.IsSeen).Select(e => e.Id).ToList());
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.WriteLine(e.Message);
-                        }
-                    }
-                }
-            }*/
         }
 
         public void Remove(TvDbSeries series)
@@ -154,13 +126,14 @@ namespace SeriesTracker.Core
                             if (!storage.FileExists(filename))
                                 continue;
 
-                            try {
+                            try
+                            {
                                 using (var stream = new IsolatedStorageFileStream(filename, FileMode.Open, storage))
                                 {
                                     if (stream.Length == 0)
                                         continue;
 
-                                    series = (TvDbSeries) Serializer.Deserialize(stream);
+                                    series = (TvDbSeries)Serializer.Deserialize(stream);
 
                                     var seenFilename = string.Format(@"{0}\{1}\seen.xml", SubscriptionsFolderName, series.Id);
 
@@ -187,7 +160,7 @@ namespace SeriesTracker.Core
                             }
                             catch (InvalidOperationException)
                             {
-                                DispatcherHelper.CheckBeginInvokeOnUI(() =>  MessageBox.Show(
+                                DispatcherHelper.CheckBeginInvokeOnUI(() => MessageBox.Show(
                                     "Error loading series from phone storage. Part of your data will be lost. Very sorry :("));
                                 try
                                 {

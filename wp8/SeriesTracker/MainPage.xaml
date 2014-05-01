@@ -302,6 +302,7 @@
                                 </Setter>
                             </Style>
                         </phone:LongListSelector.JumpListStyle>
+
                     </phone:LongListSelector>
 
                     <phone:LongListSelector Visibility="{Binding RegularSortingVisibility}" ItemTemplate="{StaticResource SeriesTemplate}" Background="Transparent" ItemsSource="{Binding Series}" IsGroupingEnabled="False" toolkit:TiltEffect.IsTiltEnabled="True" HideEmptyGroups="True" LayoutMode="List" Margin="0,1,0,-1">

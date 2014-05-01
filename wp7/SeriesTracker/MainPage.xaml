@@ -19,7 +19,11 @@
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
     SupportedOrientations="Portrait"
 	Orientation="Portrait"
-    shell:SystemTray.IsVisible="False">
+    shell:SystemTray.IsVisible="False"
+    DataContext="{Binding Path=MainViewModel, Source={StaticResource Locator}}"
+    Foreground="{StaticResource PhoneForegroundBrush}" 
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}">
     
 	<phone:PhoneApplicationPage.Resources>
         <DataTemplate x:Key="SeriesTemplate">
@@ -66,10 +70,10 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="next up" Grid.Column="0" Grid.Row="0" Style="{StaticResource PhoneTextSubtleStyle}" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" VerticalAlignment="Bottom" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
-                        <TextBlock Text="{Binding NextEpisodeETA}" Grid.Column="0" Grid.Row="1" d:LayoutOverrides="Width, Height" Style="{StaticResource PhoneTextExtraLargeStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" FontSize="38.667" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
+                        <TextBlock Text="{Binding NextEpisodeETA}" Grid.Column="0" Grid.Row="1" d:LayoutOverrides="Width, Height" Style="{StaticResource PhoneTextExtraLargeStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" FontSize="37" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}"/>
                         <Rectangle Width="1" Height="60" Grid.Column="0" Grid.RowSpan="2" HorizontalAlignment="Right" Fill="White" StrokeThickness="0" Visibility="{Binding NextEpisodeETA, Converter={StaticResource VisibleIfNotNullOrEmpty}}" />
-                        <TextBlock Text="to see" Grid.Column="1" Grid.Row="0" Style="{StaticResource PhoneTextSubtleStyle}" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" VerticalAlignment="Bottom" />
-                        <TextBlock Text="{Binding UnseenEpisodeCount}" d:LayoutOverrides="Width, Height" Grid.Column="1" Grid.Row="1" Style="{StaticResource PhoneTextExtraLargeStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" FontSize="38.667" />
+                        <TextBlock Text="to watch" Grid.Column="1" Grid.Row="0" Style="{StaticResource PhoneTextSubtleStyle}" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" VerticalAlignment="Bottom" />
+                        <TextBlock Text="{Binding UnseenEpisodeCount}" d:LayoutOverrides="Width, Height" Grid.Column="1" Grid.Row="1" Style="{StaticResource PhoneTextExtraLargeStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="{StaticResource PhoneHorizontalMargin}" FontSize="37" />
                         <Rectangle Width="1" Height="60" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Right" Fill="White" StrokeThickness="0" Visibility="{Binding UnseenEpisodeCount, Converter={StaticResource VisibleIfNotNullOrEmpty}}" />
                     </Grid>
                 </Grid>
@@ -192,19 +196,7 @@
         	</DoubleAnimationUsingKeyFrames>
         </Storyboard>
     </phone:PhoneApplicationPage.Resources>
-	<phone:PhoneApplicationPage.FontFamily>
-		<StaticResource ResourceKey="PhoneFontFamilyNormal"/>
-	</phone:PhoneApplicationPage.FontFamily>
-	<phone:PhoneApplicationPage.FontSize>
-		<StaticResource ResourceKey="PhoneFontSizeNormal"/>
-	</phone:PhoneApplicationPage.FontSize>
-	<phone:PhoneApplicationPage.Foreground>
-		<StaticResource ResourceKey="PhoneForegroundBrush"/>
-	</phone:PhoneApplicationPage.Foreground>
-	<phone:PhoneApplicationPage.DataContext>
-		<Binding Mode="OneWay" Path="MainViewModel" Source="{StaticResource Locator}"/>
-	</phone:PhoneApplicationPage.DataContext>
-	<toolkit:TransitionService.NavigationInTransition>
+    <toolkit:TransitionService.NavigationInTransition>
 	    <toolkit:NavigationInTransition>
 	    	<toolkit:NavigationInTransition.Forward>
 	            <toolkit:TurnstileTransition Mode="ForwardIn"/>
@@ -233,66 +225,61 @@
         </Grid.RowDefinitions>
 
         <i:Interaction.Behaviors>
-	        <ec:DataStateBehavior Binding="{Binding IsLoadingSubscriptions}" TrueState="Loading" FalseState="NotLoading" Value="True"/>
-	    </i:Interaction.Behaviors>	
-		<VisualStateManager.VisualStateGroups>
-			<VisualStateGroup x:Name="LoadingSubs">
-				<VisualState x:Name="Loading">
-					<Storyboard>
-						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="subsProgressBar">
-							<DiscreteObjectKeyFrame KeyTime="0">
-								<DiscreteObjectKeyFrame.Value>
-									<Visibility>Visible</Visibility>
-								</DiscreteObjectKeyFrame.Value>
-							</DiscreteObjectKeyFrame>
-						</ObjectAnimationUsingKeyFrames>
-					</Storyboard>
-				</VisualState>
-				<VisualState x:Name="NotLoading"/>
-			</VisualStateGroup>
-			<VisualStateGroup x:Name="Search">
-				<VisualState x:Name="Searching">
-					<Storyboard>
-						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="searchProgressBar">
-							<DiscreteObjectKeyFrame KeyTime="0">
-								<DiscreteObjectKeyFrame.Value>
-									<Visibility>Visible</Visibility>
-								</DiscreteObjectKeyFrame.Value>
-							</DiscreteObjectKeyFrame>
-						</ObjectAnimationUsingKeyFrames>
-						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="searchProgressBar">
-							<DiscreteObjectKeyFrame KeyTime="0">
-								<DiscreteObjectKeyFrame.Value>
-									<Thickness>0,-10,0,0</Thickness>
-								</DiscreteObjectKeyFrame.Value>
-							</DiscreteObjectKeyFrame>
-						</ObjectAnimationUsingKeyFrames>
-					</Storyboard>
-				</VisualState>
-				<VisualState x:Name="NotSearching"/>
-			</VisualStateGroup>
-		</VisualStateManager.VisualStateGroups>
-	 
-		<VisualStateManager.CustomVisualStateManager>
-			<ec:ExtendedVisualStateManager/>
-		</VisualStateManager.CustomVisualStateManager>
-		
-		<controls:Panorama TitleTemplate="{StaticResource PanoramaTitle}">
- 
-			<controls:PanoramaItem Header="followed" toolkit:TiltEffect.IsTiltEnabled="True">
-				<Grid Width="420">
-					<toolkit:PerformanceProgressBar x:Name="subsProgressBar" Height="10" IsIndeterminate="True" VerticalAlignment="Top" Visibility="Collapsed" Margin="0,-10,0,0" />
+            <ec:DataStateBehavior Binding="{Binding IsLoadingSubscriptions}" TrueState="Loading" FalseState="NotLoading" Value="True"/>
+        </i:Interaction.Behaviors>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="LoadingSubs">
+                <VisualState x:Name="Loading">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="subsProgressBar">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Visible</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="NotLoading"/>
+            </VisualStateGroup>
+            <VisualStateGroup x:Name="Search">
+                <VisualState x:Name="Searching">
+                    <Storyboard>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="searchProgressBar">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Visibility>Visible</Visibility>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Margin)" Storyboard.TargetName="searchProgressBar">
+                            <DiscreteObjectKeyFrame KeyTime="0">
+                                <DiscreteObjectKeyFrame.Value>
+                                    <Thickness>0,-10,0,0</Thickness>
+                                </DiscreteObjectKeyFrame.Value>
+                            </DiscreteObjectKeyFrame>
+                        </ObjectAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="NotSearching"/>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
-                    <toolkit:LongListSelector ItemsSource="{Binding SeriesSortedList}" Visibility="{Binding AlphabeticalSortingVisibility}" IsFlatList="False" ShowListFooter="False" ShowListHeader="False" ItemTemplate="{StaticResource SeriesTemplate}">
-                        <toolkit:LongListSelector.GroupItemsPanel>
-                            <ItemsPanelTemplate>
-                                <toolkit:WrapPanel />
-                            </ItemsPanelTemplate>
-                        </toolkit:LongListSelector.GroupItemsPanel>
+        <VisualStateManager.CustomVisualStateManager>
+            <ec:ExtendedVisualStateManager/>
+        </VisualStateManager.CustomVisualStateManager>
+
+        <controls:Panorama TitleTemplate="{StaticResource PanoramaTitle}">
+
+            <controls:PanoramaItem Header="followed" toolkit:TiltEffect.IsTiltEnabled="True">
+                <Grid Width="420">
+                    <toolkit:PerformanceProgressBar x:Name="subsProgressBar" Height="10" IsIndeterminate="True" VerticalAlignment="Top" Visibility="Collapsed" Margin="0,-10,0,0" />
+
+                    <toolkit:LongListSelector Visibility="{Binding AlphabeticalSortingVisibility}" ItemTemplate="{StaticResource SeriesTemplate}" Background="Transparent" ItemsSource="{Binding SeriesSortedList}" IsFlatList="False" ShowListFooter="False" ShowListHeader="False">
                         <toolkit:LongListSelector.GroupHeaderTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneMargin}" MinHeight="72" MinWidth="72">
+                                    <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneVerticalMargin}" MinHeight="72" MinWidth="72">
                                         <Border.Background>
                                             <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                                         </Border.Background>
@@ -303,13 +290,17 @@
                         </toolkit:LongListSelector.GroupHeaderTemplate>
                         <toolkit:LongListSelector.GroupItemTemplate>
                             <DataTemplate>
-                                <Border Margin="{StaticResource PhoneTouchTargetOverhang}"  Padding="{StaticResource PhoneTouchTargetOverhang}" MinWidth="92" MinHeight="92" Background="{Binding GroupBackgroundBrush}">
+                                <Border Margin="{StaticResource PhoneTouchTargetOverhang}"  Padding="{StaticResource PhoneTouchTargetOverhang}" Width="92" Height="92" Background="{Binding GroupBackgroundBrush}">
                                     <TextBlock Text="{Binding Key}" Style="{StaticResource PhoneTextLargeStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                             </DataTemplate>
                         </toolkit:LongListSelector.GroupItemTemplate>
+                        <toolkit:LongListSelector.GroupItemsPanel>
+                            <ItemsPanelTemplate>
+                                <toolkit:WrapPanel />
+                            </ItemsPanelTemplate>
+                        </toolkit:LongListSelector.GroupItemsPanel>
                     </toolkit:LongListSelector>
-
                     <toolkit:LongListSelector ItemsSource="{Binding Series}" Visibility="{Binding RegularSortingVisibility}" IsFlatList="True" ShowListFooter="False" ShowListHeader="False" ItemTemplate="{StaticResource SeriesTemplate}">
                         <toolkit:LongListSelector.GroupItemsPanel>
                             <ItemsPanelTemplate>
@@ -328,14 +319,9 @@
                                 </Grid>
                             </DataTemplate>
                         </toolkit:LongListSelector.GroupHeaderTemplate>
-                        <toolkit:LongListSelector.GroupItemTemplate>
-                            <DataTemplate>
-                                <Border Margin="{StaticResource PhoneTouchTargetOverhang}"  Padding="{StaticResource PhoneTouchTargetOverhang}" MinWidth="92" MinHeight="92" Background="{Binding GroupBackgroundBrush}">
-                                    <TextBlock Text="{Binding Key}" Style="{StaticResource PhoneTextLargeStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
-                            </DataTemplate>
-                        </toolkit:LongListSelector.GroupItemTemplate>
                     </toolkit:LongListSelector>
+
+
                     
                 </Grid>
 			</controls:PanoramaItem>

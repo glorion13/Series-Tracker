@@ -163,6 +163,7 @@ namespace SeriesTracker
 
             return -1 * String.Compare(Title, other.Title, StringComparison.Ordinal);
         }
+
         private readonly Dictionary<TvDbSeriesEpisode, IDisposable> isSeenListeners = new Dictionary<TvDbSeriesEpisode, IDisposable>();
         private ObservableCollection<TvDbSeriesEpisode> episodes;
         public ObservableCollection<TvDbSeriesEpisode> Episodes
@@ -285,7 +286,8 @@ namespace SeriesTracker
             RaisePropertyChanged(() => UnseenEpisodeCount);
         }
 
-        public TvDbSeries() {
+        public TvDbSeries()
+        {
             Episodes = new ObservableCollection<TvDbSeriesEpisode>();
         }
 

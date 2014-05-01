@@ -168,6 +168,8 @@ namespace SeriesTracker
                     Banner = "http://thetvdb.com/banners/graphical/121361-g19.jpg",
                     Rating = 5,
                     AirsTime = "9 PM",
+                    RemindersEnabled = true,
+                    NotificationTime = DateTime.Now,
                     AirsDayOfWeek = 6,
                     Episodes = new ObservableCollection<TvDbSeriesEpisode>() {
                         new TvDbSeriesEpisode() {
@@ -247,7 +249,7 @@ namespace SeriesTracker
                 return new LongListCollection<EpisodeViewModel, string>(
                     series.Episodes.OrderByDescending(l => l.SeriesNumber).ThenByDescending(l => l.FirstAired).Select(x => new EpisodeViewModel(x)),
                     e => e.Episode.SeriesNumber,
-                    series.Episodes.Select(e => e.SeriesNumber).ToList());
+                    series.Episodes.Select(e => e.SeriesNumber).OrderByDescending(sn => sn).ToList());
             }
         }
 

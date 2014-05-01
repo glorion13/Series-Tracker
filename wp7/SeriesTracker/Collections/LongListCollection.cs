@@ -34,7 +34,7 @@ namespace SeriesTracker.Collections
                 groups[key].Add(item);
             }
 
-            foreach (var value in groups.Values.OrderByDescending(i => i.Key.ToString().PadLeft(10, '0')))
+            foreach (var value in groups.Values)
                 this.Add(value);
         }
         #endregion

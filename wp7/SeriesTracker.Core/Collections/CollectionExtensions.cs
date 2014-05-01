@@ -11,7 +11,7 @@ namespace SeriesTracker
 {
     public static class CollectionExtensions
     {
-        public static void RemoveAllThatMatch<T>(this Collection<T> collection, Func<T, bool> predicate)
+        public static void RemoveAllThatMatch<T>(this ICollection<T> collection, Func<T, bool> predicate)
         {
             var matching = collection.Where(predicate).ToList();
             foreach (var match in matching)
@@ -20,24 +20,14 @@ namespace SeriesTracker
             }
         }
 
-        public static async Task AddAll<T>(this Collection<T> collection, IEnumerable<T> items)
+        public static async Task AddAllAsync<T>(this ICollection<T> collection, IEnumerable<T> items)
         {
             if (items == null)
                 return;
 
-            if (DispatcherHelper.UIDispatcher.CheckAccess())
-            {
-                foreach (var item in items)
-                {
-                    collection.Add(item);
-                }
-                return;
-            }
-
             foreach (var item in items)
             {
-                var i = item;
-                await DispatcherHelper.UIDispatcher.InvokeAsync(() => collection.Add(i));                
+                await DispatcherHelper.UIDispatcher.InvokeAsync(() => collection.Add(item));                
             }
         }
     }

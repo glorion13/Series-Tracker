@@ -10,63 +10,79 @@
     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
 	xmlns:ec="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions" 
     xmlns:toolkitPrimitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit"
-    xmlns:appBarUtils="clr-namespace:AppBarUtils;assembly=AppBarUtils"
+	xmlns:appBarUtils="clr-namespace:AppBarUtils;assembly=AppBarUtils"
+	xmlns:local="clr-namespace:SeriesTracker"
 	xmlns:GalaSoft_MvvmLight_Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP71" 
     x:Class="SeriesTracker.SeriesDetails" 
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
     SupportedOrientations="Portrait"  Orientation="Portrait"
     shell:SystemTray.IsVisible="False"
-	DataContext="{Binding SeriesDetails, Source={StaticResource Locator}}">
-	
-	<toolkit:TransitionService.NavigationInTransition>
-	    <toolkit:NavigationInTransition>
-	    	<toolkit:NavigationInTransition.Forward>
-	            <toolkit:TurnstileTransition Mode="ForwardIn"/>
-	        </toolkit:NavigationInTransition.Forward>
-	        <toolkit:NavigationInTransition.Backward>
-	            <toolkit:TurnstileTransition Mode="BackwardIn"/>
-	        </toolkit:NavigationInTransition.Backward>
-	    </toolkit:NavigationInTransition>
-	</toolkit:TransitionService.NavigationInTransition>
-	<toolkit:TransitionService.NavigationOutTransition>
-	    <toolkit:NavigationOutTransition>
-	        <toolkit:NavigationOutTransition.Backward>
-	            <toolkit:TurnstileTransition Mode="BackwardOut"/>
-	        </toolkit:NavigationOutTransition.Backward>
-	        <toolkit:NavigationOutTransition.Forward>
-	            <toolkit:TurnstileTransition Mode="ForwardOut"/>
-	        </toolkit:NavigationOutTransition.Forward>
-	    </toolkit:NavigationOutTransition>
-	</toolkit:TransitionService.NavigationOutTransition>
-	
-	<phone:PhoneApplicationPage.Resources>
-		<DataTemplate x:Key="TitleTemplate">
-			<Grid MinHeight="130"/>
-		</DataTemplate>
-		<DataTemplate x:Key="HeaderTemplate">
-			<Grid>
-				<TextBlock Text="{Binding}" Opacity="0.618"/>
-			</Grid>
-		</DataTemplate>
-		<DataTemplate x:Key="DataTemplate1">
-			<Border Margin="{StaticResource PhoneTouchTargetOverhang}"  Padding="{StaticResource PhoneTouchTargetOverhang}" Width="92" Height="92" Background="{Binding GroupBackgroundBrush}">
-				<TextBlock Text="{Binding Key}" Style="{StaticResource PhoneTextLargeStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-			</Border>
-		</DataTemplate>
+	>
+
+    <phone:PhoneApplicationPage.Resources>
+        <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <DataTemplate x:Key="TitleTemplate">
+            <Grid MinHeight="130"/>
+        </DataTemplate>
+        <DataTemplate x:Key="HeaderTemplate">
+            <Grid>
+                <TextBlock Text="{Binding}" Opacity="0.618"/>
+            </Grid>
+        </DataTemplate>
     </phone:PhoneApplicationPage.Resources>
+
+    <phone:PhoneApplicationPage.DataContext>
+        <Binding Path="SeriesDetails" Source="{StaticResource Locator}"/>
+    </phone:PhoneApplicationPage.DataContext>
+
+    <toolkit:TransitionService.NavigationInTransition>
+        <toolkit:NavigationInTransition>
+            <toolkit:NavigationInTransition.Forward>
+                <toolkit:TurnstileTransition Mode="ForwardIn"/>
+            </toolkit:NavigationInTransition.Forward>
+            <toolkit:NavigationInTransition.Backward>
+                <toolkit:TurnstileTransition Mode="BackwardIn"/>
+            </toolkit:NavigationInTransition.Backward>
+        </toolkit:NavigationInTransition>
+    </toolkit:TransitionService.NavigationInTransition>
+    <toolkit:TransitionService.NavigationOutTransition>
+        <toolkit:NavigationOutTransition>
+            <toolkit:NavigationOutTransition.Backward>
+                <toolkit:TurnstileTransition Mode="BackwardOut"/>
+            </toolkit:NavigationOutTransition.Backward>
+            <toolkit:NavigationOutTransition.Forward>
+                <toolkit:TurnstileTransition Mode="ForwardOut"/>
+            </toolkit:NavigationOutTransition.Forward>
+        </toolkit:NavigationOutTransition>
+    </toolkit:TransitionService.NavigationOutTransition>
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <Grid x:Name="LayoutRoot">
-    	<i:Interaction.Triggers>
-    		<i:EventTrigger>
-    			<ec:ChangePropertyAction TargetName="panorama" PropertyName="Background">
-    				<ec:ChangePropertyAction.Value>
-    					<ImageBrush ImageSource="{Binding SeriesDetails.Series.Banner, Source={StaticResource Locator}, Converter={StaticResource Resizer}, ConverterParameter=860}" AlignmentX="Left" AlignmentY="Top" Stretch="Uniform" Opacity="0.381"/>				
-					</ec:ChangePropertyAction.Value>
-				</ec:ChangePropertyAction>
-    		</i:EventTrigger>
-    	</i:Interaction.Triggers>
+        <i:Interaction.Triggers>
+            <i:EventTrigger>
+                <ec:ChangePropertyAction TargetName="panorama" PropertyName="Background">
+                    <ec:ChangePropertyAction.Value>
+                        <ImageBrush ImageSource="{Binding SeriesDetails.Series.Banner, ConverterParameter=860, Converter={StaticResource Resizer}, Source={StaticResource Locator}}" AlignmentX="Left" AlignmentY="Top" Stretch="Uniform" Opacity="0.381"/>
+                    </ec:ChangePropertyAction.Value>
+                </ec:ChangePropertyAction>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
         <controls:Panorama x:Name="panorama" HeaderTemplate="{StaticResource HeaderTemplate}"  Title="{Binding Series}"  TitleTemplate="{StaticResource TitleTemplate}" RenderTransformOrigin="0.5,0.5">
+            <!--Behaviors for dynamic app bar-->
+            <i:Interaction.Triggers>
+                <appBarUtils:SelectedPanoItemChangedTrigger>
+                    <appBarUtils:SwitchAppBarAction>
+                        <appBarUtils:AppBar Id="0">
+                            <appBarUtils:AppBarButton IconUri="{Binding ToggleSubscribeIcon}" Text="{Binding ToggleSubscribeText}" Command="{Binding ToggleSubscribed}" />
+                            <appBarUtils:AppBarButton IconUri="Toolkit.Content/feature.alarm.png" Text="notification">
+                                <ec:NavigateToPageAction TargetPage="/SeriesNotification.xaml"/>
+                            </appBarUtils:AppBarButton>
+                        </appBarUtils:AppBar>
+                        <!--<appBarUtils:AppBar Id="1" Mode="Minimized">
+                </appBarUtils:AppBar>-->
+                    </appBarUtils:SwitchAppBarAction>
+                </appBarUtils:SelectedPanoItemChangedTrigger>
+            </i:Interaction.Triggers>
             <!--Panorama item one-->
             <controls:PanoramaItem Header=" ">
                 <ScrollViewer>
@@ -83,19 +99,27 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="0.3*"/>
+                                <ColumnDefinition Width="0.6*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48"/>
-                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Next episode" Grid.Row="1" Style="{StaticResource PhoneTextNormalStyle}" Margin="12,18,0,6"/>
-                            <TextBlock Margin="{StaticResource PhoneHorizontalMargin}" Text="{Binding Series.NextEpisodeAirs, Mode=OneWay}" Grid.Row="2" Style="{StaticResource PhoneTextAccentStyle}"/>
-                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="IMDb" Grid.Row="3" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}" d:LayoutOverrides="Height"/>
-                            <HyperlinkButton Content="Read more at IMDb" Command="{Binding OpenImdbLink, Mode=OneWay}" Grid.Row="4" FontSize="20" HorizontalAlignment="Left" >
+                            <TextBlock Text="{Binding Series.Title, Converter={StaticResource ToUpper}}" Margin="{StaticResource PhoneMargin}" Style="{StaticResource PhoneTextTitle2Style}" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue" FontSize="48" Grid.ColumnSpan="2"/>
+                            <TextBlock HorizontalAlignment="Left" Grid.ColumnSpan="2" TextWrapping="Wrap" Text="Next episode" Grid.Row="1" Style="{StaticResource PhoneTextNormalStyle}" Margin="12,18,0,6"/>
+                            <TextBlock Margin="{StaticResource PhoneHorizontalMargin}" Text="{Binding Series.NextEpisodeAirs, Mode=OneWay}" Grid.Row="2" Style="{StaticResource PhoneTextAccentStyle}" />
+
+                            <TextBlock TextWrapping="NoWrap" Margin="{StaticResource PhoneHorizontalMargin}" Grid.Row="2" Grid.Column="1" Style="{StaticResource PhoneTextAccentStyle}" Visibility="{Binding Series.RemindersEnabled, Converter={StaticResource BooleanToVisibilityConverter}}" TextAlignment="Right">
+								<Run FontFamily="Wingdings" FontSize="19" FontWeight="Bold">%</Run>
+                                <Run>&#160;</Run>
+                                <Run Text="{Binding Series.NotificationTime, Mode=OneWay, StringFormat=t}"/>
+                            </TextBlock>
+
+                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="IMDb" Grid.Row="3" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}"/>
+                            <HyperlinkButton Content="Read more at IMDb" Command="{Binding OpenImdbLink, Mode=OneWay}" Grid.Row="4" FontSize="20" HorizontalAlignment="Left" Grid.ColumnSpan="2" >
                                 <HyperlinkButton.Foreground>
                                     <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                                 </HyperlinkButton.Foreground>
                             </HyperlinkButton>
-                            <TextBlock HorizontalAlignment="Left" Text="Series overview" Grid.Row="5" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}" />
-                            <TextBlock TextWrapping="Wrap" Text="{Binding Series.Overview, Mode=OneWay}" Style="{StaticResource PhoneTextSubtleStyle}" Grid.Row="6" />
+                            <TextBlock HorizontalAlignment="Left" Grid.ColumnSpan="2" Text="Series overview" Grid.Row="5" Margin="12,18,0,6" Style="{StaticResource PhoneTextNormalStyle}" />
+                            <TextBlock TextWrapping="Wrap" Text="{Binding Series.Overview, Mode=OneWay}" Style="{StaticResource PhoneTextSubtleStyle}" Grid.Row="6" Grid.ColumnSpan="2" Margin="12,0,12,425" />
                         </Grid>
                     </StackPanel>
                 </ScrollViewer>
@@ -138,7 +162,7 @@
                                         </toolkit:ContextMenu>
                                     </toolkit:ContextMenuService.ContextMenu>
 
-                                    <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneMargin}" MinHeight="72" MinWidth="72">
+                                    <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneVerticalMargin}" MinHeight="72" MinWidth="72">
                                         <Border.Background>
                                             <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                                         </Border.Background>
@@ -149,7 +173,7 @@
                 		</toolkit:LongListSelector.GroupHeaderTemplate>
                 		<toolkit:LongListSelector.ItemTemplate>
                 			<DataTemplate>
-                                <Grid Margin="0,0,-28,12" Width="425">
+                                <Grid Margin="0,0,0,12" Width="435">
 
                                     <toolkit:ContextMenuService.ContextMenu>
                                         <toolkit:ContextMenu>
@@ -187,25 +211,25 @@
                                         <ec:ExtendedVisualStateManager/>
                                     </VisualStateManager.CustomVisualStateManager>
                                     <Grid.RowDefinitions>
-                						<RowDefinition Height="Auto"/>
-                						<RowDefinition />
-                					</Grid.RowDefinitions>
-                					<Grid.ColumnDefinitions>
-                						<ColumnDefinition Width="0.382*"/>
-                						<ColumnDefinition Width="0.618*"/>
-                					</Grid.ColumnDefinitions>
-                					<Image Height="90" Stretch="UniformToFill" x:Name="image">
-                						<Image.Source>
-                							<BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Episode.Image, Converter={StaticResource Resizer}, ConverterParameter=162}" />     						
-                						</Image.Source>
-                					</Image>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.382*"/>
+                                        <ColumnDefinition Width="0.618*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Image Height="90" Stretch="UniformToFill" x:Name="image">
+                                        <Image.Source>
+                                            <BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Episode.Image, ConverterParameter=162, Converter={StaticResource Resizer}}" />
+                                        </Image.Source>
+                                    </Image>
                                     <Grid x:Name="tick" Width="90" Height="90" Visibility="Visible" Opacity="0" CacheMode="BitmapCache">
                                         <Path Data="F1M57.0078,13.3424C54.8815,11.3346,51.5313,11.4283,49.5221,13.5521L23.7877,39.6022 14.0924,31.125C11.8854,29.2084 8.53906,29.4531 6.62231,31.6666 4.71094,33.8776 4.95313,37.224 7.16528,39.1342L19.9426,50.3125C20.1731,50.5131 20.4244,50.6771 20.6809,50.8307 22.8112,52.6484 26.0065,52.5143 27.9479,50.4557L57.2161,20.8295C59.2291,18.7045,59.1354,15.3516,57.0078,13.3424z" Stretch="Uniform" Fill="{StaticResource PhoneAccentBrush}" Width="60" Height="60" Margin="0,0,0,0" />
                                     </Grid>
                                     <Grid VerticalAlignment="Top" Grid.Row="1">
-                						<Rectangle Fill="{StaticResource PhoneAccentBrush}" />
-                						<TextBlock Text="{Binding Episode.Name, Converter={StaticResource ToUpper}}" Foreground="{StaticResource PhoneForegroundBrush}" Style="{StaticResource PhoneTextBlockBase}" Margin="12,10,8,7" TextWrapping="Wrap" TextOptions.TextHintingMode="Animated" FontSize="18.667" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue"/>
-                					</Grid>
+                                        <Rectangle Fill="{StaticResource PhoneAccentBrush}" />
+                                        <TextBlock Text="{Binding Episode.Name, Converter={StaticResource ToUpper}}" Foreground="{StaticResource PhoneForegroundBrush}" Style="{StaticResource PhoneTextBlockBase}" Margin="12,10,8,7" TextWrapping="Wrap" TextOptions.TextHintingMode="Animated" FontSize="18.667" FontFamily="/SeriesTracker;component/Fonts/Fonts.zip#Bebas Neue"/>
+                                    </Grid>
                                     <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="2">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
@@ -220,20 +244,6 @@
                 	</toolkit:LongListSelector>
                 </Grid>
             </controls:PanoramaItem>
-
-            <!--<i:Interaction.Triggers>
-                <appBarUtils:SelectedPanoItemChangedTrigger>
-                    <appBarUtils:SwitchAppBarAction>
-                        <appBarUtils:AppBar Id="0">
-                            <appBarUtils:AppBarButton IconUri="{Binding ToggleSubscribeIcon}" Text="{Binding ToggleSubscribeText}" Command="{Binding ToggleSubscribed}" />
-                        </appBarUtils:AppBar>
-                        <appBarUtils:AppBar Id="1" Mode="Minimized">
-                </appBarUtils:AppBar>
-                    </appBarUtils:SwitchAppBarAction>
-                </appBarUtils:SelectedPanoItemChangedTrigger>
-            </i:Interaction.Triggers>-->
-
         </controls:Panorama>
     </Grid>
-
 </phone:PhoneApplicationPage>

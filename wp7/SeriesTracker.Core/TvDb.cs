@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net;
 using System.Threading;
-using System.Windows.Controls;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
@@ -22,11 +21,12 @@ namespace SeriesTracker
     public class TvDb
     {
         private const string ApiKey = "D8E7E19874B4F438";
+        private const string ApiUrl = "http://www.thetvdb.com/api/" + ApiKey + "/mirrors.xml";
    
         private readonly ConnectivityService connectivityService;
         private readonly AsyncLock key = new AsyncLock();
 
-        private string mirror = null;
+        private string mirror;
 
         private bool initialized;        
 
@@ -46,24 +46,23 @@ namespace SeriesTracker
                         await DoInitialize();
                         initialized = true;
                     }
-                    catch (WebException we)
+                    catch (WebException)
                     {
                         connectivityService.ReportHealth(false);
                     }
                 }
-
+                
                 return initialized;
             }
         }
 
         private async Task DoInitialize()
         {
-            var url = "http://www.thetvdb.com/api/" + ApiKey + "/mirrors.xml";
-            var wc = new WebClient();
-            var result = await wc.DownloadStringTaskAsync(new Uri(url));
+            var result = await new WebClient().DownloadStringTaskAsync(new Uri(ApiUrl));
             connectivityService.ReportHealth(true);
 
-            mirror = await Task.Factory.StartNew(() => (from path in XDocument.Parse(result).Descendants("mirrorpath") select path.Value).First());
+            mirror = await Task.Factory.StartNew(() => (from path in XDocument.Parse(result).Descendants("mirrorpath")
+                           select path.Value).First());
         }
 
         public async Task<IEnumerable<TvDbSeries>> FindSeries(string name)
@@ -92,20 +91,20 @@ namespace SeriesTracker
 
                 return list;
             }
-            catch (WebException we)
+            catch (WebException)
             {
                 connectivityService.ReportHealth(false);
                 return new List<TvDbSeries>();
             }   
         }
 
-        private static List<string> daysOfWeek = CultureInfo.InvariantCulture.DateTimeFormat.DayNames.Select(d => d.ToLowerInvariant()).ToList();
+        private static readonly List<string> DaysOfWeek = CultureInfo.InvariantCulture.DateTimeFormat.DayNames.Select(d => d.ToLowerInvariant()).ToList();
 
         public async Task UpdateData(TvDbSeries series)
         {
             if (!await EnsureInitialized())
                 return;
-            
+
             try
             {
                 var url = string.Format("{0}/api/{1}/series/{2}/all/en.xml", mirror, ApiKey, series.Id);
@@ -123,14 +122,14 @@ namespace SeriesTracker
                 }
                 catch (XmlException)
                 {
-                    
+
                 }
             }
             catch (WebException we)
             {
-                connectivityService.ReportHealth(false); 
+                connectivityService.ReportHealth(false);
                 Console.Out.WriteLine("Error initializing: " + we.Message);
-            }  
+            }
         }
 
         private IEnumerable<Action<TvDbSeries>> GetSeriesUpdates(string response)
@@ -154,55 +153,55 @@ namespace SeriesTracker
 
             yield return
                 doc.ParseAndGetUpdateAction("Airs_DayOfWeek",
-                    value => daysOfWeek.IndexOf(value.Trim().ToLowerInvariant()), (s, v) => s.AirsDayOfWeek = v);
+                    value => DaysOfWeek.IndexOf(value.Trim().ToLowerInvariant()), (s, v) => s.AirsDayOfWeek = v);
 
             yield return
                 doc.ParseAndGetUpdateAction("Runtime", int.Parse, (s, i) => s.Runtime = i);
 
             var episodeUpdates = from newData in doc.Descendants("Episode")
-                select new
-                {
-                    Id = TvDbSeriesEpisode.GetEpisodeId(
-                        newData.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
-                        newData.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault()),
-                    Data = newData
-                };
+                                 select new
+                                 {
+                                     Id = TvDbSeriesEpisode.GetEpisodeId(
+                                         newData.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault(),
+                                         newData.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault()),
+                                     Data = newData
+                                 };
 
             var newEpisodes = (from update in episodeUpdates
-                let name = update.Data.Descendants("EpisodeName").Select(e => e.Value).FirstOrDefault()
-                let seasonNumber = update.Data.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault()
-                let episodeNumber = update.Data.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault()
-                let overview = update.Data.Descendants("Overview").Select(n => n.Value).FirstOrDefault()
-                let firstAired = update.Data.Descendants("FirstAired").Select(n =>
-                {
-                    DateTime date;
-                    if (DateTime.TryParse(n.Value, out date))
-                        return (DateTime?) date;
+                               let name = update.Data.Descendants("EpisodeName").Select(e => e.Value).FirstOrDefault()
+                               let seasonNumber = update.Data.Descendants("SeasonNumber").Select(n => n.Value).FirstOrDefault()
+                               let episodeNumber = update.Data.Descendants("EpisodeNumber").Select(n => n.Value).FirstOrDefault()
+                               let overview = update.Data.Descendants("Overview").Select(n => n.Value).FirstOrDefault()
+                               let firstAired = update.Data.Descendants("FirstAired").Select(n =>
+                               {
+                                   DateTime date;
+                                   if (DateTime.TryParse(n.Value, out date))
+                                       return (DateTime?)date;
 
-                    return null;
-                }).FirstOrDefault()
-                let image = update.Data.Descendants("filename").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault()
+                                   return null;
+                               }).FirstOrDefault()
+                               let image = update.Data.Descendants("filename").Select(n => string.Format("{0}/banners/{1}", mirror, n.Value)).FirstOrDefault()
                                select (Func<IList<TvDbSeriesEpisode>, TvDbSeriesEpisode>)(episodes =>
-                {
-                    var episode = episodes.FirstOrDefault(e => e.Id == update.Id);
-                    if (episode == null)
-                    {
-                        episode = new TvDbSeriesEpisode();
-                    }
-                    else
-                    {
-                        episodes.Remove(episode);
-                    }
+                               {
+                                   var episode = episodes.FirstOrDefault(e => e.Id == update.Id);
+                                   if (episode == null)
+                                   {
+                                       episode = new TvDbSeriesEpisode();
+                                   }
+                                   else
+                                   {
+                                       episodes.Remove(episode);
+                                   }
 
-                    episode.Name = name;
-                    episode.SeriesNumber = seasonNumber;
-                    episode.EpisodeNumber = episodeNumber;
-                    episode.Description = overview;
-                    episode.FirstAired = firstAired;
-                    episode.Image = image;
+                                   episode.Name = name;
+                                   episode.SeriesNumber = seasonNumber;
+                                   episode.EpisodeNumber = episodeNumber;
+                                   episode.Description = overview;
+                                   episode.FirstAired = firstAired;
+                                   episode.Image = image;
 
-                    return episode;
-                })).ToList();
+                                   return episode;
+                               })).ToList();
 
             yield return s =>
             {

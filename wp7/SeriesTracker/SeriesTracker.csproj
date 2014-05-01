@@ -135,12 +135,15 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AppSettings.cs" />
     <Compile Include="Collections\LongListCollection.cs" />
     <Compile Include="Controls\FeedbackOverlay.xaml.cs">
       <DependentUpon>FeedbackOverlay.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\IntToBeforeAfterAirTimeConverter.cs" />
     <Compile Include="Converters\ResizeImageUrlConverter.cs" />
     <Compile Include="Converters\BooleanToSeenConverter.cs" />
+    <Compile Include="Converters\TimeSpanToAirTimeDeltaConverter.cs" />
     <Compile Include="Converters\VisibleIfNotNullOrEmptyCoverter.cs" />
     <Compile Include="Converters\UppercaseConverter.cs" />
     <Compile Include="Converters\NoneIfZero.cs" />
@@ -158,6 +161,9 @@
     <Compile Include="SeriesDetails.xaml.cs">
       <DependentUpon>SeriesDetails.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SeriesNotification.xaml.cs">
+      <DependentUpon>SeriesNotification.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SettingsPage.xaml.cs">
       <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
@@ -165,6 +171,7 @@
       <DependentUpon>SplashPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\AboutViewModel.cs" />
+    <Compile Include="ViewModel\NotificationViewModel.cs" />
     <Compile Include="ViewModel\SeriesDetailsViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\SettingsViewModel.cs" />
@@ -189,6 +196,8 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SeriesDetails.xaml">
+    </Page>
+    <Page Include="SeriesNotification.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -251,6 +260,10 @@
     <Content Include="SplashScreenImage.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SeriesTracker.Agent\SeriesTracker.Agent.csproj">
+      <Project>{EAEA755B-818F-405E-9297-90F15CC5A825}</Project>
+      <Name>SeriesTracker.Agent</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SeriesTracker.Core\SeriesTracker.Core.csproj">
       <Project>{34D61BBF-D269-4543-BA61-D537642E54DF}</Project>
       <Name>SeriesTracker.Core</Name>

@@ -131,7 +131,7 @@ namespace SeriesTracker
 
             if (other.SeriesNumber == null)
                 return 1;
-
+                
 
             var seriesOrder = -1 * String.Compare(SeriesNumber, other.SeriesNumber, StringComparison.Ordinal);
 

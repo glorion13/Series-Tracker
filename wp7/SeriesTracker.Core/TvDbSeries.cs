@@ -178,7 +178,7 @@ namespace SeriesTracker
                 isSeenListeners.Clear();
 
                 Set(() => Episodes, ref episodes, value);
-                
+
                 episodes.CollectionChanged += OnEpisodesCollectionChanged;
                 foreach (var episode in episodes)
                 {
@@ -378,6 +378,29 @@ namespace SeriesTracker
         {
             get { return nextEpisodeAirs; }
             protected set { Set(() => NextEpisodeAirs, ref nextEpisodeAirs, value); }
+        }
+
+        private bool remindersEnabled;
+        public bool RemindersEnabled
+        {
+            get { return remindersEnabled; }
+            set { Set(() => RemindersEnabled, ref remindersEnabled, value); }
+        }
+
+        private DateTime? notificationTime;
+        /// <summary>
+        /// Of interest is only the *time* component of this DateTime property.
+        /// </summary>
+        public DateTime? NotificationTime
+        {
+            get
+            {
+                return notificationTime;
+            }
+            set
+            {
+                Set(() => NotificationTime, ref notificationTime, value);
+            }
         }
     }
 }

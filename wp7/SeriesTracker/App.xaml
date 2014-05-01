@@ -9,17 +9,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
   <!--Application Resources-->
-    <Application.Resources>
-        <ResourceDictionary>
-        	<BitmapCreateOptions x:Key="CreateOption">DelayCreation</BitmapCreateOptions> 
-            <app:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
-            <app:UppercaseConverter x:Key="ToUpper" />
-            <app:BooleanToSeenConverter x:Key="BooleanToSeen" />
-            <app:VisibleIfNotNullOrEmptyConverter x:Key="VisibleIfNotNullOrEmpty" />
-			<app:ResizeImageUrlConverter x:Key="Resizer" />
-			<Thickness x:Key="LabelMargin">12,18,12,6</Thickness>
-        </ResourceDictionary>
-    </Application.Resources>
+  <Application.Resources>
+    <ResourceDictionary>
+      <BitmapCreateOptions x:Key="CreateOption">DelayCreation</BitmapCreateOptions>
+      <app:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
+      <app:UppercaseConverter x:Key="ToUpper" />
+      <app:BooleanToSeenConverter x:Key="BooleanToSeen" />
+      <app:VisibleIfNotNullOrEmptyConverter x:Key="VisibleIfNotNullOrEmpty" />
+      <app:ResizeImageUrlConverter x:Key="Resizer" />
+      <Thickness x:Key="LabelMargin">12,18,12,6</Thickness>
+    </ResourceDictionary>
+  </Application.Resources>
   <Application.ApplicationLifetimeObjects>
     <!--Required object that handles lifetime events for the application-->
     <shell:PhoneApplicationService Launching="Application_Launching" Closing="Application_Closing" Activated="Application_Activated" Deactivated="Application_Deactivated" />

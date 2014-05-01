@@ -26,12 +26,15 @@ using GalaSoft.MvvmLight.Threading;
 using System.Windows.Navigation;
 using System.Threading.Tasks;
 using Microsoft.Phone.Shell;
+using SeriesTracker.Agent;
+using SeriesTracker.Core;
 using SeriesTracker.Collections;
 
 namespace SeriesTracker
 {
     public class MainViewModel : ViewModelBase
     {
+        // Live Tile stuff
         public class LiveTileUpdater
         {
             private MainViewModel mvm;
@@ -44,9 +47,24 @@ namespace SeriesTracker
 
             }
         }
+        private void initialiseLiveTile()
+        {
+            ShellTile PrimaryTile = ShellTile.ActiveTiles.First();
+
+            if (PrimaryTile != null)
+            {
+                StandardTileData tile = new StandardTileData();
+
+                tile.Count = 4;
+                tile.Title = "Series Tracker";
+                PrimaryTile.Update(tile);
+            }
+        }
 
         private readonly TvDbSeriesRepository repository;
         private readonly ConnectivityService connectivityService;
+        private readonly ReminderService reminderService;
+        private readonly AgentScheduler agentScheduler;
         private LiveTileUpdater ltUpdater;
 
         private bool connectionDown;
@@ -116,21 +134,16 @@ namespace SeriesTracker
             }
         }
 
-        private LongListCollection<TvDbSeries, char> seriesSortedList;
         public LongListCollection<TvDbSeries, char> SeriesSortedList
         {
             get
             {
-                // We group the series by first letter. If it's not a letter, add it under '#'.
+                // We group the series by first letter. If it's a symbol or number, add it under '#'.
                 // If the first word is 'the', then use the first letter of the second word.
                 return new LongListCollection<TvDbSeries, char>(
                     series.OrderBy(l => l.Title[0]).Select(x => x),
                     s => GroupByNumberOrLetter(s.Title),
                     "#abcdefghijklmnopqrstuvwxyz".ToCharArray().OrderBy(l => l).ToList());
-            }
-            set
-            {
-                Set(() => SeriesSortedList, ref seriesSortedList, value);
             }
         }
 
@@ -165,13 +178,19 @@ namespace SeriesTracker
             }
         }
 
-        public MainViewModel(TvDbSeriesRepository repository, ConnectivityService connectivityService)
+        public MainViewModel(TvDbSeriesRepository repository, ConnectivityService connectivityService, ReminderService reminderService, AgentScheduler agentScheduler)
         {
             this.connectivityService = connectivityService;
+            this.reminderService = reminderService;
+            this.agentScheduler = agentScheduler;
             connectivityService.InternetDown += connectivityService_InternetDown;
             connectivityService.InternetUp += connectivityService_InternetUp;
 
-            AlphabeticalSortingEnabled = Settings.Instance.AlphabeticalSortingEnabled;
+            Series = new SelfSortingObservableCollection<TvDbSeries, DateTime?>(s => s.NextEpisodeAirDateTime, new SoonestFirstComparer());
+            repository.Subscribed += (sender, args) => DispatcherHelper.UIDispatcher.BeginInvoke(() => Series.Add(args.Series));
+            repository.Unsubscribed += (sender, args) => DispatcherHelper.UIDispatcher.BeginInvoke(() => Series.Remove(args.Series));
+
+            AlphabeticalSortingEnabled = AppSettings.Instance.AlphabeticalSortingEnabled;
 
             if (!IsInDesignMode)
             {
@@ -180,18 +199,15 @@ namespace SeriesTracker
                 searchResults = new SelfSortingObservableCollection<TvDbSeries, float>(s => s.Rating, order: SortOrder.Desc);
                 ltUpdater = new LiveTileUpdater(this);
 
-                MessengerInstance.Register<Settings>(this, s => AlphabeticalSortingEnabled = s.AlphabeticalSortingEnabled);
-                //series = new SelfSortingObservableCollection<SeriesRecord, string>(s => s.Series.Title);
+                MessengerInstance.Register<AppSettings>(this, s => AlphabeticalSortingEnabled = s.AlphabeticalSortingEnabled);
+                //series = new SelfSortingObservableCollection<TvDbSeries, string>(s => s.Title);
             }
             else if (IsInDesignMode)
             {
                 searchResults = new ObservableCollection<TvDbSeries>();
-                series = new ObservableCollection<TvDbSeries>();
-
-                AlphabeticalSortingEnabled = false;
 
                 Search = "Simpsons";
-                series.Add(new TvDbSeries()
+                Series.Add(new TvDbSeries()
                 {
                     Title = "Futurama",
                     Image = "http://thetvdb.com/banners/posters/73871-2.jpg",
@@ -226,7 +242,7 @@ namespace SeriesTracker
                     }
                 });
 
-                series.Add(new TvDbSeries()
+                Series.Add(new TvDbSeries()
                 {
                     Title = "Simpsons",
                     Image = "http://thetvdb.com/banners/posters/71663-10.jpg",
@@ -234,6 +250,8 @@ namespace SeriesTracker
                 });
 
                 searchResults = series;
+
+                AlphabeticalSortingEnabled = true;
             }
         }
 
@@ -249,8 +267,16 @@ namespace SeriesTracker
 
         public async Task Initialize()
         {
-            await LoadSubscriptions();
+            if (initialized || IsInDesignMode)
+                return;
+
+            initialized = true;
+
             SetupSearch();
+
+            await LoadSubscriptions();
+
+            reminderService.CreateOrUpdateRemindersAsync();
         }
 
         private readonly AsyncLock searchLock = new AsyncLock();
@@ -302,7 +328,7 @@ namespace SeriesTracker
 
             token.ThrowIfCancellationRequested();
 
-            await searchResults.AddAll(results.Keys);
+            await searchResults.AddAllAsync(results.Keys);
 
             token.ThrowIfCancellationRequested();
 
@@ -319,7 +345,8 @@ namespace SeriesTracker
 
             try
             {
-                Series = await repository.GetSubscribedAsync();
+                var subscribed = await repository.GetSubscribedAsync();
+                await Series.AddAllAsync(subscribed);
             }
             finally
             {
@@ -410,7 +437,7 @@ namespace SeriesTracker
                     else
                     {
                         //series.Remove(series.FirstOrDefault(old => old.Series.Id == s.Id));
-                        repository.UnsubscribeAsync(s); 
+                        repository.UnsubscribeAsync(s);
                     }
                 }));
             }
@@ -438,22 +465,9 @@ namespace SeriesTracker
             }
         }
 
-        // Live Tile stuff
-        private void initialiseLiveTile()
-        {
-            ShellTile PrimaryTile = ShellTile.ActiveTiles.First();
-
-            if (PrimaryTile != null)
-            {
-                StandardTileData tile = new StandardTileData();
-
-                tile.Count = 0;
-                tile.Title = "Series Tracker";
-                PrimaryTile.Update(tile);
-            }
-        }
-
         private ICommand viewSettingsPage;
+        private bool initialized;
+
         public ICommand ViewSettingsPage
         {
             get
