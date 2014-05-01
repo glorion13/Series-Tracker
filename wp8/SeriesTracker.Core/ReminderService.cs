@@ -30,22 +30,30 @@ namespace SeriesTracker.Core
                 if (!series.RemindersEnabled)
                     continue;
 
-                var nextEpisode = series.Episodes.Where(e => e.FirstAired >= DateTime.Today).OrderBy(e => e.FirstAired).FirstOrDefault();
-                if (nextEpisode == null || nextEpisode.FirstAired == null)
+                var nextEpisodes = series.Episodes.Where(e => e.FirstAired >= DateTime.Today).OrderBy(e => e.FirstAired).Take(2).ToList();
+
+
+                if (nextEpisodes.Count == 0)
                     continue;
 
                 var notificationTime = series.NotificationTime ?? DateTime.Today.AddHours(18);
 
-                var notificationDate = nextEpisode.FirstAired.Value.Date + notificationTime.TimeOfDay;
-
-                var reminder = new Reminder(series.Id)
+                foreach (var episode in nextEpisodes)
                 {
-                    BeginTime = notificationDate,
-                    Title = series.Title,
-                    Content = string.Format("New {0} episode is up!", series.Title)
-                };
+                    if (episode.FirstAired == null)
+                        continue;
 
-                ScheduledActionService.Add(reminder);
+                    var notificationDate = episode.FirstAired.Value.Date + notificationTime.TimeOfDay;
+
+                    var reminder = new Reminder(series.Id + episode.Id)
+                    {
+                        BeginTime = notificationDate,
+                        Title = series.Title,
+                        Content = string.Format("New {0} episode is up!", series.Title)
+                    };
+
+                    ScheduledActionService.Add(reminder);
+                }
             }
         }
 
