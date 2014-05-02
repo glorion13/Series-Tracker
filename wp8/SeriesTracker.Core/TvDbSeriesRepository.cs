@@ -145,7 +145,7 @@ namespace SeriesTracker.Core
 
         public async Task SubscribeAsync(TvDbSeries series)
         {
-            using (await subscriptionLock.LockAsync())
+            using (await ioLock.DisposableWaitAsync())
             {
                 var subscriptions = await subscribed.Value;
                 subscriptions.Add(series);

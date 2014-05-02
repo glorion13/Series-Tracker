@@ -230,7 +230,6 @@
       <Numbers>True</Numbers>
       <Punctuation>True</Punctuation>
     </BlendEmbeddedFont>
-    <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\AppManifest.xml" />
     <None Include="Properties\WMAppManifest.xml" />
