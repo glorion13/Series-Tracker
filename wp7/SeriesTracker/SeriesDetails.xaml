@@ -29,6 +29,11 @@
                 <TextBlock Text="{Binding}" Opacity="0.618"/>
             </Grid>
         </DataTemplate>
+        <DataTemplate x:Key="DataTemplate1">
+            <Border Margin="{StaticResource PhoneTouchTargetOverhang}" Padding="{StaticResource PhoneTouchTargetOverhang}" Width="92" Height="92" Background="{Binding GroupBackgroundBrush}">
+                <TextBlock Text="{Binding Key}" Style="{StaticResource PhoneTextLargeStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+        </DataTemplate>
     </phone:PhoneApplicationPage.Resources>
 
     <phone:PhoneApplicationPage.DataContext>

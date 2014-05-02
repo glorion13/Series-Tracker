@@ -28,8 +28,8 @@ namespace SeriesTracker.Core
         private readonly SeriesStorageManager storageManager;
         private readonly TvDb tvDb;
         private readonly Dictionary<TvDbSeries, Task> updates;
-        private readonly AsyncLock ioLock = new AsyncLock();
-        private readonly AsyncLazy<List<TvDbSeries>> subscribed;
+        private readonly Nito.AsyncEx.AsyncLock ioLock = new Nito.AsyncEx.AsyncLock();
+        private readonly Nito.AsyncEx.AsyncLazy<List<TvDbSeries>> subscribed;
 
         public event EventHandler<SubscriptionChangedEventArgs> Subscribed;
         public event EventHandler<SubscriptionChangedEventArgs> Unsubscribed;
@@ -41,9 +41,9 @@ namespace SeriesTracker.Core
 
             updates = new Dictionary<TvDbSeries, Task>();
 
-            subscribed = new AsyncLazy<List<TvDbSeries>>(async () =>
+            subscribed = new Nito.AsyncEx.AsyncLazy<List<TvDbSeries>>(async () =>
             {
-                var subscriptions = await Task.Run(() => storageManager.GetSavedSeries());
+                var subscriptions = await Task.Factory.StartNew<IEnumerable<TvDbSeries>>(() => storageManager.GetSavedSeries());
                 var collection = new List<TvDbSeries>(subscriptions);
                 return collection;
             });
@@ -115,7 +115,7 @@ namespace SeriesTracker.Core
 
         private Task UpdateSeriesAsync(TvDbSeries series)
         {
-            return TaskEx.WhenAll(new[] { tvDb.UpdateData(series), UpdateSubscirptionStatusAsync(series) });
+            return TaskEx.WhenAll(new[] { tvDb.UpdateData(series), UpdateSubscriptionStatusAsync(series) });
         }
 
         private async Task UpdateSubscriptionStatusAsync(TvDbSeries series)
@@ -149,7 +149,7 @@ namespace SeriesTracker.Core
 
         public async Task SubscribeAsync(TvDbSeries series)
         {
-            using (await subscriptionLock.LockAsync())
+            using (await ioLock.LockAsync())
             {
                 var subscriptions = await subscribed;
                 subscriptions.Add(series);

@@ -15,6 +15,7 @@ using Microsoft.Phone.Shell;
 using GalaSoft.MvvmLight.Threading;
 using System.Windows.Media.Imaging;
 using ReactiveUI;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace SeriesTracker
 {
