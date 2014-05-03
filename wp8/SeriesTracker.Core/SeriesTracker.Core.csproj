@@ -168,7 +168,6 @@
     <Compile Include="ConnectivityService.cs" />
     <Compile Include="MutexLock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReminderService.cs" />
     <Compile Include="SemaphoreSlimExtensions.cs" />
     <Compile Include="SeriesStorageManager.cs" />
     <Compile Include="SharedSettings.cs" />
