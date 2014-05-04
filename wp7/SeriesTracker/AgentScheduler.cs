@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO.IsolatedStorage;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using Microsoft.Phone.Scheduler;
 
-namespace SeriesTracker.Agent
+namespace SeriesTracker
 {
     public class AgentScheduler
     {
