@@ -11,15 +11,6 @@ using GalaSoft.MvvmLight.Threading;
 
 namespace SeriesTracker.Core
 {
-    public sealed class SubscriptionChangedEventArgs : EventArgs
-    {
-        public SubscriptionChangedEventArgs(TvDbSeries series)
-        {
-            Series = series;
-        }
-
-        public TvDbSeries Series { get; private set; }
-   }
     public class TvDbSeriesRepository
     {
         private readonly SeriesStorageManager storageManager;

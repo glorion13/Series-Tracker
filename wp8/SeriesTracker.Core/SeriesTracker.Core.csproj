@@ -161,7 +161,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgentScheduler.cs" />
     <Compile Include="AsyncLazy.cs" />
     <Compile Include="Collections\CollectionExtensions.cs" />
     <Compile Include="Collections\SelfSortingObservableCollection.cs" />
@@ -172,6 +171,7 @@
     <Compile Include="SeriesStorageManager.cs" />
     <Compile Include="SharedSettings.cs" />
     <Compile Include="SoonestFirstComparer.cs" />
+    <Compile Include="SubscriptionChangedEventArgs.cs" />
     <Compile Include="TvDb.cs" />
     <Compile Include="TvDbSeries.cs" />
     <Compile Include="TvDbSeriesEpisode.cs" />
