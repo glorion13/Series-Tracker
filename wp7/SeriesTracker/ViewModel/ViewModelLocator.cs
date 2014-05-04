@@ -12,9 +12,11 @@
   See http://www.galasoft.ch/mvvm
 */
 
+using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Threading;
 using GalaSoft.MvvmLight.Ioc;
+using Microsoft.Phone.Shell;
 using Microsoft.Practices.ServiceLocation;
 using SeriesTracker.Agent;
 using SeriesTracker.Core;
@@ -39,7 +41,10 @@ namespace SeriesTracker
 
             SimpleIoc.Default.Register<TvDbSeriesRepository>();
             SimpleIoc.Default.Register<SeriesStorageManager>(true);
-            
+
+            var storageManager = SimpleIoc.Default.GetInstance<SeriesStorageManager>();
+            storageManager.StorageFailure += (sender, e) => MessageBox.Show(e.Message);
+
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<SeriesDetailsViewModel>(true);
             SimpleIoc.Default.Register<NotificationViewModel>(true);

@@ -13,6 +13,16 @@ using GalaSoft.MvvmLight.Threading;
 
 namespace SeriesTracker.Core
 {
+    public sealed class StorageFailureEventArgs : EventArgs
+    {
+        public StorageFailureEventArgs(string message)
+        {
+            Message = message;
+        }
+
+        public string Message { get; private set; }
+    }
+
     public sealed class SeriesStorageManager
     {
         const string SubscriptionsFolderName = "subscriptions";
@@ -34,6 +44,9 @@ namespace SeriesTracker.Core
                 return seenSerializer ?? (seenSerializer = new XmlSerializer(typeof(List<string>)));
             }
         }
+
+        public event EventHandler<StorageFailureEventArgs> StorageFailure;
+
 
         public SeriesStorageManager()
         {
@@ -81,6 +94,9 @@ namespace SeriesTracker.Core
                         catch (Exception e)
                         {
                             Debug.WriteLine(e.Message);
+                            OnStorageFailure(
+                                new StorageFailureEventArgs(
+                                    "Failed to save data to local storage. Any modifications or updates will be lost, sorry! :("));
                         }
                     }
                 }
@@ -160,8 +176,6 @@ namespace SeriesTracker.Core
                             }
                             catch (InvalidOperationException)
                             {
-                                DispatcherHelper.CheckBeginInvokeOnUI(() => MessageBox.Show(
-                                    "Error loading series from phone storage. Part of your data will be lost. Very sorry :("));
                                 try
                                 {
                                     storage.DeleteFile(filename);
@@ -170,6 +184,9 @@ namespace SeriesTracker.Core
                                 {
 
                                 }
+                                OnStorageFailure(
+                                    new StorageFailureEventArgs(
+                                        "Error loading series from phone storage. Part of your data will be lost. Very sorry :("));
                                 continue;
                             }
                         }
@@ -177,6 +194,14 @@ namespace SeriesTracker.Core
                         yield return series;
                     }
                 }
+            }
+        }
+
+        private void OnStorageFailure(StorageFailureEventArgs storageFailureEventArgs)
+        {
+            if (StorageFailure != null)
+            {
+                StorageFailure(this, storageFailureEventArgs);
             }
         }
     }

@@ -205,5 +205,4 @@ namespace SeriesTracker.Core
             }
         }
     }
-
 }
