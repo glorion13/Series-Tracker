@@ -6,8 +6,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeriesTracker.Core", "SeriesTracker.Core\SeriesTracker.Core.csproj", "{34D61BBF-D269-4543-BA61-D537642E54DF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B500E416-2D86-4553-90E5-C738CA55ACD9}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeriesTracker.Agent", "SeriesTracker.Agent\SeriesTracker.Agent.csproj", "{EAEA755B-818F-405E-9297-90F15CC5A825}"
 EndProject
 Global

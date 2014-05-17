@@ -1,25 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
-using System.Reactive.Concurrency;
-using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using System.Reactive.Linq;
 using System.Collections.Generic;
-using System.Reactive.Subjects;
-using System.Reactive;
-using System.Windows.Threading;
 using GalaSoft.MvvmLight.Threading;
 using ReactiveUI;
 
@@ -113,6 +98,15 @@ namespace SeriesTracker
                         }
                     }
                     break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    foreach (var subscription in subscriptions)
+                    {
+                        subscription.Value.Dispose();
+                    }
+                    subscriptions.Clear();
+                    break;
+
             }
             base.OnCollectionChanged(e);
         }
