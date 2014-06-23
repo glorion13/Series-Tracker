@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.IsolatedStorage;
 using Microsoft.Phone.Scheduler;
+using System.ComponentModel;
 
 namespace SeriesTracker
 {
