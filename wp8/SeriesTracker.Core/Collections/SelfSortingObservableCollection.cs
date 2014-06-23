@@ -98,6 +98,15 @@ namespace SeriesTracker
                         }
                     }
                     break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    foreach (var subscription in subscriptions)
+                    {
+                        subscription.Value.Dispose();
+                    }
+                    subscriptions.Clear();
+                    break;
+
             }
             base.OnCollectionChanged(e);
         }
