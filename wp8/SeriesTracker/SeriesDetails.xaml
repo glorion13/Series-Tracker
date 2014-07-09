@@ -132,36 +132,35 @@
                         <phone:LongListSelector.GroupHeaderTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <toolkit:ContextMenuService.ContextMenu>
-                                        <toolkit:ContextMenu>
-                                            <toolkit:MenuItem CommandParameter="{Binding Key}" Command="{Binding SeriesDetails.MarkSeenSeason, Source={StaticResource Locator}}">
-                                                <toolkit:MenuItem.Header>
-                                                    <TextBlock Text="Mark season as seen" />
-                                                </toolkit:MenuItem.Header>
-                                            </toolkit:MenuItem>
-                                            <toolkit:MenuItem CommandParameter="{Binding Key}" Command="{Binding SeriesDetails.UnmarkSeenSeason, Source={StaticResource Locator}}">
-                                                <toolkit:MenuItem.Header>
-                                                    <TextBlock Text="Mark season as not seen" />
-                                                </toolkit:MenuItem.Header>
-                                            </toolkit:MenuItem>
-                                            <toolkit:MenuItem Command="{Binding SeriesDetails.MarkSeenAll, Source={StaticResource Locator}}">
-                                                <toolkit:MenuItem.Header>
-                                                    <TextBlock Text="Mark all seasons as seen" />
-                                                </toolkit:MenuItem.Header>
-                                            </toolkit:MenuItem>
-                                            <toolkit:MenuItem Command="{Binding SeriesDetails.UnmarkSeenAll, Source={StaticResource Locator}}">
-                                                <toolkit:MenuItem.Header>
-                                                    <TextBlock Text="Mark all seasons as not seen" />
-                                                </toolkit:MenuItem.Header>
-                                            </toolkit:MenuItem>
-                                        </toolkit:ContextMenu>
-                                    </toolkit:ContextMenuService.ContextMenu>
-
                                     <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="{StaticResource PhoneVerticalMargin}" MinHeight="72" MinWidth="72">
                                         <Border.Background>
                                             <SolidColorBrush Color="{StaticResource PhoneAccentColor}"/>
                                         </Border.Background>
-                                        <TextBlock Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource PhoneTextLargeStyle}" FontSize="37.333" Margin="12,13,12,11" />
+                                        <TextBlock x:Name="JumplistHeader" Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource PhoneTextLargeStyle}" FontSize="37.333" Margin="12,13,12,11" />
+                                        <toolkit:ContextMenuService.ContextMenu>
+                                            <toolkit:ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                                <toolkit:MenuItem CommandParameter="{Binding Text, ElementName=JumplistHeader}" Command="{Binding SeriesDetails.MarkSeenSeason, Source={StaticResource Locator}}">
+                                                    <toolkit:MenuItem.Header>
+                                                        <TextBlock Text="Mark season as seen" />
+                                                    </toolkit:MenuItem.Header>
+                                                </toolkit:MenuItem>
+                                                <toolkit:MenuItem CommandParameter="{Binding Text, ElementName=JumplistHeader}" Command="{Binding SeriesDetails.UnmarkSeenSeason, Source={StaticResource Locator}}">
+                                                    <toolkit:MenuItem.Header>
+                                                        <TextBlock Text="Mark season as not seen" />
+                                                    </toolkit:MenuItem.Header>
+                                                </toolkit:MenuItem>
+                                                <toolkit:MenuItem Command="{Binding SeriesDetails.MarkSeenAll, Source={StaticResource Locator}}">
+                                                    <toolkit:MenuItem.Header>
+                                                        <TextBlock Text="Mark all seasons as seen" />
+                                                    </toolkit:MenuItem.Header>
+                                                </toolkit:MenuItem>
+                                                <toolkit:MenuItem Command="{Binding SeriesDetails.UnmarkSeenAll, Source={StaticResource Locator}}">
+                                                    <toolkit:MenuItem.Header>
+                                                        <TextBlock Text="Mark all seasons as not seen" />
+                                                    </toolkit:MenuItem.Header>
+                                                </toolkit:MenuItem>
+                                            </toolkit:ContextMenu>
+                                        </toolkit:ContextMenuService.ContextMenu>
                                     </Border>
                                 </Grid>
                             </DataTemplate>
@@ -243,7 +242,7 @@
                                     <Setter.Value>
                                         <DataTemplate>
                                             <Border Margin="{StaticResource PhoneTouchTargetOverhang}"  Padding="{StaticResource PhoneTouchTargetOverhang}" Width="92" Height="92" Background="{Binding GroupBackgroundBrush}">
-                                                <TextBlock Text="{Binding Key, UpdateSourceTrigger=Explicit}" Style="{StaticResource PhoneTextLargeStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding Key}" Style="{StaticResource PhoneTextLargeStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Border>
                                         </DataTemplate>
                                     </Setter.Value>
