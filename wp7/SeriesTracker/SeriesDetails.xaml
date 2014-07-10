@@ -143,13 +143,13 @@
                 			<DataTemplate>
                                 <Grid>
                                     <toolkit:ContextMenuService.ContextMenu>
-                                        <toolkit:ContextMenu>
-                                            <toolkit:MenuItem CommandParameter="{Binding Key}" Command="{Binding SeriesDetails.MarkSeenSeason, Source={StaticResource Locator}}">
+                                        <toolkit:ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                                            <toolkit:MenuItem CommandParameter="{Binding Text, ElementName=JumplistHeader}" Command="{Binding SeriesDetails.MarkSeenSeason, Source={StaticResource Locator}}">
                                                 <toolkit:MenuItem.Header>
                                                     <TextBlock Text="Mark season as seen" />
                                                 </toolkit:MenuItem.Header>
                                             </toolkit:MenuItem>
-                                            <toolkit:MenuItem CommandParameter="{Binding Key}" Command="{Binding SeriesDetails.UnmarkSeenSeason, Source={StaticResource Locator}}">
+                                            <toolkit:MenuItem CommandParameter="{Binding Text, ElementName=JumplistHeader}" Command="{Binding SeriesDetails.UnmarkSeenSeason, Source={StaticResource Locator}}">
                                                 <toolkit:MenuItem.Header>
                                                     <TextBlock Text="Mark season as not seen" />
                                                 </toolkit:MenuItem.Header>
@@ -241,7 +241,7 @@
                                             <RowDefinition />
                                         </Grid.RowDefinitions>
                                         <TextBlock TextWrapping="NoWrap" Text="{Binding Episode.FirstAired}" Grid.Row="0" Style="{StaticResource PhoneTextLargeStyle}" FontSize="16" VerticalAlignment="Top" />
-                                        <TextBlock TextWrapping="Wrap" Text="{Binding Episode.Description}" Grid.Row="1" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" VerticalAlignment="Top" />
+                                        <TextBlock TextWrapping="Wrap" Text="{Binding Episode.Description}" Grid.Row="1" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" VerticalAlignment="Top" Margin="12,0,30,0" />
                                     </Grid>
                                 </Grid>
                 			</DataTemplate>

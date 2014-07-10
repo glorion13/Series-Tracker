@@ -228,7 +228,7 @@
                                             <RowDefinition />
                                         </Grid.RowDefinitions>
                                         <TextBlock TextWrapping="NoWrap" Text="{Binding Episode.FirstAired}" Grid.Row="0" Style="{StaticResource PhoneTextLargeStyle}" FontSize="16" VerticalAlignment="Top" />
-                                        <TextBlock TextWrapping="Wrap" Text="{Binding Episode.Description}" Grid.Row="1" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" VerticalAlignment="Top" Margin="12,0,31,0" />
+                                        <TextBlock TextWrapping="Wrap" Text="{Binding Episode.Description}" Grid.Row="1" Style="{StaticResource PhoneTextSmallStyle}" FontSize="16" VerticalAlignment="Top" Margin="12,0,30,0" />
                                     </Grid>
                                 </Grid>
                             </DataTemplate>
