@@ -148,7 +148,21 @@ namespace SeriesTracker
             if (other.EpisodeNumber == null)
                 return 1;
 
-            return -1 * String.Compare(EpisodeNumber, other.EpisodeNumber, StringComparison.Ordinal);
+            if (FirstAired == null)
+            {
+                if (other.FirstAired == null)
+                    return 0;
+                return -1;
+            }
+
+            if (other.FirstAired == null)
+                return 1;
+
+            if (FirstAired == other.FirstAired)
+                return 0;
+
+            return -1 * (FirstAired > other.FirstAired ? 1 : -1);
+            //return -1 * String.Compare(EpisodeNumber, other.EpisodeNumber, StringComparison.Ordinal);
         }
     }
 }

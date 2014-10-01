@@ -12,7 +12,7 @@
     <Tasks>
       <DefaultTask Name="_default" NavigationPage="SplashPage.xaml" ActivationPolicy="Resume" />
       <ExtendedTask Name="PeriodicAgent">
-        <BackgroundServiceAgent Specifier="ScheduledTaskAgent" Source="SeriesTracker.Agent" Type ="SeriesTracker.Agent.ScheduledAgent" Name="Series Tracker Agent" />
+        <BackgroundServiceAgent Specifier="ScheduledTaskAgent" Source="SeriesTracker.Agent" Type="SeriesTracker.Agent.ScheduledAgent" Name="Series Tracker Agent" />
       </ExtendedTask>
     </Tasks>
     <Tokens>
