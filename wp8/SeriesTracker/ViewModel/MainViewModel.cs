@@ -392,11 +392,23 @@ namespace SeriesTracker
                 {
                     if (a.Key == Key.Enter)
                     {
-                        IsSearchBoxEnabled = false;
-                        IsSearchBoxEnabled = true;
+                        SearchVisualsCommand();
                     }
                 }));
             }
+        }
+        private RelayCommand searchVisuals;
+        public RelayCommand SearchVisuals
+        {
+            get
+            {
+                return searchVisuals ?? new RelayCommand(SearchVisualsCommand);
+            }
+        }
+        public void SearchVisualsCommand()
+        {
+            IsSearchBoxEnabled = false;
+            IsSearchBoxEnabled = true;
         }
 
         private bool isLoadingSubscriptions = true;

@@ -337,13 +337,16 @@
                         <phone:LongListSelector.ListHeaderTemplate>
                             <DataTemplate>
                                 <Grid>
-                                    <TextBox Text="{Binding Search, Mode=TwoWay}" InputScope="Search" IsEnabled="{Binding IsSearchBoxEnabled}" Margin="0,-12,0,0">
+                                    <toolkit:PhoneTextBox Text="{Binding Search, Mode=TwoWay}" ActionIcon="Search.png" Hint="Search" ActualHintVisibility="Visible" InputScope="Search" IsEnabled="{Binding IsSearchBoxEnabled}" Margin="0,-12,0,0">
                                         <i:Interaction.Triggers>
                                             <i:EventTrigger EventName="KeyDown">
                                                 <commands:EventToCommand Command="{Binding CloseSoftKeyboard}" PassEventArgsToCommand="True" />
                                             </i:EventTrigger>
+                                            <i:EventTrigger EventName="ActionIconTapped">
+                                                <commands:EventToCommand Command="{Binding SearchVisuals}" />
+                                            </i:EventTrigger>
                                         </i:Interaction.Triggers>
-                                    </TextBox>
+                                    </toolkit:PhoneTextBox>
                                 </Grid>
                             </DataTemplate>
                         </phone:LongListSelector.ListHeaderTemplate>

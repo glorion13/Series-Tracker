@@ -185,6 +185,8 @@
     <Compile Include="Controls\FeedbackOverlay.xaml.cs">
       <DependentUpon>FeedbackOverlay.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\DateTimeToDateConverter.cs" />
+    <Compile Include="Converters\EpisodeNumberToEpisodeStringConverter.cs" />
     <Compile Include="Converters\IntToBeforeAfterAirTimeConverter.cs" />
     <Compile Include="Converters\ResizeImageUrlConverter.cs" />
     <Compile Include="Converters\BooleanToSeenConverter.cs" />
@@ -301,6 +303,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="imdb.ico" />
+    <Content Include="Search.png" />
     <Content Include="tile_medium.png" />
     <Content Include="tile_small.png" />
     <Content Include="tile_wide.png" />

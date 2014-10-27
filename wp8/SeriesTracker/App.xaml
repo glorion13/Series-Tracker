@@ -6,6 +6,8 @@
       <BitmapCreateOptions x:Key="CreateOption">DelayCreation</BitmapCreateOptions>
       <app:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
       <app:UppercaseConverter x:Key="ToUpper" />
+      <app:DateTimeToDateConverter x:Key="DateOnly" />
+      <app:EpisodeNumberToEpisodeStringConverter x:Key="ToEpisodeString" />
       <app:BooleanToSeenConverter x:Key="BooleanToSeen" />
       <app:VisibleIfNotNullOrEmptyConverter x:Key="VisibleIfNotNullOrEmpty" />
       <app:ResizeImageUrlConverter x:Key="Resizer" />

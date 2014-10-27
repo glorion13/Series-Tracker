@@ -176,6 +176,7 @@ namespace SeriesTracker
                             Name = "Episode 1",
                             SeriesNumber = "1",
                             EpisodeNumber = "1",
+                            FirstAired = DateTime.Today,
                             Description = "Jack and Chloe have a plan in place to eliminate the terrorist threat before any more attacks rock London. With no time to spare and lives on the line, Jack and Kate pursue crucial leads in an attempt to gain the upper hand on the incredibly intense circumstances. Meanwhile, key players reveal their true colors.",
                             Image = "http://thetvdb.com/banners/episodes/121361/3254641.jpg"
                         },
@@ -191,6 +192,7 @@ namespace SeriesTracker
                             Name = "Episode 1",
                             SeriesNumber = "2",
                             EpisodeNumber = "1",
+                            FirstAired = DateTime.Today,
                             Description = "Jack and Chloe have a plan in place to eliminate the terrorist threat before any more attacks rock London. With no time to spare and lives on the line, Jack and Kate pursue crucial leads in an attempt to gain the upper hand on the incredibly intense circumstances. Meanwhile, key players reveal their true colors.",
                             Image = "http://thetvdb.com/banners/episodes/121361/3254641.jpg"
                         }
