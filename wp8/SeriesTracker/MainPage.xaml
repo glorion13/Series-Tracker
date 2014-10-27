@@ -55,7 +55,8 @@
                     </Grid.ColumnDefinitions>
                     <Image Grid.RowSpan="3" Stretch="UniformToFill">
                         <Image.Source>
-                            <BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Image, ConverterParameter=100, Converter={StaticResource Resizer}}" />
+                            <BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Image}" />
+                            <!--ConverterParameter=100, Converter={StaticResource Resizer}-->
                         </Image.Source>
                     </Image>
                     <TextBlock Text="{Binding Title}" d:LayoutOverrides="Width, Height"  HorizontalAlignment="Right" Grid.ColumnSpan="2" Margin="12,6,12,0" Style="{StaticResource PhoneTextNormalStyle}"/>
@@ -125,7 +126,8 @@
         			</i:Interaction.Triggers>
         			<Image Height="100" Width="100" Stretch="UniformToFill" x:Name="image">
         				<Image.Source>
-        					<BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Image, ConverterParameter=100, Converter={StaticResource Resizer}}" />
+                            <BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Image}" />
+                            <!--ConverterParameter=100, Converter={StaticResource Resizer}-->
         				</Image.Source>
         			</Image>
         			<Grid x:Name="tick" Width="100" Height="100" Visibility="Visible" Opacity="0" CacheMode="BitmapCache">

@@ -54,9 +54,9 @@ namespace SeriesTracker
             {
                 StandardTileData tile = new StandardTileData();
 
-                tile.Count = 4;
+                //tile.Count = 4;
                 tile.Title = "Series Tracker";
-                PrimaryTile.Update(tile);
+                //PrimaryTile.Update(tile);
             }
         }
 
@@ -199,7 +199,7 @@ namespace SeriesTracker
                 ltUpdater = new LiveTileUpdater(this);
                 initialiseLiveTile();
                 MessengerInstance.Register<AppSettings>(this, s => AlphabeticalSortingEnabled = s.AlphabeticalSortingEnabled);
-                //series = new SelfSortingObservableCollection<TvDbSeries, string>(s => s.Title);
+                series = new SelfSortingObservableCollection<TvDbSeries, string>(s => s.Title);
             }
             else if (IsInDesignMode)
             {

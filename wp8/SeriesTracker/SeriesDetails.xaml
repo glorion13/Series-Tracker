@@ -62,7 +62,8 @@
             <i:EventTrigger>
                 <ec:ChangePropertyAction TargetName="panorama" PropertyName="Background">
                     <ec:ChangePropertyAction.Value>
-                        <ImageBrush ImageSource="{Binding SeriesDetails.Series.Banner, ConverterParameter=860, Converter={StaticResource Resizer}, Source={StaticResource Locator}}" AlignmentX="Left" AlignmentY="Top" Stretch="Uniform" Opacity="0.381"/>
+                        <ImageBrush ImageSource="{Binding SeriesDetails.Series.Banner, Source={StaticResource Locator}}" AlignmentX="Left" AlignmentY="Top" Stretch="Uniform" Opacity="0.381"/>
+                        <!--ConverterParameter=860, Converter={StaticResource Resizer}-->
                     </ec:ChangePropertyAction.Value>
                 </ec:ChangePropertyAction>
             </i:EventTrigger>
@@ -212,7 +213,8 @@
                                     </Grid.ColumnDefinitions>
                                     <Image Height="90" Stretch="UniformToFill" x:Name="image">
                                         <Image.Source>
-                                            <BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Episode.Image, ConverterParameter=162, Converter={StaticResource Resizer}}" />
+                                            <BitmapImage CreateOptions="{StaticResource CreateOption}" UriSource="{Binding Episode.Image}" />
+                                            <!--, ConverterParameter=162, Converter={StaticResource Resizer}-->
                                         </Image.Source>
                                     </Image>
                                     <Grid x:Name="tick" Width="90" Height="90" Visibility="Visible" Opacity="0" CacheMode="BitmapCache">
