@@ -16,6 +16,7 @@ namespace SeriesTracker
     {
         public AboutViewModel()
         {
+            //GoogleAnalytics.EasyTracker.GetTracker().SendView("MainPage");
         }
 
         private ICommand openEmailLink;

@@ -33,6 +33,8 @@ Facebook: https://www.facebook.com/SeriesTracker
 Changes list etc
 ---------------------
 
+* Added Google Analytics SDK.
+
 Change entire description, and add 'series notifier' as a search term - fixed
 
 General refactoring - done
@@ -57,6 +59,9 @@ Backporting to wp7.1:
 Fixed bugs:
 - Completely solved ordering problem, and should not crash if the string can't be converted to an int
 
+Known bugs:
+- Alphabetical view doesn't immediately update when a series is added, need to close and re-open app
+
 Ideas for new features
 -------------------------
 
@@ -64,7 +69,7 @@ Spanish localisation (mexico biggest market + all the other spanish speaking mar
 Episode details always scroll to the top 'seen' episode
 Tutorial + welcome screen
 Lost series section - tell you what you missed last week from your favorites?
-Today section - what's on today?
+Today or This Week section - what's on today?
 Recommend new series - explore section
 Add donations option, so that we get moneyz!
 Add some sharing options e.g. new episode is out!

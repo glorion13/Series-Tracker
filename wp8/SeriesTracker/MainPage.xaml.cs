@@ -26,7 +26,7 @@ namespace SeriesTracker
         // Load data for the ViewModel Items
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
-
+            GoogleAnalytics.EasyTracker.GetTracker().SendView("MainPage");
         }
     }
 }

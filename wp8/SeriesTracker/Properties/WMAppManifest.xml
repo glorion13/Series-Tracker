@@ -4,7 +4,7 @@
   <Languages xmlns="">
     <Language code="en-GB" />
   </Languages>
-  <App xmlns="" ProductID="{3715797b-f831-4e64-98a4-39446456c0b5}" Title="Series Tracker" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="Ondrej Pialek, Alexandros Gouvatsos" Description="Hate missing your favourite TV shows? Series Tracker helps you keep track of the TV series and shows you watch! Know exactly what and when to watch it!" Publisher="Series Tracker" PublisherID="{9a8cdc5c-76ad-4b13-9555-8aa193604d87}">
+  <App xmlns="" ProductID="{3715797b-f831-4e64-98a4-39446456c0b5}" Title="Series Tracker" RuntimeType="Silverlight" Version="1.2.4.0" Genre="apps.normal" Author="Ondrej Pialek, Alexandros Gouvatsos" Description="Hate missing your favourite TV shows? Series Tracker helps you keep track of the TV series and shows you watch! Know exactly what and when to watch it!" Publisher="Series Tracker" PublisherID="{9a8cdc5c-76ad-4b13-9555-8aa193604d87}">
     <IconPath IsRelative="true" IsResource="false">ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />
