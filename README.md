@@ -54,9 +54,8 @@ Backporting to wp7.1:
 - add dates next to episodes, correct order - fixed
 - jumplist bug - fixed
 
-New bugs:
-- Date bug (test with Dance Moms) - fixed
-- Remove unfollow from context menu, doesn't work (seems okay now, kept the feature)
+Fixed bugs:
+- Completely solved ordering problem, and should not crash if the string can't be converted to an int
 
 Ideas for new features
 -------------------------

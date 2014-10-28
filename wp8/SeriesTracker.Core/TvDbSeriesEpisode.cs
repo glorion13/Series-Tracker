@@ -120,49 +120,62 @@ namespace SeriesTracker
 
         public int CompareTo(TvDbSeriesEpisode other)
         {
+            // Check if the other episode is null
             if (other == null) return 1;
 
+            // Compare in terms of season order
             if (SeriesNumber == null)
             {
                 if (other.SeriesNumber == null)
                     return 0;
                 return -1;
             }
-
             if (other.SeriesNumber == null)
                 return 1;
-                
-
-            var seriesOrder = -1 * String.Compare(SeriesNumber, other.SeriesNumber, StringComparison.Ordinal);
-
-            if (seriesOrder != 0)
-                return seriesOrder;
-
-            if (EpisodeNumber == null)
+            try
             {
-                if (other.EpisodeNumber == null)
-                    return 0;
-                return -1;
+                if (Convert.ToInt32(SeriesNumber) != Convert.ToInt32(other.SeriesNumber))
+                    return -1 * (Convert.ToInt32(SeriesNumber) > Convert.ToInt32(other.SeriesNumber) ? 1 : -1);
+            }
+            catch (FormatException e)
+            {
+                if (SeriesNumber != other.SeriesNumber)
+                    return -1 * String.Compare(EpisodeNumber, other.EpisodeNumber, StringComparison.OrdinalIgnoreCase);
             }
 
-            if (other.EpisodeNumber == null)
-                return 1;
-
+            // Compare in terms of date order
             if (FirstAired == null)
             {
                 if (other.FirstAired == null)
                     return 0;
                 return -1;
             }
-
             if (other.FirstAired == null)
                 return 1;
+            if (FirstAired != other.FirstAired)
+                return -1 * (FirstAired > other.FirstAired ? 1 : -1);
 
-            if (FirstAired == other.FirstAired)
-                return 0;
-
-            return -1 * (FirstAired > other.FirstAired ? 1 : -1);
-            //return -1 * String.Compare(EpisodeNumber, other.EpisodeNumber, StringComparison.Ordinal);
+            // Compare in terms of episode order
+            if (EpisodeNumber == null)
+            {
+                if (other.EpisodeNumber == null)
+                    return 0;
+                return -1;
+            }
+            if (other.EpisodeNumber == null)
+                return 1;
+            try
+            {
+                if (Convert.ToInt32(EpisodeNumber) == Convert.ToInt32(other.EpisodeNumber))
+                    return 0;
+                return -1 * (Convert.ToInt32(EpisodeNumber) > Convert.ToInt32(other.EpisodeNumber) ? 1 : -1);
+            }
+            catch (FormatException e)
+            {
+                if (EpisodeNumber == other.EpisodeNumber)
+                    return 0;
+                return -1 * String.Compare(EpisodeNumber, other.EpisodeNumber, StringComparison.OrdinalIgnoreCase);
+            }
         }
     }
 }

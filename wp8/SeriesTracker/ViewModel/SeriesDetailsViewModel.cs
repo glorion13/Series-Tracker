@@ -249,9 +249,9 @@ namespace SeriesTracker
             get
             {
                 return new LongListCollection<EpisodeViewModel, string>(
-                    series.Episodes.OrderByDescending(l => l.SeriesNumber).ThenByDescending(l => l.FirstAired).Select(x => new EpisodeViewModel(x)),
+                    series.Episodes.OrderByDescending(e => e).Select(e => new EpisodeViewModel(e)),
                     e => e.Episode.SeriesNumber,
-                    series.Episodes.Select(e => e.SeriesNumber).OrderByDescending(sn => sn).ToList());
+                    series.Episodes.OrderBy(e => e).Select(e => e.SeriesNumber).ToList());
             }
         }
 
