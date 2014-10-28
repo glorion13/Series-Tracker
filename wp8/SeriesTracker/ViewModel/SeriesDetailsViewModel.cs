@@ -255,6 +255,19 @@ namespace SeriesTracker
             }
         }
 
+        private TvDbSeriesEpisode lastSeenEpisode;
+        public TvDbSeriesEpisode LastSeenEpisode
+        {
+            get
+            {
+                return series.Episodes[5];
+            }
+            set
+            {
+                Set(() => LastSeenEpisode, ref lastSeenEpisode, value);
+            }
+        }
+
         public Uri ToggleSubscribeIcon
         {
             get

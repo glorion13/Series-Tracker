@@ -61,6 +61,7 @@ Ideas for new features
 -------------------------
 
 Spanish localisation (mexico biggest market + all the other spanish speaking markets)
+Episode details always scroll to the top 'seen' episode
 Tutorial + welcome screen
 Lost series section - tell you what you missed last week from your favorites?
 Today section - what's on today?

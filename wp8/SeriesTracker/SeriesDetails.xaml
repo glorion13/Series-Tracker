@@ -129,7 +129,7 @@
             <!--Panorama item two-->
             <controls:PanoramaItem Header="episodes">
                 <Grid>
-                    <phone:LongListSelector x:Name="episodeList" Background="Transparent" IsGroupingEnabled="True" toolkit:TiltEffect.IsTiltEnabled="True" HideEmptyGroups="True" ItemsSource="{Binding Episodes}" LayoutMode="List">
+                    <phone:LongListSelector x:Name="episodeList" Background="Transparent" SelectedItem="5" IsGroupingEnabled="True" toolkit:TiltEffect.IsTiltEnabled="True" HideEmptyGroups="True" ItemsSource="{Binding Episodes}" LayoutMode="List">
                         <phone:LongListSelector.GroupHeaderTemplate>
                             <DataTemplate>
                                 <Grid>
